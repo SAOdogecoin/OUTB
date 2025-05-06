@@ -903,56 +903,28 @@
         const keysToRemove = new Set();
         selectedDivs.forEach(div => { if (div.dataset.key !== undefined && div.dataset.key !== null) { keysToRemove.add(div.dataset.key); } });
 
-        const noteSeparatorCaptureRegex = new RegExp('(' + noteSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
-        const parts = fullText.split(noteSeparatorCaptureRegex);
-        let remainingText = "";
-        let lastWasSeparator = true; // Assume start is like after a separator
-
-        for (let i = 0; i < parts.length; i++) {
-            if (i % 2 === 0) { // Content part
-                if (!keysToRemove.has(parts[i])) { // Keep this content part
-                    if (!lastWasSeparator && remainingText !== "") { // Add separator if needed
-                         remainingText += noteSeparator.trimEnd(); // Use the actual separator string
-                    }
-                    remainingText += parts[i];
-                    lastWasSeparator = false;
-                } else { // This content part is being removed
-                    // If the next part is a separator, it might also be implicitly removed
-                    // by not adding it if this was the last item.
-                }
-            } else { // Separator part
-                 // Only add separator if the PREVIOUS content part was kept
-                 if (!keysToRemove.has(parts[i-1])) {
-                    // And if the NEXT content part (if exists) will also be kept
-                    if (i + 1 < parts.length && !keysToRemove.has(parts[i+1])) {
-                        remainingText += parts[i]; // This is the separator itself
-                        lastWasSeparator = true;
-                    } else if (i + 1 >= parts.length && remainingText !== "") {
-                        // This separator is at the end, and previous content was kept.
-                        // Don't add trailing separator if it will leave noteArea empty or just a separator.
-                    }
-                 }
-            }
-        }
-        
         // Refined clearing logic: Filter sections and join.
         const allSections = [];
-        let currentSection = "";
+        // let currentSection = ""; // This variable was unused
         fullText.split(noteSeparatorRegex).forEach(s => {
-            if (s.trim() !== "") allSections.push(s); // Store each actual section text
+            // s is the content *between* separators.
+            // If noteArea starts/ends with a separator, or has consecutive separators,
+            // split can produce empty strings. We filter these out.
+            if (s.trim() !== "") {
+                allSections.push(s); // Push the original section text (can have leading/trailing spaces if they were part of the section)
+            }
         });
 
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
-        noteArea.value = remainingSections.join(noteSeparator.trimEnd() + '\n\n').trim(); // Join with \n\n then separator, then trim. Or just use noteSeparator
 
         if (remainingSections.length > 0) {
-             noteArea.value = remainingSections.join(noteSeparator.trimEnd() + noteSeparator); // Join sections with the full separator
+             // Corrected line: Join remaining sections with the single, original noteSeparator
+             noteArea.value = remainingSections.join(noteSeparator);
         } else {
-            noteArea.value = "";
+            noteArea.value = ""; // Clear entirely if no sections remain
         }
 
-
-        countTemplatesNoteTaker(); // Will also save
+        countTemplatesNoteTaker(); // This will re-render the list and save the notes
     }
 
     function downloadAllNotes() {
