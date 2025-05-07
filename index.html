@@ -12,31 +12,31 @@
             --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
             --primary-bg: #ffffff;
             --container-bg: #ffffff;
-            --text-color: #1d1d1f; /* Default black text */
+            --text-color: #1d1d1f; /* Default black text / now also used for topbar bg */
             --secondary-text-color: #6e6e73;
             --placeholder-text-color: #aaaaaf;
-            --accent-blue: #007aff; /* Kept for focus rings, checkboxes, etc. */
+            --accent-blue: #007aff;
             --accent-blue-rgb: 0, 122, 255;
 
-            /* Button Colors - Now Black with White Text */
-            --button-bg: #1d1d1f; /* Black background for buttons */
-            --button-text: #ffffff; /* White text for buttons */
-            --button-border-color: #1d1d1f; /* Match background for solid look */
-            --button-hover-bg: #38383a; /* Slightly lighter black for hover */
+            --button-bg: #1d1d1f;
+            --button-text: #ffffff;
+            --button-border-color: #1d1d1f;
+            --button-hover-bg: #38383a;
             --button-hover-border-color: #38383a;
-            --button-active-bg: #4f4f52; /* Even lighter for active */
+            --button-active-bg: #4f4f52;
             --button-active-border-color: #4f4f52;
-            --button-disabled-bg: #e0e0e0; /* Light grey for disabled */
-            --button-disabled-text: #9e9e9e; /* Darker grey text for disabled */
+            --button-disabled-bg: #e0e0e0;
+            --button-disabled-text: #9e9e9e;
             --button-disabled-border: #e0e0e0;
 
-            --border-color: #d2d2d7; /* General border color (light grey) */
-            --focus-ring-color: rgba(var(--accent-blue-rgb), 0.25);
-            /* Shadows removed as per request */
+            --border-color: #d2d2d7;
+            /* --focus-ring-color: rgba(var(--accent-blue-rgb), 0.25); -- Focus rings removed */
             --base-border-radius: 10px;
             --button-border-radius: 6px;
             --input-border-radius: 6px;
             --top-bar-height: 50px;
+            --top-bar-bg: #1d1d1f; /* Explicitly black for top bar */
+            --top-bar-text-color: #ffffff; /* White text for top bar */
         }
         html { box-sizing: border-box; }
         *, *:before, *:after { box-sizing: inherit; }
@@ -49,14 +49,13 @@
         }
 
         .top-bar {
-            background-color: var(--primary-bg);
+            background-color: var(--top-bar-bg); /* Black top bar */
             padding: 0 24px;
             height: var(--top-bar-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
-            /* border-bottom: 1px solid var(--border-color); Removed */
         }
 
         .top-bar-left {
@@ -65,16 +64,25 @@
             gap: 12px;
         }
 
-        .hamburger-icon {
-            font-size: 1.2em;
-            color: var(--text-color);
+        .icon-placeholder { /* New style for icon placeholder */
+            width: 24px;
+            height: 24px;
+            background-color: var(--secondary-text-color); /* A grey for placeholder */
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--top-bar-text-color); /* White icon/text inside if any */
+            font-size: 12px; /* For any potential symbol inside */
             cursor: pointer;
+             border: 1px solid var(--top-bar-text-color); /* White border for placeholder */
         }
 
+
         .top-bar-title {
-            font-size: 1.3em; /* Increased title size */
+            font-size: 1.3em;
             font-weight: 600;
-            color: var(--text-color);
+            color: var(--top-bar-text-color); /* White title text */
             margin: 0;
         }
 
@@ -82,12 +90,15 @@
             position: relative;
             display: inline-block;
         }
-        /* Specific style for Version 1 button */
+        /* Version button style for black top bar */
+        /* Version button style for black top bar - now styled as a white button */
         .version-button {
-            background-color: var(--primary-bg); /* White background */
-            color: var(--text-color); /* Black text */
+            background-color: #ffffff;         /* NEW: White background */
+            color: var(--text-color);           /* NEW: Black text */
             padding: 6px 12px;
-            border: 1px solid var(--border-color); /* Grey border */
+            border: 1px solid #ffffff;         /* NEW: White border */
+            /* If you want a subtle grey border instead of white, use: */
+            /* border: 1px solid var(--border-color); */
             border-radius: var(--button-border-radius);
             cursor: pointer;
             font-family: var(--system-font);
@@ -97,13 +108,26 @@
             align-items: center;
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
-        .version-button:hover { background-color: #f0f0f0; } /* Light grey hover for white button */
-        .version-button:active { background-color: #e0e0e0; transform: scale(0.97); }
-        .version-button i { margin-left: 6px; font-size: 0.8em; }
+        .version-button:hover {
+            background-color: #f0f0f0;         /* NEW: Light grey hover */
+            border-color: #e0e0e0;             /* NEW: Slightly darker grey border on hover if desired */
+            /* or keep border-color: #ffffff; if you want the border to remain white */
+        }
+        .version-button:active {
+            background-color: #e0e0e0;         /* NEW: Darker grey active */
+            border-color: #d0d0d0;             /* NEW: Even darker for active if desired */
+            /* or keep border-color: #ffffff; */
+            transform: scale(0.97);
+        }
+        .version-button i {
+            margin-left: 6px;
+            font-size: 0.8em;
+            color: var(--text-color);           /* NEW: Black icon */
+        }
 
         .version-dropdown-content {
-            display: none; position: absolute; background-color: var(--primary-bg);
-            min-width: 120px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Kept a light shadow for dropdown */
+            display: none; position: absolute; background-color: var(--primary-bg); /* Dropdown itself is white */
+            min-width: 120px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             z-index: 1001; border-radius: var(--button-border-radius);
             border: 1px solid var(--border-color); right: 0; margin-top: 4px;
         }
@@ -125,32 +149,31 @@
         }
 
         .tool-card-title {
-            display: none; /* Hidden by default, shown on wide screens */
+            display: none;
             font-size: 1.1em;
             font-weight: 600;
             color: var(--text-color);
-            margin: -5px 0 15px 0; /* Adjust to align with card padding */
+            margin: -5px 0 10px 0;
+            /* padding-bottom: 10px; */ /* Removed */
+            /* border-bottom: 1px solid var(--border-color); */ /* Removed */
         }
 
         @media (min-width: 992px) {
             .main-wrapper {
                 flex-direction: row; padding: 24px; gap: 24px; align-items: stretch;
-                /* ... other main-wrapper styles ... */
             }
             .tool-card-title {
-                display: block; /* Show titles on wide screens */
+                display: block;
             }
             .left-column-wrapper {
-                /* OLD: width: 35%; */
-                width: calc(35% - (24px * 0.35)); /* NEW: Adjust for gap. (24px * 0.35 = 8.4px) */
+                width: calc(35% - (24px * 0.35)); /* Adjusted for gap */
                 flex-shrink: 0;
-                gap: 24px; /* This gap is for items *inside* left-column-wrapper, not between left and right columns */
+                gap: 24px;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
                 overflow-y: auto; padding-bottom: 1px;
             }
             .note-taker-tool {
-                /* OLD: width: 65%; */
-                width: calc(65% - (24px * 0.65)); /* NEW: Adjust for gap. (24px * 0.65 = 15.6px) */
+                width: calc(65% - (24px * 0.65)); /* Adjusted for gap */
                 flex-shrink: 0;
                 display: flex; flex-direction: column;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
@@ -159,7 +182,6 @@
              .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
              .merchant-actions-tool #merchantList { height: 220px; }
         }
-        
         @media (max-width: 991px) {
             .top-bar { display: none; }
             .main-wrapper { overflow-y: auto; overflow-x: hidden; max-height: 100vh; }
@@ -170,7 +192,6 @@
 
         .tool-container {
              background-color: var(--container-bg); border-radius: var(--base-border-radius);
-             /* box-shadow: 0 1px 2px var(--shadow-color-light), 0 3px 8px var(--shadow-color-medium); Removed shadow */
              box-shadow: none;
              padding: 20px;
              display: flex; flex-direction: column; position: relative;
@@ -189,8 +210,9 @@
         textarea { font-family: var(--mono-font); resize: vertical; min-height: 100px; }
         textarea::placeholder, input::placeholder { color: var(--placeholder-text-color); }
         textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--accent-blue); outline: none;
-            box-shadow: 0 0 0 3px var(--focus-ring-color);
+            border-color: var(--border-color); /* No blue border on focus */
+            outline: none;
+            box-shadow: none; /* Removed focus ring */
         }
         input[type="number"] { width: auto; margin-bottom: 0; }
 
@@ -234,25 +256,17 @@
         .note-taker-tool .top-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .note-taker-tool .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
-        /* Counter Pill styled like a white button */
         .note-taker-tool .counter-pill {
             display: inline-flex; align-items: center; gap: 12px;
-            background-color: var(--primary-bg); /* White background */
-            padding: 7px 14px; /* Match button padding */
-            border-radius: var(--button-border-radius); /* Match button radius */
-            border: 1px solid var(--border-color); /* Grey border */
-            font-size: 13px; /* Match button font size */
-            font-weight: 500; /* Match button font weight */
+            background-color: var(--primary-bg);
+            padding: 7px 14px;
+            border-radius: var(--button-border-radius);
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 500;
         }
-        .note-taker-tool .counter-pill p {
-            margin: 0;
-            color: var(--text-color); /* Black text */
-        }
-        .note-taker-tool .counter-pill span {
-            font-weight: 600; /* Keep span slightly bolder */
-            color: var(--text-color); /* Black text */
-            margin-left: 2px;
-        }
+        .note-taker-tool .counter-pill p { margin: 0; color: var(--text-color); }
+        .note-taker-tool .counter-pill span { font-weight: 600; color: var(--text-color); margin-left: 2px; }
 
         .merchant-actions-tool .bulk-actions {
             margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
@@ -271,14 +285,27 @@
             border: 1px solid var(--border-color);
         }
         .merchant-actions-tool .merchant-stats:hover { background-color: #f0f0f5; }
-        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; }
+        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } /* Or a dark theme selection */
         .merchant-actions-tool .merchant-stats > div { display: flex; align-items: center; justify-content: flex-start; width: 100%; gap: 8px; }
-        .merchant-actions-tool .merchant-checkbox { appearance: none; -webkit-appearance: none; -moz-appearance: none; width: 16px; height: 16px; border: 1px solid #c7c7cc; border-radius: 4px; outline: none; cursor: pointer; position: relative; transition: background-color 0.15s ease, border-color 0.15s ease; flex-shrink: 0; background-color: var(--container-bg); margin: 0; }
-        .merchant-actions-tool .merchant-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue); }
-        .merchant-actions-tool .merchant-checkbox:checked::after { content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+        .merchant-actions-tool .merchant-checkbox {
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            width: 16px; height: 16px; border: 1px solid #c7c7cc; border-radius: 4px;
+            outline: none; cursor: pointer; position: relative;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+            flex-shrink: 0; background-color: var(--container-bg); margin: 0;
+        }
+        .merchant-actions-tool .merchant-checkbox:checked {
+            background-color: var(--text-color); /* Black background when checked */
+            border-color: var(--text-color);   /* Black border when checked */
+        }
+        .merchant-actions-tool .merchant-checkbox:checked::after {
+            content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px;
+            border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
+        }
 
         .merchant-name-display { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; cursor: text; padding: 2px 4px; border: 1px solid transparent; border-radius: 3px; display: inline-block; flex-grow: 1; }
-        .merchant-name-display:focus { border: 1px solid var(--accent-blue); background-color: var(--primary-bg); box-shadow: 0 0 0 3px var(--focus-ring-color); outline: none; white-space: normal; overflow: visible; }
+        .merchant-name-display:focus { border: 1px solid var(--border-color); background-color: var(--primary-bg); box-shadow: none; outline: none; white-space: normal; overflow: visible; }
         .merchant-name-editable-container { display: flex; align-items: baseline; overflow: hidden; flex-grow: 1; min-width: 0; }
         .merchant-count-text { flex-shrink: 0; margin-left: 4px; }
 
@@ -294,15 +321,17 @@
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .3s; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: white; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-        input:checked + .slider { background-color: var(--accent-blue); }
-        input:focus + .slider { box-shadow: 0 0 0 2px var(--focus-ring-color); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        input:checked + .slider {
+            background-color: var(--text-color); /* Black background when checked */
+        }
+        input:focus + .slider {
+            box-shadow: none; /* Removed focus ring from slider */
+        }
         .slider.round { border-radius: 22px; }
         .slider.round:before { border-radius: 50%; }
-        /* .parser-group-label removed from HTML */
-        #parserGroupSize { /* Renamed from .parser-group-input for specificity */
-            width: 70px; /* Adjusted width */
-            padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
+
+        #parserGroupSize {
+            width: 70px; padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
             border: 1px solid var(--border-color); border-radius: var(--input-border-radius);
             background-color: var(--container-bg); transition: background-color 0.3s ease, opacity 0.3s ease;
         }
@@ -310,7 +339,7 @@
 
         .duplicate-indicator { display: inline-block; width: 8px; height: 8px; background-color: #ff9f0a; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; box-shadow: none; }
         #upsUspsOutputArea { width: 100%; min-height: 80px; resize: vertical; border-radius: var(--input-border-radius); }
-        #btnProcessUpsUsps { margin-top: 8px; } /* This button will also be black/white */
+        #btnProcessUpsUsps { margin-top: 8px; }
         #upsUspsOutputContainer { margin-top: 12px; padding-bottom: 4px; }
 
         #splitModal { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: rgba(60,60,67,0.4); }
@@ -318,9 +347,8 @@
         #splitModalContent h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; color: var(--text-color); border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; text-align: center; }
         #splitModalContent label { font-size: 0.85rem; font-weight: 500; color: var(--secondary-text-color); margin-bottom: 4px; display: block; }
         #splitModalContent #splitOrdersPerTemplate, #splitModalContent #splitNumberInput { margin-bottom: 0; border-radius: var(--input-border-radius); }
-        /* Buttons inside modal will also be black/white due to general button styling */
-        #splitModalContent #splitOrdersPerTemplate { width: 60px; } /* Retain specific width for this input */
-        #splitModalContent #splitNumberInput { width: 75px; flex-grow: 1; } /* Retain specific width for this input */
+        #splitModalContent #splitOrdersPerTemplate { width: 60px; }
+        #splitModalContent #splitNumberInput { width: 75px; flex-grow: 1; }
         #splitMerchantInfo { font-size: 0.9em; color: var(--secondary-text-color); background-color: #f0f0f5; padding: 8px 12px; border-radius: var(--input-border-radius); border: 1px solid var(--border-color); }
         #splitModalContent hr { border: none; border-top: 1px solid #e5e5ea; margin: 6px 0; }
         #splitModalContent .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
@@ -330,7 +358,7 @@
 
     <div class="top-bar">
         <div class="top-bar-left">
-            <i class="fas fa-bars hamburger-icon"></i>
+            <div class="icon-placeholder"></div> <!-- Replaced hamburger icon -->
             <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
         </div>
         <div class="version-dropdown">
@@ -353,7 +381,6 @@
                         </label>
                         <label for="groupToggle" class="toggle-label">Group Orders (AMZL)</label>
                         <input type="number" id="parserGroupSize" min="1" value="2" disabled>
-                        <!-- Removed label for parserGroupSize -->
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <label class="toggle-switch">
@@ -378,7 +405,6 @@
                     <button id="btnDownloadAll">Download All Notes</button>
                 </div>
                 <div id="merchantList">
-                    <!-- Merchant items will be dynamically added here by JS -->
                 </div>
             </div>
         </div>
@@ -391,8 +417,8 @@
                     <div class="button-group">
                         <button id="btnAddSeparator">Add Separator</button>
                         <button id="btnAddSpacing">Add Spacing</button>
-                        <button id="btnUndo" disabled>Undo</button> <!-- Placeholder -->
-                        <button id="btnRedo" disabled>Redo</button> <!-- Placeholder -->
+                        <button id="btnUndo" disabled>Undo</button>
+                        <button id="btnRedo" disabled>Redo</button>
                     </div>
                     <div class="counter-pill">
                         <p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
@@ -426,7 +452,7 @@
             </div>
         </div>
     </div>
-
+    
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
