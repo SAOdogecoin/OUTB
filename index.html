@@ -49,8 +49,9 @@
         }
 
         .top-bar {
-            background-color: var(--top-bar-bg); /* Black top bar */
-            padding: 0 24px;
+            background-color: var(--top-bar-bg);
+            /* OLD: padding: 0 24px; */
+            padding: 0 12px 0 10px; /* NEW: Reduced left padding (e.g., 10px), kept right padding (e.g., 12px or 24px) */
             height: var(--top-bar-height);
             display: flex;
             align-items: center;
@@ -60,8 +61,9 @@
 
         .top-bar-left {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            align-items: center; /* This helps vertically align logo and title */
+            /* OLD: gap: 12px; */
+            gap: 8px; /* NEW: Reduced gap between logo and title (e.g., 8px) */
         }
 
         .icon-placeholder {
@@ -78,10 +80,12 @@
 
 
         .top-bar-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: var(--top-bar-text-color); /* White title text */
-            margin: 0;
+            /* OLD: font-size: 1.3em; or 1.4em */
+            font-size: 1.1em; /* NEW: Smaller font size (adjust as needed) */
+            font-weight: 600; /* Keep or adjust weight */
+            color: var(--top-bar-text-color);
+            margin: 0; /* Keep margin at 0 */
+            line-height: 1; /* Helps with tighter vertical alignment if font has large line-height */
         }
 
         .version-dropdown {
