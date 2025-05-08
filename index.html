@@ -319,34 +319,67 @@
 
         .parser-controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; margin-bottom: 0; padding-bottom: 4px; flex-wrap: wrap; }
         .toggle-label { font-size: 13px; color: var(--text-color); cursor: pointer; user-select: none; margin-right: 4px; }
-        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .3s; }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;    /* Example */
-            width: 18px;     /* Example */
-            left: 2px;       /* Initial horizontal offset within the slider track */
-            bottom: 2px;     /* Vertical offset */
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-
-            /* --- THIS IS THE KEY --- */
-            transition: all 0.3s ease-in-out, background-color 0.3s ease-in-out;
-            /* You can also use 'all 0.3s ease-in-out;' if you want all animatable properties to transition */
-            /* Or simply 'transition: .3s;' as you had, but ensure it's not overridden */
-        }
-        input:checked + .slider {
-            transform: translateX(18px); /* Or your calculated translate value */
+/* --- Container for the toggle --- */
+.toggle-switch {
+    position: relative; /* Crucial for positioning .slider within it */
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
 }
-            background-color: var(--text-color); /* Black background when checked */
-        }
-        input:focus + .slider {
-            box-shadow: none; /* Removed focus ring from slider */
-        }
-        .slider.round { border-radius: 22px; }
-        .slider.round:before { border-radius: 50%; }
+
+/* --- The hidden actual checkbox --- */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* --- The visual track of the slider --- */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #c7c7cc; /* Default 'off' color for the track */
+    transition: background-color 0.3s ease-in-out; /* Animate track color change */
+}
+
+/* --- The visual knob of the slider --- */
+.slider:before {
+    position: absolute; /* Crucial: positions knob relative to .slider track */
+    content: "";
+    height: 18px;   /* Knob height */
+    width: 18px;    /* Knob width */
+    left: 2px;      /* Initial horizontal position of the knob within the track */
+    bottom: 2px;    /* Initial vertical position of the knob within the track */
+    background-color: white; /* Knob color */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease-in-out; /* Animate knob's movement */
+}
+
+/* --- Styles when the toggle is ON (checkbox is checked) --- */
+
+/* 1. Change the track's background color */
+input:checked + .slider {
+    background-color: var(--text-color); /* Your desired 'on' color for the track (black) */
+}
+
+/* 2. Move the knob */
+input:checked + .slider:before {
+    transform: translateX(18px); /* Moves the knob to the right */
+}
+
+/* --- Optional: Rounded appearance --- */
+.slider.round {
+    border-radius: 22px; /* Or equal to height of .toggle-switch or .slider */
+}
+
+.slider.round:before {
+    border-radius: 50%; /* Makes knob circular */
+}
 
         #parserGroupSize {
             width: 70px; padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
