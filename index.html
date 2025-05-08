@@ -338,6 +338,8 @@
             /* Or simply 'transition: .3s;' as you had, but ensure it's not overridden */
         }
         input:checked + .slider {
+            transform: translateX(18px); /* Or your calculated translate value */
+}
             background-color: var(--text-color); /* Black background when checked */
         }
         input:focus + .slider {
