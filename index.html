@@ -9,34 +9,51 @@
     <style>
         :root {
             --system-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
+            --mono-font: 'SF Mono', Menlo, Consolas, 'Courier New', Courier, monospace;
             --primary-bg: #ffffff;
-            --container-bg: #ffffff;
-            --text-color: #1d1d1f; /* Default black text / now also used for topbar bg */
+            --container-bg: #f7f7f7;
+            --text-color: #1d1d1f;
             --secondary-text-color: #6e6e73;
             --placeholder-text-color: #aaaaaf;
             --accent-blue: #007aff;
             --accent-blue-rgb: 0, 122, 255;
+            --accent-green: #34c759;
+            --accent-red: #ff3b30;
+            --accent-orange: #ff9500;
+            --border-color: #d2d2d7;
+            --top-bar-bg: #f0f0f0;
+            --top-bar-text-color: var(--text-color);
 
-            --button-bg: #1d1d1f;
-            --button-text: #ffffff;
-            --button-border-color: #1d1d1f;
-            --button-hover-bg: #38383a;
-            --button-hover-border-color: #38383a;
-            --button-active-bg: #4f4f52;
-            --button-active-border-color: #4f4f52;
+            /* Button Color Variables (Light Theme Specific) */
+            --button-bg: #f0f0f0;
+            --button-text: var(--text-color);
+            --button-border-color: var(--border-color);
+            --button-hover-bg: #e0e0e0;
+            --button-hover-border-color: #c0c0c0;
+            --button-active-bg: #d0d0d0;
+            --button-active-border-color: #b0b0b0;
             --button-disabled-bg: #e0e0e0;
             --button-disabled-text: #9e9e9e;
             --button-disabled-border: #e0e0e0;
 
-            --border-color: #d2d2d7;
-            /* --focus-ring-color: rgba(var(--accent-blue-rgb), 0.25); -- Focus rings removed */
-            --base-border-radius: 10px;
+            /* Primary Action Button Variables */
+            --button-primary-bg: var(--accent-blue);
+            --button-primary-text: #ffffff;
+            --button-primary-border-color: var(--accent-blue);
+            --button-primary-hover-bg: #0071e3;
+            --button-primary-hover-border-color: #0071e3;
+            --button-primary-active-bg: #0066cc;
+            --button-primary-active-border-color: #0066cc;
+            
+            /* Sizing and Border Radius Variables */
+            --base-border-radius: 8px;
             --button-border-radius: 6px;
             --input-border-radius: 6px;
-            --top-bar-height: 50px;
-            --top-bar-bg: #1d1d1f; /* Explicitly black for top bar */
-            --top-bar-text-color: #ffffff; /* White text for top bar */
+            --top-bar-height: 44px;
+
+            /* Scrollbar Defaults */
+            --scrollbar-thumb-color: #c0c0c0; 
+            --scrollbar-thumb-hover-color: #b3b3b3; 
         }
         html { box-sizing: border-box; }
         *, *:before, *:after { box-sizing: inherit; }
@@ -50,85 +67,92 @@
 
         .top-bar {
             background-color: var(--top-bar-bg);
-            /* OLD: padding: 0 24px; */
-            padding: 0 12px 0 10px; /* NEW: Reduced left padding (e.g., 10px), kept right padding (e.g., 12px or 24px) */
+            padding: 0 12px 0 10px; 
             height: var(--top-bar-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .top-bar-left {
             display: flex;
-            align-items: center; /* This helps vertically align logo and title */
-            /* OLD: gap: 12px; */
-            gap: 8px; /* NEW: Reduced gap between logo and title (e.g., 8px) */
+            align-items: center; 
+            gap: 8px; 
         }
 
-        .icon-placeholder {
-            width: 130px;
-            height: 30px;
+        /* icon-placeholder class is no longer used as the element is removed */
+
+        #themeToggleBtn, #compactToggleBtn {
+            background: transparent;
+            border: none;
+            color: var(--top-bar-text-color); 
             cursor: pointer;
-            /* border: 1px solid white; /* Optional: if you want a border around the SVG */
-
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxuczp4PSJuc19leHRlbmQ7IiB4bWxuczppPSJuc19haTsiIHhtbG5zOmdyYXBoPSJuc19ncmFwaHM7IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDIwNC40IDUwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDQuNCA1MDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgogPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KICAuc3Qwe2ZpbGw6I0ZGRkZGRjt9Cgkuc3Qxe2ZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO2ZpbGw6I0ZGRkZGRjt9CiA8L3N0eWxlPgogPG1ldGFkYXRhPgogIDxzZncgeG1sbnM9Im5zX3NmdzsiPgogICA8c2xpY2VzPgogICA8L3NsaWNlcz4KICAgPHNsaWNlU291cmNlQm91bmRzIGJvdHRvbUxlZnRPcmlnaW49InRydWUiIGhlaWdodD0iNTAiIHdpZHRoPSIyMDQuNCIgeD0iLTczLjYiIHk9IjAiPgogICA8L3NsaWNlU291cmNlQm91bmRzPgogIDwvc2Z3PgogPC9tZXRhZGF0YT4KIDxnPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMy42LDEzLjVDMjMuNiw1LjUsMTYsMiw4LjcsNGMtMC4zLDAuMS0wLjMsMC41LDAsMC42bDEuNiwwLjZjMC4zLDAuMSwwLjMsMC42LDAsMC43CgkJYy00LjksMS44LTYuNyw4LjktNi43LDEzLjZDMy42LDIwLjQsNCwyMSw0LjksMjFjMS4yLDAsMS42LTEsMi4xLTIuMWMwLjMtMC43LDAuNi0xLjUsMS4yLTIuMWMwLjUtMC42LDEuMy0xLDIuMS0xLjUKCQljMC44LTAuNSwxLjctMSwyLjQtMS42YzAuNC0wLjQsMC43LTEuMywwLjgtMmMwLjEtMC40LDAuNS0wLjcsMC44LTAuNGMwLjYsMC42LDEsMS43LDEsMi44YzAsMS45LTEuMywyLjYtMi41LDMuMwoJCWMtMC44LDAuNC0xLjYsMC45LTIuMSwxLjZjLTAuMywwLjQtMC41LDAuOS0wLjgsMS40QzksMjIuMiw4LDI0LjMsNC44LDI0LjNjLTIuOSwwLTQuNC0yLTQuNC00LjVjMC00LjgsMS4yLTkuNiw0LjItMTMuNgoJCWMwLjItMC4zLTAuMS0wLjctMC40LTAuNUwxLjYsNi45Yy0wLjUsMC4zLTEtMC4zLTAuNy0wLjdDMi41LDMuOSw2LjIsMCwxMi45LDBjOC41LDAsMTUuMiw1LjQsMTUuMiwxMy40YzAsNS4xLTIuNSw4LjMtNCw5LjgKCQljLTAuNSwwLjUtMC40LDEuNCwwLjEsMS44YzEuOCwxLjUsNS4xLDQuOSw1LjEsMTAuMkMyOS40LDQzLjMsMjMuMSw1MCwxNCw1MEM0LjksNTAsMS40LDQ0LjMsMCwzOS41Yy0wLjMtMC45LDEuMi0xLjIsMS43LTAuNQoJCWMyLDMsNS41LDYsMTEuMiw2YzUuOCwwLDEwLjYtMy42LDEwLjYtMTAuMWMwLTQuNC0zLjktOC4xLTUuOS05LjdjLTAuNS0wLjQtMC41LTEuNCwwLTEuOEMxOS44LDIxLjksMjMuNiwxOC40LDIzLjYsMTMuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTEuNCw5LjhjMCwwLjctMC41LDEuMi0xLjIsMS4yUzksMTAuNSw5LDkuOHMwLjUtMS4yLDEuMi0xLjJTMTEuNCw5LjIsMTEuNCw5Ljh6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTQ0LjIsMTYuOWgtNy41di0zLjdoMTkuM3YzLjdoLTcuNXYyMC42aC00LjRWMTYuOXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjcuNSwyMi43Yy0yLjMsMC0zLjksMS41LTMuOSw0LjF2MTAuN2gtNC4zVjEzLjNoNC4ydjkuMmgwLjJjMC44LTIuMSwyLjYtMy4zLDUuNC0zLjNjMy44LDAsNi4zLDIuNSw2LjMsNi44CgkJdjExLjZoLTQuM1YyNi42QzcxLjEsMjQuMSw2OS44LDIyLjcsNjcuNSwyMi43eiI+CiAgPC9wYXRoPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik03OS40LDM3LjVoNC4zVjI2LjhjMC0yLjMsMS43LTMuOSw0LjEtMy45YzAuNywwLDEuNiwwLjEsMiwwLjJ2LTMuOWMtMC40LTAuMS0xLjEtMC4xLTEuNS0wLjEKCQljLTIuMSwwLTMuOCwxLjItNC41LDMuM2gtMC4ydi0zaC00LjJWMzcuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTA3LjUsMzIuNmMtMC44LDMuMi0zLjcsNS4yLTcuOSw1LjJjLTUuNSwwLTguOC0zLjYtOC44LTkuM2MwLTUuNiwzLjQtOS40LDguNi05LjRjNC41LDAsOC4zLDIuOCw4LjMsOS4yCgkJdjEuM0g5NWMwLDMuMSwxLjksNC45LDQuNiw0LjljMS44LDAsMy4zLTAuOCwzLjgtMi4zTDEwNy41LDMyLjZ6IE05OS40LDIyLjRjLTIuNiwwLTQuMywyLTQuNCw0LjNoOC41CgkJQzEwMy41LDI0LjIsMTAxLjksMjIuNCw5OS40LDIyLjR6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTExOSwzNy45YzQuMiwwLDcuMS0yLjEsNy45LTUuMmwtNC0wLjRjLTAuNiwxLjUtMiwyLjMtMy44LDIuM2MtMi44LDAtNC42LTEuOC00LjYtNC45aDEyLjd2LTEuMwoJCWMwLTYuNC0zLjgtOS4yLTguMy05LjJjLTUuMiwwLTguNiwzLjgtOC42LDkuNEMxMTAuMiwzNC4yLDExMy41LDM3LjksMTE5LDM3Ljl6IE0xMTQuNCwyNi43YzAuMS0yLjMsMS44LTQuMyw0LjQtNC4zCgkJYzIuNSwwLDQuMSwxLjgsNC4xLDQuM0gxMTQuNHoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQ2LjEsMzEuM2MtMC4zLDMuOS0zLjIsNi42LTcuOCw2LjZjLTUuNCwwLTguNy0zLjktOC43LTkuNGMwLTUuNiwzLjQtOS40LDguNy05LjRjNC40LDAsNy41LDIuNiw3LjgsNi41CgkJSDE0MmMtMC4zLTEuOC0xLjYtMy4xLTMuNy0zLjFjLTIuNiwwLTQuNCwyLjItNC40LDUuOWMwLDMuNywxLjcsNiw0LjQsNmMxLjksMCwzLjMtMS4xLDMuNy0zLjFIMTQ2LjF6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1Ny4yLDM3LjljNS4zLDAsOC43LTMuOCw4LjctOS40YzAtNS42LTMuNC05LjQtOC43LTkuNGMtNS4zLDAtOC43LDMuOC04LjcsOS40CgkJQzE0OC41LDM0LjEsMTUxLjksMzcuOSwxNTcuMiwzNy45eiBNMTU3LjIsMzQuNGMtMi45LDAtNC40LTIuNi00LjQtNmMwLTMuMywxLjQtNiw0LjQtNmMyLjksMCw0LjMsMi43LDQuMyw2CgkJQzE2MS42LDMxLjgsMTYwLjEsMzQuNCwxNTcuMiwzNC40eiI+CiAgPC9wYXRoPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNjkuMiwxMy4zaDQuM3YyNC4yaC00LjNWMTMuM3oiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTg2LjcsMTkuM2gtMy42VjE1aC00LjN2NC40aC0yLjZ2My4zaDIuNnYxMC4xYzAsMy40LDIuNSw1LjEsNS43LDVjMS4yLDAsMi4xLTAuMywyLjUtMC40bC0wLjctMy4zCgkJYy0wLjIsMC4xLTAuNywwLjItMS4zLDAuMmMtMS4xLDAtMS45LTAuNC0xLjktMi4xdi05LjRoMy42VjE5LjN6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5Ni43LDE5LjFjNC4zLDAsNi43LDIsNy4zLDVsLTMuOSwwLjRjLTAuMy0xLjItMS40LTIuMy0zLjMtMi4zYy0xLjgsMC0zLjEsMC45LTMuMSwyLjEKCQljMCwxLjEsMC43LDEuNywyLjYsMi4xbDMuMSwwLjdjMy40LDAuNyw1LjEsMi4zLDUuMSw0LjljMCwzLjQtMy4yLDUuOC03LjgsNS44Yy00LjUsMC03LjMtMi03LjgtNS4zbDQuMi0wLjQKCQljMC40LDEuNiwxLjYsMi41LDMuNiwyLjVjMiwwLDMuNC0wLjksMy40LTIuMmMwLTEtMC44LTEuNy0yLjQtMi4xbC0zLjEtMC43Yy0zLjUtMC43LTUuMS0yLjUtNS4xLTUuMQoJCUMxODkuNCwyMS4yLDE5Mi4zLDE5LjEsMTk2LjcsMTkuMXoiPgogIDwvcGF0aD4KIDwvZz4KPC9zdmc+"); /* Replace this with your actual Base64 */
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: 100% 100%; /* Adjust as needed, e.g., '18px' or '80%' */
+            font-size: 1.0em; 
+            padding: 6px; 
+            margin-left: 4px; 
         }
-
+        #themeToggleBtn:hover, #compactToggleBtn:hover {
+            background-color: rgba(0,0,0,0.07); 
+        }
+        html[data-theme="dark"] #themeToggleBtn:hover, 
+        html[data-theme="dark"] #compactToggleBtn:hover {
+            background-color: rgba(255,255,255,0.1); 
+        }
 
         .top-bar-title {
-            /* OLD: font-size: 1.3em; or 1.4em */
-            font-size: 1.1em; /* NEW: Smaller font size (adjust as needed) */
-            font-weight: 600; /* Keep or adjust weight */
+            font-size: 1.1em; 
+            font-weight: 600; 
             color: var(--top-bar-text-color);
-            margin: 0; /* Keep margin at 0 */
-            line-height: 1; /* Helps with tighter vertical alignment if font has large line-height */
+            margin: 0; 
+            line-height: 1; 
         }
 
         .version-dropdown {
             position: relative;
             display: inline-block;
         }
-        /* Version button style for black top bar */
-        /* Version button style for black top bar - now styled as a white button */
+        
         .version-button {
-            background-color: #ffffff;         /* NEW: White background */
-            color: var(--text-color);           /* NEW: Black text */
-            padding: 6px 12px;
-            border: 1px solid #ffffff;         /* NEW: White border */
-            /* If you want a subtle grey border instead of white, use: */
-            /* border: 1px solid var(--border-color); */
+            background-color: transparent; 
+            color: var(--top-bar-text-color);
+            padding: 5px 10px; 
+            border: 1px solid transparent; 
             border-radius: var(--button-border-radius);
             cursor: pointer;
             font-family: var(--system-font);
             font-weight: 500;
-            font-size: 12px;
+            font-size: 12px; 
             display: inline-flex;
             align-items: center;
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .version-button:hover {
-            background-color: #f0f0f0;         /* NEW: Light grey hover */
-            border-color: #e0e0e0;             /* NEW: Slightly darker grey border on hover if desired */
-            /* or keep border-color: #ffffff; if you want the border to remain white */
+            background-color: rgba(0,0,0,0.07); 
         }
         .version-button:active {
-            background-color: #e0e0e0;         /* NEW: Darker grey active */
-            border-color: #d0d0d0;             /* NEW: Even darker for active if desired */
-            /* or keep border-color: #ffffff; */
+            background-color: rgba(0,0,0,0.1); 
             transform: scale(0.97);
         }
-        .version-button i {
+        .version-button i.fas { 
             margin-left: 6px;
             font-size: 0.8em;
-            color: var(--text-color);           /* NEW: Black icon */
+            color: var(--top-bar-text-color); 
         }
+        html[data-theme="dark"] .version-button {
+            /* color var should handle text, bg is transparent */
+        }
+        html[data-theme="dark"] .version-button:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        html[data-theme="dark"] .version-button:active {
+            background-color: rgba(255,255,255,0.15);
+        }
+        /* html[data-theme="dark"] .version-button i.fas color is handled by var(--top-bar-text-color) */
 
         .version-dropdown-content {
-            display: none; position: absolute; background-color: var(--primary-bg); /* Dropdown itself is white */
+            display: none; position: absolute; background-color: var(--primary-bg);
             min-width: 120px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             z-index: 1001; border-radius: var(--button-border-radius);
             border: 1px solid var(--border-color); right: 0; margin-top: 4px;
@@ -156,8 +180,6 @@
             font-weight: 600;
             color: var(--text-color);
             margin: -5px 0 10px 0;
-            /* padding-bottom: 10px; */ /* Removed */
-            /* border-bottom: 1px solid var(--border-color); */ /* Removed */
         }
 
         @media (min-width: 992px) {
@@ -168,14 +190,14 @@
                 display: block;
             }
             .left-column-wrapper {
-                width: calc(35% - (24px * 0.35)); /* Adjusted for gap */
+                width: calc(35% - (24px * 0.35)); 
                 flex-shrink: 0;
                 gap: 24px;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
                 overflow-y: auto; padding-bottom: 1px;
             }
             .note-taker-tool {
-                width: calc(65% - (24px * 0.65)); /* Adjusted for gap */
+                width: calc(65% - (24px * 0.65)); 
                 flex-shrink: 0;
                 display: flex; flex-direction: column;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
@@ -193,17 +215,22 @@
         }
 
         .tool-container {
-             background-color: var(--container-bg); border-radius: var(--base-border-radius);
-             box-shadow: none;
+             background-color: var(--container-bg); 
+             border-radius: var(--base-border-radius);
+             box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 2px 5px rgba(0,0,0,0.03); /* Adjusted for light */
              padding: 20px;
              display: flex; flex-direction: column; position: relative;
              border: 1px solid var(--border-color);
          }
+         html[data-theme="dark"] .tool-container {
+            box-shadow: 0 0 0 0.5px var(--border-color), 0 1px 2px rgba(0,0,0,0.1); /* Adjusted for dark */
+         }
 
         textarea, input[type="text"], input[type="number"] {
-            width: 100%; margin-bottom: 12px; padding: 10px 12px;
-            border: 1px solid var(--border-color); border-radius: var(--input-border-radius);
-            background-color: var(--container-bg);
+            width: 100%; margin-bottom: 12px; padding: 8px 10px;
+            border: 1px solid var(--border-color); 
+            border-radius: var(--input-border-radius);
+            background-color: var(--primary-bg);
             color: var(--text-color);
             line-height: 1.5; font-family: var(--system-font); font-size: 14px;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -212,22 +239,25 @@
         textarea { font-family: var(--mono-font); resize: vertical; min-height: 100px; }
         textarea::placeholder, input::placeholder { color: var(--placeholder-text-color); }
         textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--border-color); /* No blue border on focus */
+            border-color: var(--accent-blue); 
             outline: none;
-            box-shadow: none; /* Removed focus ring */
+            box-shadow: 0 0 0 3px rgba(var(--accent-blue-rgb), 0.2);
         }
         input[type="number"] { width: auto; margin-bottom: 0; }
 
        #shipmentInput { margin-bottom: 0; min-height: 150px; }
 
         button {
-            background-color: var(--button-bg); color: var(--button-text);
-            padding: 7px 14px;
+            background-color: var(--button-bg); 
+            color: var(--button-text);
+            padding: 6px 12px;
             border: 1px solid var(--button-border-color);
-            border-radius: var(--button-border-radius); cursor: pointer; margin: 0;
+            border-radius: var(--button-border-radius); 
+            cursor: pointer; margin: 0;
             transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
             font-family: var(--system-font);
-            font-weight: 500; font-size: 13px;
+            font-weight: 500; 
+            font-size: 13px;
             flex-shrink: 0; text-align: center; display: inline-flex;
             align-items: center; justify-content: center; position: relative; overflow: hidden;
             box-shadow: none;
@@ -253,6 +283,32 @@
         }
         button:disabled:active { transform: none; }
 
+        button.button-primary {
+            background-color: var(--button-primary-bg);
+            color: var(--button-primary-text);
+            border-color: var(--button-primary-border-color);
+            font-weight: 500; 
+        }
+        button.button-primary:hover {
+            background-color: var(--button-primary-hover-bg);
+            border-color: var(--button-primary-hover-border-color);
+        }
+        button.button-primary:active {
+            background-color: var(--button-primary-active-bg);
+            border-color: var(--button-primary-active-border-color);
+        }
+
+        button i.fas, button i.far, button i.fab {
+            margin-right: 7px; 
+            font-size: 0.9em; 
+            line-height: 1; 
+            vertical-align: middle; 
+        }
+        body.compact-mode button i.fas, 
+        body.compact-mode button i.far, 
+        body.compact-mode button i.fab {
+            margin-right: 5px;
+        }
 
         .note-taker-tool .controls-and-stats { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; margin-top: auto; }
         .note-taker-tool .top-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -287,7 +343,7 @@
             border: 1px solid var(--border-color);
         }
         .merchant-actions-tool .merchant-stats:hover { background-color: #f0f0f5; }
-        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } /* Or a dark theme selection */
+        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } 
         .merchant-actions-tool .merchant-stats > div { display: flex; align-items: center; justify-content: flex-start; width: 100%; gap: 8px; }
 
         .merchant-actions-tool .merchant-checkbox {
@@ -295,100 +351,90 @@
             width: 16px; height: 16px; border: 1px solid #c7c7cc; border-radius: 4px;
             outline: none; cursor: pointer; position: relative;
             transition: background-color 0.15s ease, border-color 0.15s ease;
-            flex-shrink: 0; background-color: var(--container-bg); margin: 0;
+            flex-shrink: 0; background-color: var(--primary-bg); margin: 0; 
         }
         .merchant-actions-tool .merchant-checkbox:checked {
-            background-color: var(--text-color); /* Black background when checked */
-            border-color: var(--text-color);   /* Black border when checked */
+            background-color: var(--accent-blue); 
+            border-color: var(--accent-blue);   
         }
         .merchant-actions-tool .merchant-checkbox:checked::after {
             content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px;
             border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
         }
+        html[data-theme="dark"] .merchant-actions-tool .merchant-checkbox:checked::after {
+           border: solid var(--button-primary-text); 
+           border-width: 0 2px 2px 0;
+        }
+
 
         .merchant-name-display { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; cursor: text; padding: 2px 4px; border: 1px solid transparent; border-radius: 3px; display: inline-block; flex-grow: 1; }
         .merchant-name-display:focus { border: 1px solid var(--border-color); background-color: var(--primary-bg); box-shadow: none; outline: none; white-space: normal; overflow: visible; }
         .merchant-name-editable-container { display: flex; align-items: baseline; overflow: hidden; flex-grow: 1; min-width: 0; }
         .merchant-count-text { flex-shrink: 0; margin-left: 4px; }
 
-        * { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+        * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb-color, #c0c0c0) transparent; }
         *::-webkit-scrollbar { width: 9px; height: 9px; }
         *::-webkit-scrollbar-track { background: transparent; }
-        *::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
-        *::-webkit-scrollbar-thumb:hover { background-color: #b3b3b3; }
+        *::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color, #cccccc); border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+        *::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-thumb-hover-color, #b3b3b3); }
 
         .parser-controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; margin-bottom: 0; padding-bottom: 4px; flex-wrap: wrap; }
         .toggle-label { font-size: 13px; color: var(--text-color); cursor: pointer; user-select: none; margin-right: 4px; }
-/* --- Container for the toggle --- */
-.toggle-switch {
-    position: relative; /* Crucial for positioning .slider within it */
-    display: inline-block;
-    width: 40px;
-    height: 22px;
-    flex-shrink: 0;
-}
 
-/* --- The hidden actual checkbox --- */
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* --- The visual track of the slider --- */
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #c7c7cc; /* Default 'off' color for the track */
-    transition: background-color 0.3s ease-in-out; /* Animate track color change */
-}
-
-/* --- The visual knob of the slider --- */
-.slider:before {
-    position: absolute; /* Crucial: positions knob relative to .slider track */
-    content: "";
-    height: 18px;   /* Knob height */
-    width: 18px;    /* Knob width */
-    left: 2px;      /* Initial horizontal position of the knob within the track */
-    bottom: 2px;    /* Initial vertical position of the knob within the track */
-    background-color: white; /* Knob color */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease-in-out; /* Animate knob's movement */
-}
-
-/* --- Styles when the toggle is ON (checkbox is checked) --- */
-
-/* 1. Change the track's background color */
-input:checked + .slider {
-    background-color: var(--text-color); /* Your desired 'on' color for the track (black) */
-}
-
-/* 2. Move the knob */
-input:checked + .slider:before {
-    transform: translateX(18px); /* Moves the knob to the right */
-}
-
-/* --- Optional: Rounded appearance --- */
-.slider.round {
-    border-radius: 22px; /* Or equal to height of .toggle-switch or .slider */
-}
-
-.slider.round:before {
-    border-radius: 50%; /* Makes knob circular */
-}
+        .toggle-switch {
+            position: relative; 
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #c7c7cc; 
+            transition: background-color 0.3s ease-in-out; 
+        }
+        .slider:before {
+            position: absolute; 
+            content: "";
+            height: 18px;   
+            width: 18px;    
+            left: 2px;      
+            bottom: 2px;    
+            background-color: white; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease-in-out; 
+        }
+        input:checked + .slider {
+            background-color: var(--accent-green); 
+        }
+        input:checked + .slider:before {
+            transform: translateX(18px); 
+        }
+        .slider.round {
+            border-radius: 22px; 
+        }
+        .slider.round:before {
+            border-radius: 50%; 
+        }
 
         #parserGroupSize {
             width: 70px; padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
             border: 1px solid var(--border-color); border-radius: var(--input-border-radius);
-            background-color: var(--container-bg); transition: background-color 0.3s ease, opacity 0.3s ease;
+            background-color: var(--primary-bg); transition: background-color 0.3s ease, opacity 0.3s ease;
         }
         #parserGroupSize:disabled { background-color: #f8f8f8; color: #bbb; cursor: not-allowed; opacity: 0.7; border-color: #e8e8ed; }
 
-        .duplicate-indicator { display: inline-block; width: 8px; height: 8px; background-color: #ff9f0a; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; box-shadow: none; }
+        .duplicate-indicator { display: inline-block; width: 8px; height: 8px; background-color: var(--accent-orange); border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; box-shadow: none; }
         #upsUspsOutputArea { width: 100%; min-height: 80px; resize: vertical; border-radius: var(--input-border-radius); }
         #btnProcessUpsUsps { margin-top: 8px; }
         #upsUspsOutputContainer { margin-top: 12px; padding-bottom: 4px; }
@@ -400,18 +446,218 @@ input:checked + .slider:before {
         #splitModalContent #splitOrdersPerTemplate, #splitModalContent #splitNumberInput { margin-bottom: 0; border-radius: var(--input-border-radius); }
         #splitModalContent #splitOrdersPerTemplate { width: 60px; }
         #splitModalContent #splitNumberInput { width: 75px; flex-grow: 1; }
-        #splitMerchantInfo { font-size: 0.9em; color: var(--secondary-text-color); background-color: #f0f0f5; padding: 8px 12px; border-radius: var(--input-border-radius); border: 1px solid var(--border-color); }
+        #splitModalContent #splitMerchantInfo { font-size: 0.9em; color: var(--secondary-text-color); background-color: #f0f0f5; padding: 8px 12px; border-radius: var(--input-border-radius); border: 1px solid var(--border-color); }
         #splitModalContent hr { border: none; border-top: 1px solid #e5e5ea; margin: 6px 0; }
         #splitModalContent .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+
+        html[data-theme="dark"] {
+            --primary-bg: #1e1e1e;
+            --container-bg: #2c2c2e;
+            --text-color: #f5f5f7;
+            --secondary-text-color: #8e8e93;
+            --placeholder-text-color: #6a6a6e;
+            --accent-blue: #0a84ff; 
+            --accent-blue-rgb: 10, 132, 255; 
+            --accent-green: #30d158;
+            --accent-red: #ff453a;
+            --accent-orange: #ff9f0a;
+            --border-color: #38383a;
+            --top-bar-bg: #121212;
+            --top-bar-text-color: var(--text-color);
+
+            /* Dark Theme Button Colors */
+            --button-bg: #3a3a3c;
+            --button-text: var(--text-color);
+            --button-border-color: #48484a; 
+            --button-hover-bg: #4a4a4c;
+            --button-hover-border-color: #58585a;
+            --button-active-bg: #5a5a5c;
+            --button-active-border-color: #68686a;
+
+            --button-primary-bg: var(--accent-blue);
+            --button-primary-text: #1e1e1e; 
+            --button-primary-border-color: var(--accent-blue);
+            --button-primary-hover-bg: #0071e3; 
+            --button-primary-hover-border-color: #0071e3;
+            --button-primary-active-bg: #0066cc;
+            --button-primary-active-border-color: #0066cc;
+
+            /* Update scrollbar colors for dark theme */
+            --scrollbar-thumb-color: #555;
+            --scrollbar-thumb-hover-color: #666;
+            /* --button-text: var(--text-color); already defined, ensure it's correct */
+        }
+        html[data-theme="dark"] .slider {
+            background-color: #555; 
+        }
+        html[data-theme="dark"] input:checked + .slider {
+            background-color: var(--accent-blue); 
+        }
+        
+        html[data-theme="dark"] .merchant-actions-tool .merchant-checkbox {
+            background-color: var(--container-bg); 
+            border: 1px solid var(--secondary-text-color);
+        }
+        html[data-theme="dark"] .merchant-actions-tool .merchant-checkbox:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+         /* Split Modal for Dark Theme */
+        html[data-theme="dark"] #splitModalContent {
+            background-color: #333337; 
+            border: 1px solid #4a4a4e; 
+        }
+        html[data-theme="dark"] #splitModalContent h2 {
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        html[data-theme="dark"] #splitModalContent label, html[data-theme="dark"] #splitModalContent #splitMerchantInfo, html[data-theme="dark"] #splitModalContent div[style*="font-size: 0.9em"] {
+            color: var(--secondary-text-color);
+        }
+        html[data-theme="dark"] #splitModalContent #splitMerchantInfo {
+             background-color: #3f3f43; 
+             border: 1px solid var(--border-color);
+        }
+        html[data-theme="dark"] #splitModalContent hr {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        html[data-theme="dark"] #splitModalContent input[type="number"] {
+            background-color: #2c2c2e; 
+            color: var(--text-color);
+            border: 1px solid #4a4a4e;
+        }
+     
+        html[data-theme="dark"] * {
+            scrollbar-color: var(--scrollbar-thumb-color) transparent;
+        }
+        html[data-theme="dark"] *::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-color);
+        }
+        html[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover-color);
+        }
+
+        /* Compact Mode Styles */
+        body.compact-mode .top-bar {
+            height: 36px; 
+            padding: 0 8px 0 6px; 
+        }
+        body.compact-mode .top-bar-title {
+            font-size: 1em; 
+        }
+        body.compact-mode .version-button {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        body.compact-mode #themeToggleBtn, body.compact-mode #compactToggleBtn {
+            font-size: 1em; 
+            padding: 3px; 
+        }
+
+        body.compact-mode .main-wrapper {
+            padding: 12px; 
+            gap: 12px;     
+        }
+
+        @media (min-width: 992px) {
+            body.compact-mode .left-column-wrapper {
+                width: calc(35% - (12px * 0.35)); 
+                gap: 12px;
+                max-height: calc(100vh - 36px - (2 * 12px)); 
+            }
+            body.compact-mode .note-taker-tool {
+                width: calc(65% - (12px * 0.65)); 
+                max-height: calc(100vh - 36px - (2 * 12px)); 
+            }
+        }
+
+        body.compact-mode .tool-container {
+            padding: 12px; 
+            border-radius: 6px; 
+        }
+        body.compact-mode .tool-card-title {
+            font-size: 1em;
+            margin: -2px 0 8px 0; 
+        }
+
+        body.compact-mode textarea, 
+        body.compact-mode input[type="text"], 
+        body.compact-mode input[type="number"] {
+            padding: 6px 8px; 
+            font-size: 13px;  
+            margin-bottom: 8px; 
+        }
+        body.compact-mode textarea {
+            min-height: 80px; 
+        }
+        body.compact-mode #shipmentInput {
+            min-height: 120px;
+        }
+
+        body.compact-mode button {
+            padding: 5px 10px; 
+            font-size: 12px;   
+            border-radius: 5px;
+        }
+        
+        body.compact-mode .note-taker-tool .counter-pill {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        body.compact-mode .merchant-actions-tool #merchantList {
+            gap: 6px; 
+        }
+        body.compact-mode .merchant-actions-tool .merchant-stats {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        body.compact-mode .merchant-actions-tool .merchant-checkbox {
+            width: 14px;
+            height: 14px;
+        }
+        body.compact-mode .merchant-actions-tool .merchant-checkbox:checked::after {
+            top: 0px; left: 3px; width: 4px; height: 7px; 
+        }
+
+        body.compact-mode .parser-controls {
+            gap: 12px; 
+            margin-top: 8px;
+        }
+        body.compact-mode .toggle-label {
+            font-size: 12px;
+        }
+        body.compact-mode .toggle-switch {
+            width: 36px; height: 20px; 
+        }
+        body.compact-mode .slider:before {
+            height: 16px; width: 16px; 
+        }
+        body.compact-mode input:checked + .slider:before {
+            transform: translateX(16px); 
+        }
+        body.compact-mode #parserGroupSize {
+            width: 60px; padding: 5px 6px; font-size: 12px;
+        }
+        body.compact-mode #upsUspsOutputArea {
+            min-height: 60px;
+        }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <div class="top-bar-left">
-            <div class="icon-placeholder"></div> <!-- Replaced hamburger icon -->
+            <!-- Icon placeholder removed -->
             <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
         </div>
+        <button id="themeToggleBtn" title="Toggle Light/Dark Theme">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button id="compactToggleBtn" title="Toggle Compact Mode">
+            <i class="fas fa-compress-arrows-alt"></i>
+        </button>
         <div class="version-dropdown">
             <button id="versionButton" class="version-button" aria-haspopup="true" aria-expanded="false">Version 1 <i class="fas fa-chevron-down"></i></button>
             <div id="versionDropdownContent" class="version-dropdown-content" role="menu">
@@ -442,18 +688,18 @@ input:checked + .slider:before {
                 </div>
                 <div id="upsUspsOutputContainer" style="display: none;">
                     <textarea id="upsUspsOutputArea" placeholder="Extracted UPS/USPS Tracking Numbers..."></textarea>
-                    <button id="btnProcessUpsUsps">Process & Add to Notes</button>
+                    <button id="btnProcessUpsUsps"><i class="fas fa-cogs"></i> Process & Add to Notes</button>
                 </div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
                 <h3 class="tool-card-title">Merchants</h3>
                 <div class="bulk-actions">
-                    <button id="btnDownloadSelected">Download Selected</button>
-                    <button id="btnClearSelected">Clear Selected</button>
-                    <button id="btnSelectAll">Select All</button>
-                    <button id="btnSplitSelected" disabled>Split Selected</button>
-                    <button id="btnDownloadAll">Download All Notes</button>
+                    <button id="btnDownloadSelected"><i class="fas fa-download"></i> Download Selected</button>
+                    <button id="btnClearSelected"><i class="fas fa-trash-can"></i> Clear Selected</button>
+                    <button id="btnSelectAll"><i class="fas fa-check-square"></i> Select All</button>
+                    <button id="btnSplitSelected" disabled><i class="fas fa-object-ungroup"></i> Split Selected</button>
+                    <button id="btnDownloadAll" class="button-primary"><i class="fas fa-download"></i> Download All Notes</button> 
                 </div>
                 <div id="merchantList">
                 </div>
@@ -466,10 +712,10 @@ input:checked + .slider:before {
             <div class="controls-and-stats">
                 <div class="top-controls">
                     <div class="button-group">
-                        <button id="btnAddSeparator">Add Separator</button>
-                        <button id="btnAddSpacing">Add Spacing</button>
-                        <button id="btnUndo" disabled>Undo</button>
-                        <button id="btnRedo" disabled>Redo</button>
+                        <button id="btnAddSeparator"><i class="fas fa-minus"></i> Add Separator</button>
+                        <button id="btnAddSpacing"><i class="fas fa-arrows-alt-v"></i> Add Spacing</button>
+                        <button id="btnUndo" disabled><i class="fas fa-rotate-left"></i> Undo</button>
+                        <button id="btnRedo" disabled><i class="fas fa-rotate-right"></i> Redo</button>
                     </div>
                     <div class="counter-pill">
                         <p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
@@ -498,8 +744,8 @@ input:checked + .slider:before {
                 <input type="number" id="splitNumberInput" min="1" placeholder="e.g., 100">
             </div>
             <div class="modal-actions">
-                <button id="btnCancelSplit">Cancel</button>
-                <button id="btnGenerateSplits">Generate & Download Splits</button>
+                <button id="btnCancelSplit"><i class="fas fa-times"></i> Cancel</button>
+                <button id="btnGenerateSplits" class="button-primary"><i class="fas fa-file-archive"></i> Generate & Download Splits</button>
             </div>
         </div>
     </div>
@@ -512,8 +758,34 @@ input:checked + .slider:before {
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
+    const themeKey = 'themePreference_amzlTool';
+    const compactModeKey = 'compactMode';
 
     let tempUpsUspsData = {};
+
+    function applyCompactMode(isCompact) {
+        document.body.classList.toggle('compact-mode', isCompact);
+        localStorage.setItem(compactModeKey, isCompact ? 'true' : 'false');
+        const compactToggleBtn = document.getElementById('compactToggleBtn');
+        if (compactToggleBtn) {
+            compactToggleBtn.title = isCompact ? 'Switch to Normal Mode' : 'Switch to Compact Mode';
+            if (isCompact) {
+               compactToggleBtn.innerHTML = '<i class="fas fa-expand-arrows-alt"></i>';
+            } else {
+               compactToggleBtn.innerHTML = '<i class="fas fa-compress-arrows-alt"></i>';
+            }
+        }
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(themeKey, theme);
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            themeToggleBtn.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            themeToggleBtn.title = theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
+        }
+    }
 
     function saveNotesToLocalStorage() {
         const noteArea = document.getElementById('noteArea');
@@ -740,9 +1012,7 @@ input:checked + .slider:before {
                 noteArea.value = currentNoteTrimmed + spacing + finalOutputString;
                 noteArea.scrollTop = noteArea.scrollHeight;
 
-                countTemplatesNoteTaker(); // This will also save notes due to its internal listener
-                // saveNotesToLocalStorage(); // No longer strictly needed here if countTemplatesNoteTaker saves
-
+                countTemplatesNoteTaker(); 
                 input.value = '';
                 const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL shipment(s). `;
@@ -810,8 +1080,7 @@ input:checked + .slider:before {
             noteArea.value = currentNoteTrimmed + spacing + processedBlocks.join('\n\n');
             noteArea.scrollTop = noteArea.scrollHeight;
 
-            countTemplatesNoteTaker(); // This will also save notes
-            // saveNotesToLocalStorage(); // No longer strictly needed here
+            countTemplatesNoteTaker(); 
 
             upsUspsOutputArea.value = '';
             tempUpsUspsData = {};
@@ -835,8 +1104,8 @@ input:checked + .slider:before {
    }
 
 
-    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmedValue = ta.value.trimEnd(); ta.value = trimmedValue + (trimmedValue ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); /* saveNotesToLocalStorage(); // covered by countTemplates */ }
-    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); /* Only save here, no need to recount for just spacing */ }
+    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmedValue = ta.value.trimEnd(); ta.value = trimmedValue + (trimmedValue ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
+    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
     function selectAllMerchants() { document.querySelectorAll('#merchantList .merchant-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
 
 
@@ -866,26 +1135,25 @@ input:checked + .slider:before {
         let replaced = false;
 
         for (let i = 0; i < parts.length; i++) {
-            if (i % 2 === 0) { // Content part
+            if (i % 2 === 0) { 
                 if (parts[i].trim() === originalSectionKey.trim()) {
                     reconstructedNotes += newSectionText;
                     replaced = true;
                 } else {
                     reconstructedNotes += parts[i];
                 }
-            } else { // Separator part
+            } else { 
                 reconstructedNotes += parts[i];
             }
         }
 
         if (replaced) {
             noteArea.value = reconstructedNotes;
-            // Call countTemplatesNoteTaker AFTER saving, as it reads from noteArea for its processing.
             saveNotesToLocalStorage();
-            countTemplatesNoteTaker(); // This will re-render the list with the new name.
+            countTemplatesNoteTaker(); 
         } else {
             console.warn("Failed to replace section text for name edit. Original section key:", originalSectionKey);
-            editableSpan.textContent = originalDisplayName; // Revert UI
+            editableSpan.textContent = originalDisplayName; 
         }
     }
 
@@ -893,7 +1161,7 @@ input:checked + .slider:before {
         const noteArea = document.getElementById('noteArea');
         const fullText = noteArea.value;
         const merchantListDiv = document.getElementById('merchantList');
-        merchantListDiv.innerHTML = ''; // Clear previous items
+        merchantListDiv.innerHTML = ''; 
 
         const trackingNumberRegex = /\b([A-Z0-9]+(?:-|\s)*\((?:AMZ[NL]|UPS|USPS)\))/gi;
         const allTrackingNumbers = (fullText.match(trackingNumberRegex) || []);
@@ -905,7 +1173,7 @@ input:checked + .slider:before {
             seenTrackingNumbers.add(coreTN);
         });
 
-        const merchantsData = {}; // Use this to hold structured data before sorting
+        const merchantsData = {}; 
         let totalTemplatesOverall = 0;
         let merchantIndex = 0;
         const sections = fullText.split(noteSeparatorRegex);
@@ -930,24 +1198,23 @@ input:checked + .slider:before {
                  merchantName = `Data Entry ${merchantIndex}`;
             }
 
-            merchantsData[sectionTextOriginal] = { // Use original section text as key to preserve whitespace for replacement
+            merchantsData[sectionTextOriginal] = { 
                  displayName: merchantName,
                  isNameFromFirstLine: isNameFromFirstLine,
                  count: templateCount,
-                 text: sectionTextOriginal // Store the original, possibly non-trimmed version
+                 text: sectionTextOriginal 
             };
         });
 
         document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
         document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
 
-        // Sort by displayName for rendering
         const sortedMerchants = Object.entries(merchantsData).sort(([, a], [, b]) => a.displayName.localeCompare(b.displayName));
 
         sortedMerchants.forEach(([key, data]) => {
             const merchantDiv = document.createElement('div');
             merchantDiv.className = 'merchant-stats';
-            merchantDiv.dataset.key = key; // This key is the original section text
+            merchantDiv.dataset.key = key; 
             merchantDiv.dataset.displayName = data.displayName;
             merchantDiv.dataset.count = data.count;
 
@@ -965,7 +1232,6 @@ input:checked + .slider:before {
             const titleText = `${data.displayName} (${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
 
             const innerFlexDiv = document.createElement('div');
-            // innerFlexDiv's style is set by .merchant-stats > div in CSS
 
             if (sectionHasDuplicate) {
                 const indicatorSpan = document.createElement('span');
@@ -983,15 +1249,13 @@ input:checked + .slider:before {
 
             const nameAndCountWrapper = document.createElement('span');
             nameAndCountWrapper.className = 'merchant-name-editable-container';
-            // Style from CSS
-
+            
             const nameSpan = document.createElement('span');
             nameSpan.className = 'merchant-name-display';
             nameSpan.contentEditable = true;
             nameSpan.textContent = data.displayName;
             nameSpan.title = titleText + (sectionHasDuplicate ? ` | DUPLICATES FOUND: ${Array.from(duplicatesInSectionDisplay).join(', ')}` : '');
-            // Style from CSS
-
+            
             nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
             nameSpan.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
@@ -1002,14 +1266,13 @@ input:checked + .slider:before {
             const countSpan = document.createElement('span');
             countSpan.className = 'merchant-count-text';
             countSpan.textContent = `(${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
-            // Style from CSS
             nameAndCountWrapper.appendChild(countSpan);
             innerFlexDiv.appendChild(nameAndCountWrapper);
 
             if (sectionHasDuplicate) {
                 const duplicateListSpan = document.createElement('span');
                 const duplicateList = Array.from(duplicatesInSectionDisplay).join(', ');
-                duplicateListSpan.style.cssText = "color: #ff9f0a; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; max-width: 80px;"; // Adjusted max-width
+                duplicateListSpan.style.cssText = "color: var(--accent-orange); font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; max-width: 80px;"; 
                 duplicateListSpan.title = `Duplicate TN(s): ${duplicateList}`;
                 duplicateListSpan.textContent = `(${duplicateList})`;
                 innerFlexDiv.appendChild(duplicateListSpan);
@@ -1017,7 +1280,7 @@ input:checked + .slider:before {
 
             merchantDiv.appendChild(innerFlexDiv);
             merchantDiv.onclick = (e) => {
-                 if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { // Don't toggle if clicking name
+                 if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { 
                      const cb = merchantDiv.querySelector('.merchant-checkbox');
                      if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); }
                  }
@@ -1061,7 +1324,7 @@ input:checked + .slider:before {
         const textsToDownload = [];
         let totalSelectedCases = 0;
         selectedDivs.forEach((div) => {
-            const key = div.dataset.key; // This key is the full original section text
+            const key = div.dataset.key; 
             if (key !== undefined && key !== null) {
                 textsToDownload.push(key);
                 totalSelectedCases += parseInt(div.dataset.count || '0', 10);
@@ -1070,9 +1333,9 @@ input:checked + .slider:before {
 
         if (textsToDownload.length === 0) { alert("Could not retrieve text for selected merchants."); return; }
 
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); // Use trimEnd on separator for joining
+        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
         const filename = `3COUTB_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename); // Add trailing newline to file
+        downloadText(combinedText + '\n', filename); 
     }
 
     function clearSelectedMerchants() {
@@ -1083,29 +1346,23 @@ input:checked + .slider:before {
         const fullText = noteArea.value;
         const keysToRemove = new Set();
         selectedDivs.forEach(div => { if (div.dataset.key !== undefined && div.dataset.key !== null) { keysToRemove.add(div.dataset.key); } });
-
-        // Refined clearing logic: Filter sections and join.
+        
         const allSections = [];
-        // let currentSection = ""; // This variable was unused
         fullText.split(noteSeparatorRegex).forEach(s => {
-            // s is the content *between* separators.
-            // If noteArea starts/ends with a separator, or has consecutive separators,
-            // split can produce empty strings. We filter these out.
             if (s.trim() !== "") {
-                allSections.push(s); // Push the original section text (can have leading/trailing spaces if they were part of the section)
+                allSections.push(s); 
             }
         });
 
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
 
         if (remainingSections.length > 0) {
-             // Corrected line: Join remaining sections with the single, original noteSeparator
              noteArea.value = remainingSections.join(noteSeparator);
         } else {
-            noteArea.value = ""; // Clear entirely if no sections remain
+            noteArea.value = ""; 
         }
 
-        countTemplatesNoteTaker(); // This will re-render the list and save the notes
+        countTemplatesNoteTaker(); 
     }
 
     function downloadAllNotes() {
@@ -1150,19 +1407,14 @@ input:checked + .slider:before {
         const templateRegexUpsUsps = new RegExp('^\\s*' + escapedUpsUspsTemplate + '\\s*\\n*', 'gm');
 
         textToProcess = textToProcess.replace(templateRegexAmzl, '').replace(templateRegexUpsUsps, '').trim();
-
-        // Remove potential merchant name headers before splitting by RO ID
+        
         const linesForRO = textToProcess.split('\n');
         if (linesForRO.length > 2 && linesForRO[1].trim() === "" && linesForRO[2].startsWith("Removal order ID:")) {
-            // Likely 'Merchant Name\n\nRemoval order ID:...'
             textToProcess = linesForRO.slice(2).join('\n');
         } else if (linesForRO.length > 0 && linesForRO[0].startsWith("Removal order ID:")) {
-            // Already starts with RO ID
             textToProcess = linesForRO.join('\n');
         }
-        // If it was just a merchant name, it will be filtered out by processSingleROBlock anyway.
-
-
+        
         const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
 
         potentialROBlocks.forEach((roBlock) => {
@@ -1219,7 +1471,7 @@ input:checked + .slider:before {
        let containsAmzl = false;
 
         selectedDivs.forEach((div) => {
-            const key = div.dataset.key; // Full original section text
+            const key = div.dataset.key; 
             const displayName = div.dataset.displayName || `Merchant (Unknown)`;
             if (key !== undefined && key !== null) {
                 selectedMerchantDataForSplit.push({ key: key, name: displayName });
@@ -1229,7 +1481,7 @@ input:checked + .slider:before {
             }
         });
         const merchantNames = selectedMerchantDataForSplit.map(item => item.name);
-        const combinedText = combinedTextParts.join(noteSeparator.trimEnd()); // Use trimEnd on separator for joining
+        const combinedText = combinedTextParts.join(noteSeparator.trimEnd()); 
         modal.dataset.combinedText = combinedText;
         modal.dataset.containsAmzl = containsAmzl;
         modal.dataset.containsUpsUsps = containsUpsUsps;
@@ -1240,7 +1492,7 @@ input:checked + .slider:before {
         else { merchantInfoDiv.textContent = 'No valid merchants selected.'; }
 
         ordersPerTemplateInput.value = '2';
-        splitNumberInput.value = ''; // Default to empty, user must fill
+        splitNumberInput.value = ''; 
         calculatedTemplatesSpan.textContent = '0';
         updateCalculatedTemplates();
         modal.style.display = 'flex';
@@ -1297,8 +1549,6 @@ input:checked + .slider:before {
         if (containsUpsUsps && !containsAmzl) {
             templateToUse = upsUspsTemplate;
         } else if (containsUpsUsps && containsAmzl) {
-            // For mixed content, it's safer to stick to one, or this needs more complex logic.
-            // Assuming AMZL template is general enough or user is aware.
             console.warn("Split contains mixed AMZL and UPS/USPS entries. Using AMZL template for splitting. This might not be ideal for UPS/USPS only data.");
         }
 
@@ -1315,23 +1565,6 @@ input:checked + .slider:before {
         for (let i = 0; i < templateGroups.length; i += splitNumber) {
             const groupChunk = templateGroups.slice(i, i + splitNumber);
             if (groupChunk.length > 0) {
-                 let chunkText = '';
-                 groupChunk.forEach((group, index) => {
-                     // Determine which template to use based on content of *this specific group* if possible
-                     // For now, stick to the globally decided `templateToUse`
-                     chunkText += templateToUse + '\n\n' + group;
-                     if (index < groupChunk.length - 1) {
-                         chunkText += '\n\n'; // Separator between templates in the same file (if any)
-                                            // Typically, this is not a separator between templates, but between the template text and the data.
-                                            // The current structure is Template + Data1 + Data2 ...
-                                            // So, it should be: (Template + DataGroup1) \n\n (Template + DataGroup2) ... if splitNumber > 1
-                                            // No, templateGroups are already structured with N orders.
-                                            // Each item in groupChunk is already a block of text representing one filled template.
-                                            // So, join them with \n\n if a file has multiple templates.
-                     }
-                 });
-                 // Corrected logic: each templateGroup item is data for ONE template.
-                 // If splitNumber > 1, we group multiple (template+data) blocks.
                  const fileTemplates = groupChunk.map(dataForOneTemplate => templateToUse + "\n\n" + dataForOneTemplate);
                 splitOutputs.push({ text: fileTemplates.join('\n\n'), count: groupChunk.length });
             }
@@ -1340,7 +1573,7 @@ input:checked + .slider:before {
         if (splitOutputs.length === 0) { alert("No split files generated."); return; }
 
         let filenameMerchantPart = "SplitSelection";
-        let merchantDisplayStringForFile = selectedMerchantDataForSplit.map(m=>m.name).join(' & '); // Use name from data passed to modal
+        let merchantDisplayStringForFile = selectedMerchantDataForSplit.map(m=>m.name).join(' & '); 
 
         if (selectedMerchantDataForSplit.length === 1) {
             filenameMerchantPart = sanitizeFilename(selectedMerchantDataForSplit[0].name);
@@ -1348,12 +1581,10 @@ input:checked + .slider:before {
             filenameMerchantPart = sanitizeFilename(selectedMerchantDataForSplit[0].name) + "_Multi";
         }
 
-
         const dateStr = getFormattedDate();
         splitOutputs.forEach((outputData, index) => {
             const partNumber = index + 1;
             const filename = `3COUTB_${dateStr}_${filenameMerchantPart}_PART_${partNumber}(${outputData.count}).txt`;
-            // Prepend the actual merchant name(s) to the file content
             const fileContent = merchantDisplayStringForFile + '\n\n' + outputData.text + '\n';
             downloadText(fileContent, filename);
         });
@@ -1370,9 +1601,7 @@ input:checked + .slider:before {
         const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const groupOrdersControl = document.getElementById('groupOrdersControl');
-        // const btnProcessUpsUsps = document.getElementById('btnProcessUpsUsps'); // Handled by container listener
-
-
+        
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
             if (savedNotes) { noteArea.value = savedNotes; }
@@ -1380,14 +1609,14 @@ input:checked + .slider:before {
              noteArea.addEventListener('input', () => {
                  clearTimeout(countTimer);
                  countTimer = setTimeout(() => {
-                     saveNotesToLocalStorage(); // Save first
-                     countTemplatesNoteTaker(); // Then recount/re-render
+                     saveNotesToLocalStorage(); 
+                     countTemplatesNoteTaker(); 
                     }, 300);
              });
              noteArea.addEventListener('paste', (e) => {
                  setTimeout(() => {
-                     saveNotesToLocalStorage(); // Save first
-                     countTemplatesNoteTaker(); // Then recount/re-render
+                     saveNotesToLocalStorage(); 
+                     countTemplatesNoteTaker(); 
                     }, 50);
              });
         } else { console.error("Note area element not found!"); }
@@ -1425,29 +1654,21 @@ input:checked + .slider:before {
 
         try { countTemplatesNoteTaker(); } catch(error) { console.error("Error during initial countTemplatesNoteTaker:", error); }
 
-         // Consolidated event listener for buttons in both merchant-actions-tool and note-taker-tool
          document.querySelector('.main-wrapper').addEventListener('click', function(event) {
             const targetButton = event.target.closest('button');
-            if (!targetButton || targetButton.closest('#splitModal')) { return; } // Ignore modal buttons
+            if (!targetButton || targetButton.closest('#splitModal')) { return; } 
 
             try {
                 switch (targetButton.id) {
-                    // Note Taker Tool Buttons
                     case 'btnAddSeparator': addSeparator(); break;
                     case 'btnAddSpacing': addSpacing(); break;
-                    // case 'btnUndo': // Placeholder, no function yet
-                    // case 'btnRedo': // Placeholder, no function yet
-
-                    // Merchant Actions Tool Buttons
                     case 'btnDownloadSelected': downloadSelectedMerchants(); break;
                     case 'btnClearSelected': clearSelectedMerchants(); break;
                     case 'btnSelectAll': selectAllMerchants(); break;
                     case 'btnDownloadAll': downloadAllNotes(); break;
                     case 'btnSplitSelected': openSplitModal(); break;
-
-                    // Parser Tool Button (specifically for btnProcessUpsUsps)
                     case 'btnProcessUpsUsps':
-                        if (targetButton.closest('.parser-tool')) { // Ensure it's the one in parser tool
+                        if (targetButton.closest('.parser-tool')) { 
                             processUpsUspsData();
                         }
                         break;
@@ -1505,6 +1726,41 @@ input:checked + .slider:before {
                btnGenerateSplits.addEventListener('click', generateAndDownloadSplits);
                ordersPerTemplateInputModal.addEventListener('input', updateCalculatedTemplates);
          } else { console.error("Could not attach one or more Split Modal event listeners."); }
+
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+            });
+        }
+
+        const savedTheme = localStorage.getItem(themeKey);
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else if (prefersDark) {
+            applyTheme('dark'); 
+        } else {
+            applyTheme('light'); 
+        }
+
+        const compactToggleBtn = document.getElementById('compactToggleBtn');
+        if (compactToggleBtn) {
+            compactToggleBtn.addEventListener('click', () => {
+                const isCurrentlyCompact = document.body.classList.contains('compact-mode');
+                applyCompactMode(!isCurrentlyCompact);
+            });
+        }
+
+        const savedCompactMode = localStorage.getItem(compactModeKey);
+        if (savedCompactMode === 'true') {
+            applyCompactMode(true);
+        } else {
+            applyCompactMode(false); // Default to non-compact
+        }
     });
 </script>
 
