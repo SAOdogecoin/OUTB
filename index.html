@@ -50,8 +50,7 @@
 
         .top-bar {
             background-color: var(--top-bar-bg);
-            /* OLD: padding: 0 24px; */
-            padding: 0 12px 0 10px; /* NEW: Reduced left padding (e.g., 10px), kept right padding (e.g., 12px or 24px) */
+            padding: 0 12px 0 10px; 
             height: var(--top-bar-height);
             display: flex;
             align-items: center;
@@ -61,46 +60,37 @@
 
         .top-bar-left {
             display: flex;
-            align-items: center; /* This helps vertically align logo and title */
-            /* OLD: gap: 12px; */
-            gap: 8px; /* NEW: Reduced gap between logo and title (e.g., 8px) */
+            align-items: center; 
+            gap: 8px; 
         }
 
         .icon-placeholder {
             width: 130px;
             height: 30px;
             cursor: pointer;
-            /* border: 1px solid white; /* Optional: if you want a border around the SVG */
-
-            background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxuczp4PSJuc19leHRlbmQ7IiB4bWxuczppPSJuc19haTsiIHhtbG5zOmdyYXBoPSJuc19ncmFwaHM7IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDIwNC40IDUwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDQuNCA1MDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgogPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KICAuc3Qwe2ZpbGw6I0ZGRkZGRjt9Cgkuc3Qxe2ZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO2ZpbGw6I0ZGRkZGRjt9CiA8L3N0eWxlPgogPG1ldGFkYXRhPgogIDxzZncgeG1sbnM9Im5zX3NmdzsiPgogICA8c2xpY2VzPgogICA8L3NsaWNlcz4KICAgPHNsaWNlU291cmNlQm91bmRzIGJvdHRvbUxlZnRPcmlnaW49InRydWUiIGhlaWdodD0iNTAiIHdpZHRoPSIyMDQuNCIgeD0iLTczLjYiIHk9IjAiPgogICA8L3NsaWNlU291cmNlQm91bmRzPgogIDwvc2Z3PgogPC9tZXRhZGF0YT4KIDxnPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMy42LDEzLjVDMjMuNiw1LjUsMTYsMiw4LjcsNGMtMC4zLDAuMS0wLjMsMC41LDAsMC42bDEuNiwwLjZjMC4zLDAuMSwwLjMsMC42LDAsMC43CgkJYy00LjksMS44LTYuNyw4LjktNi43LDEzLjZDMy42LDIwLjQsNCwyMSw0LjksMjFjMS4yLDAsMS42LTEsMi4xLTIuMWMwLjMtMC43LDAuNi0xLjUsMS4yLTIuMWMwLjUtMC42LDEuMy0xLDIuMS0xLjUKCQljMC44LTAuNSwxLjctMSwyLjQtMS42YzAuNC0wLjQsMC43LTEuMywwLjgtMmMwLjEtMC40LDAuNS0wLjcsMC44LTAuNGMwLjYsMC42LDEsMS43LDEsMi44YzAsMS45LTEuMywyLjYtMi41LDMuMwoJCWMtMC44LDAuNC0xLjYsMC45LTIuMSwxLjZjLTAuMywwLjQtMC41LDAuOS0wLjgsMS40QzksMjIuMiw4LDI0LjMsNC44LDI0LjNjLTIuOSwwLTQuNC0yLTQuNC00LjVjMC00LjgsMS4yLTkuNiw0LjItMTMuNgoJCWMwLjItMC4zLTAuMS0wLjctMC40LTAuNUwxLjYsNi45Yy0wLjUsMC4zLTEtMC4zLTAuNy0wLjdDMi41LDMuOSw2LjIsMCwxMi45LDBjOC41LDAsMTUuMiw1LjQsMTUuMiwxMy40YzAsNS4xLTIuNSw4LjMtNCw5LjgKCQljLTAuNSwwLjUtMC40LDEuNCwwLjEsMS44YzEuOCwxLjUsNS4xLDQuOSw1LjEsMTAuMkMyOS40LDQzLjMsMjMuMSw1MCwxNCw1MEM0LjksNTAsMS40LDQ0LjMsMCwzOS41Yy0wLjMtMC45LDEuMi0xLjIsMS43LTAuNQoJCWMyLDMsNS41LDYsMTEuMiw2YzUuOCwwLDEwLjYtMy42LDEwLjYtMTAuMWMwLTQuNC0zLjktOC4xLTUuOS05LjdjLTAuNS0wLjQtMC41LTEuNCwwLTEuOEMxOS44LDIxLjksMjMuNiwxOC40LDIzLjYsMTMuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTEuNCw5LjhjMCwwLjctMC41LDEuMi0xLjIsMS4yUzksMTAuNSw5LDkuOHMwLjUtMS4yLDEuMi0xLjJTMTEuNCw5LjIsMTEuNCw5Ljh6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTQ0LjIsMTYuOWgtNy41di0zLjdoMTkuM3YzLjdoLTcuNXYyMC42aC00LjRWMTYuOXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjcuNSwyMi43Yy0yLjMsMC0zLjksMS41LTMuOSw0LjF2MTAuN2gtNC4zVjEzLjNoNC4ydjkuMmgwLjJjMC44LTIuMSwyLjYtMy4zLDUuNC0zLjNjMy44LDAsNi4zLDIuNSw2LjMsNi44CgkJdjExLjZoLTQuM1YyNi42QzcxLjEsMjQuMSw2OS44LDIyLjcsNjcuNSwyMi43eiI+CiAgPC9wYXRoPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik03OS40LDM3LjVoNC4zVjI2LjhjMC0yLjMsMS43LTMuOSw0LjEtMy45YzAuNywwLDEuNiwwLjEsMiwwLjJ2LTMuOWMtMC40LTAuMS0xLjEtMC4xLTEuNS0wLjEKCQljLTIuMSwwLTMuOCwxLjItNC41LDMuM2gtMC4ydi0zaC00LjJWMzcuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTA3LjUsMzIuNmMtMC44LDMuMi0zLjcsNS4yLTcuOSw1LjJjLTUuNSwwLTguOC0zLjYtOC44LTkuM2MwLTUuNiwzLjQtOS40LDguNi05LjRjNC41LDAsOC4zLDIuOCw4LjMsOS4yCgkJdjEuM0g5NWMwLDMuMSwxLjksNC45LDQuNiw0LjljMS44LDAsMy4zLTAuOCwzLjgtMi4zTDEwNy41LDMyLjZ6IE05OS40LDIyLjRjLTIuNiwwLTQuMywyLTQuNCw0LjNoOC41CgkJQzEwMy41LDI0LjIsMTAxLjksMjIuNCw5OS40LDIyLjR6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTExOSwzNy45YzQuMiwwLDcuMS0yLjEsNy45LTUuMmwtNC0wLjRjLTAuNiwxLjUtMiwyLjMtMy44LDIuM2MtMi44LDAtNC42LTEuOC00LjYtNC45aDEyLjd2LTEuMwoJCWMwLTYuNC0zLjgtOS4yLTguMy05LjJjLTUuMiwwLTguNiwzLjgtOC42LDkuNEMxMTAuMiwzNC4yLDExMy41LDM3LjksMTE5LDM3Ljl6IE0xMTQuNCwyNi43YzAuMS0yLjMsMS44LTQuMyw0LjQtNC4zCgkJYzIuNSwwLDQuMSwxLjgsNC4xLDQuM0gxMTQuNHoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQ2LjEsMzEuM2MtMC4zLDMuOS0zLjIsNi42LTcuOCw2LjZjLTUuNCwwLTguNy0zLjktOC43LTkuNGMwLTUuNiwzLjQtOS40LDguNy05LjRjNC40LDAsNy41LDIuNiw3LjgsNi41CgkJSDE0MmMtMC4zLTEuOC0xLjYtMy4xLTMuNy0zLjFjLTIuNiwwLTQuNCwyLjItNC40LDUuOWMwLDMuNywxLjcsNiw0LjQsNmMxLjksMCwzLjMtMS4xLDMuNy0zLjFIMTQ2LjF6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1Ny4yLDM3LjljNS4zLDAsOC43LTMuOCw4LjctOS40YzAtNS42LTMuNC05LjQtOC43LTkuNGMtNS4zLDAtOC43LDMuOC04LjcsOS40CgkJQzE0OC41LDM0LjEsMTUxLjksMzcuOSwxNTcuMiwzNy45eiBNMTU3LjIsMzQuNGMtMi45LDAtNC40LTIuNi00LjQtNmMwLTMuMywxLjQtNiw0LjQtNmMyLjksMCw0LjMsMi43LDQuMyw2CgkJQzE2MS42LDMxLjgsMTYwLjEsMzQuNCwxNTcuMiwzNC40eiI+CiAgPC9wYXRoPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNjkuMiwxMy4zaDQuM3YyNC4yaC00LjNWMTMuM3oiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTg2LjcsMTkuM2gtMy42VjE1aC00LjN2NC40aC0yLjZ2My4zaDIuNnYxMC4xYzAsMy40LDIuNSw1LjEsNS43LDVjMS4yLDAsMi4xLTAuMywyLjUtMC40bC0wLjctMy4zCgkJYy0wLjIsMC4xLTAuNywwLjItMS4zLDAuMmMtMS4xLDAtMS45LTAuNC0xLjktMi4xdi05LjRoMy42VjE5LjN6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5Ni43LDE5LjFjNC4zLDAsNi43LDIsNy4zLDVsLTMuOSwwLjRjLTAuMy0xLjItMS40LTIuMy0zLjMtMi4zYy0xLjgsMC0zLjEsMC45LTMuMSwyLjEKCQljMCwxLjEsMC43LDEuNywyLjYsMi4xbDMuMSwwLjdjMy40LDAuNyw1LjEsMi4zLDUuMSw0LjljMCwzLjQtMy4yLDUuOC03LjgsNS44Yy00LjUsMC03LjMtMi03LjgtNS4zbDQuMi0wLjQKCQljMC40LDEuNiwxLjYsMi41LDMuNiwyLjVjMiwwLDMuNC0wLjksMy40LTIuMmMwLTEtMC44LTEuNy0yLjQtMi4xbC0zLjEtMC43Yy0zLjUtMC43LTUuMS0yLjUtNS4xLTUuMQoJCUMxODkuNCwyMS4yLDE5Mi4zLDE5LjEsMTk2LjcsMTkuMXoiPgogIDwvcGF0aD4KIDwvZz4KPC9zdmc+"); /* Replace this with your actual Base64 */
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxuczp4PSJuc19leHRlbmQ7IiB4bWxuczppPSJuc19haTsiIHhtbG5zOmdyYXBoPSJuc19ncmFwaHM7IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDIwNC40IDUwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDQuNCA1MDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgogPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KICAuc3Qwe2ZpbGw6I0ZGRkZGRjt9Cgkuc3Qxe2ZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO2ZpbGw6I0ZGRkZGRjt9CiA8L3N0eWxlPgogPG1ldGFkYXRhPgogIDxzZncgeG1sbnM9Im5zX3NmdzsiPgogICA8c2xpY2VzPgogICA8L3NsaWNlcz4KICAgPHNsaWNlU291cmNlQm91bmRzIGJvdHRvbUxlZnRPcmlnaW49InRydWUiIGhlaWdodD0iNTAiIHdpZHRoPSIyMDQuNCIgeD0iLTczLjYiIHk9IjAiPgogICA8L3NsaWNlU291cmNlQm91bmRzPgogIDwvc2Z3PgogPC9tZXRhZGF0YT4KIDxnPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMy42LDEzLjVDMjMuNiw1LjUsMTYsMiw4LjcsNGMtMC4zLDAuMS0wLjMsMC41LDAsMC42bDEuNiwwLjZjMC4zLDAuMSwwLjMsMC42LDAsMC43CgkJYy00LjksMS44LTYuNyw4LjktNi43LDEzLjZDMy42LDIwLjQsNCwyMSw0LjksMjFjMS4yLDAsMS42LTEsMi4xLTIuMWMwLjMtMC43LDAuNi0xLjUsMS4yLTIuMWMwLjUtMC42LDEuMy0xLDIuMS0xLjUKCQljMC44LTAuNSwxLjctMSwyLjQtMS42YzAuNC0wLjQsMC43LTEuMywwLjgtMmMwLjEtMC40LDAuNS0wLjcsMC44LTAuNGMwLjYsMC42LDEsMS43LDEsMi44YzAsMS45LTEuMywyLjYtMi41LDMuMwoJCWMtMC44LDAuNC0xLjYsMC45LTIuMSwxLjZjLTAuMywwLjQtMC41LDAuOS0wLjgsMS40QzksMjIuMiw4LDI0LjMsNC44LDI0LjNjLTIuOSwwLTQuNC0yLTQuNC00LjVjMC00LjgsMS4yLTkuNiw0LjItMTMuNgoJCWMwLjItMC4zLTAuMS0wLjctMC40LTAuNUwxLjYsNi45Yy0wLjUsMC4zLTEtMC4zLTAuNy0wLjdDMi41LDMuOSw2LjIsMCwxMi45LDBjOC41LDAsMTUuMiw1LjQsMTUuMiwxMy40YzAsNS4xLTIuNSw4LjMtNCw5LjgKCQljLTAuNSwwLjUtMC40LDEuNCwwLjEsMS44YzEuOCwxLjUsNS4xLDQuOSw1LjEsMTAuMkMyOS40LDQzLjMsMjMuMSw1MCwxNCw1MEM0LjksNTAsMS40LDQ0LjMsMCwzOS41Yy0wLjMtMC45LDEuMi0xLjIsMS43LTAuNQoJCWMyLDMsNS41LDYsMTEuMiw2YzUuOCwwLDEwLjYtMy4xLDEwLjYtMTAuMWMwLTQuNC0zLjktOC4xLTUuOS05LjdjLTAuNS0wLjQtMC41LTEuNCwwLTEuOEMxOS44LDIxLjksMjMuNiwxOC40LDIzLjYsMTMuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTEuNCw5LjhjMCwwLjctMC41LDEuMi0xLjIsMS4yUzksMTAuNSw5LDkuOHMwLjUtMS4yLDEuMi0xLjJTMTEuNCw5LjIsMTEuNCw5Ljh6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTQ0LjIsMTYuOWgtNy41di0zLjdoMTkuM3YzLjdoLTcuNXYyMC42aC00LjRWMTYuOXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjcuNSwyMi43Yy0yLjMsMC0zLjksMS41LTMuOSw0LjF2MTAuN2gtNC4zVjEzLjNoNC4ydjkuMmgwLjJjMC44LTIuMSwyLjYtMy4zLDUuNC0zLjNjMy44LDAsNi4zLDIuNSw2LjMsNi44CgkJdjExLjZoLTQuM1YyNi42QzcxLjEsMjQuMSw2OS44LDIyLjcsNjcuNSwyMi43eiI+CiAgPC9wYXRoPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik03OS40LDM3LjVoNC4zVjI2LjhjMC0yLjMsMS43LTMuOSw0LjEtMy45YzAuNywwLDEuNiwwLjEsMiwwLjJ2LTMuOWMtMC40LTAuMS0xLjEtMC4xLTEuNS0wLjEKCQljLTIuMSwwLTMuOCwxLjItNC41LDMuM2gtMC4ydi0zaC00LjJWMzcuNXoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMTA3LjUsMzIuNmMtMC44LDMuMi0zLjcsNS4yLTcuOSw1LjJjLTUuNSwwLTguOC0zLjYtOC44LTkuM2MwLTUuNiwzLjQtOS40LDguNi05LjRjNC41LDAsOC4zLDIuOCw4LjMsOS4yCgkJdjEuM0g5NWMwLDMuMSwxLjksNC45LDQuNiw0LjljMS44LDAsMy4zLTAuOCwzLjgtMi4zTDEwNy41LDMyLjZ6IE05OS40LDIyLjRjLTIuNiwwLTQuMywyLTQuNCw0LjNoOC41CgkJQzEwMy41LDI0LjIsMTAxLjksMjIuNCw5OS40LDIyLjR6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTExOSwzNy45YzQuMiwwLDcuMS0yLjEsNy45LTUuMmwtNC0wLjRjLTAuNiwxLjUtMiwyLjMtMy44LDIuM2MtMi44LDAtNC42LTEuOC00LjYtNC45aDEyLjd2LTEuMwoJCWMwLTYuNC0zLjgtOS4yLTguMy05LjJjLTUuMiwwLTguNiwzLjgtOC42LDkuNEMxMTAuMiwzNC4yLDExMy41LDM3LjksMTE5LDM3Ljl6IE0xMTQuNCwyNi43YzAuMS0yLjMsMS44LTQuMyw0LjQtNC4zCgkJYzIuNSwwLDQuMSwxLjgsNC4xLDQuM0gxMTQuNHoiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQ2LjEsMzEuM2MtMC4zLDMuOS0zLjIsNi42LTcuOCw2LjZjLTUuNCwwLTguNy0zLjktOC43LTkuNGMwLTUuNiwzLjQtOS40LDguNy05LjRjNC40LDAsNy41LDIuNiw3LjgsNi41CgkJSDE0MmMtMC4zLTEuOC0xLjYtMy4xLTMuNy0zLjFjLTIuNiwwLTQuNCwyLjItNC40LDUuOWMwLDMuNywxLjcsNiw0LjQsNmMxLjksMCwzLjMtMS4xLDMuNy0zLjFIMTQ2LjF6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTE1Ny4yLDM3LjljNS4zLDAsOC43LTMuOCw4LjctOS40YzAtNS42LTMuNC05LjQtOC43LTkuNGMtNS4zLDAtOC43LDMuOC04LjcsOS40CgkJQzE0OC41LDM0LjEsMTUxLjksMzcuOSwxNTcuMiwzNy45eiBNMTU3LjIsMzQuNGMtMi45LDAtNC40LTIuNi00LjQtNmMwLTMuMywxLjQtNiw0LjQtNmMy45LDAsNC4zLDIuNyw0LjMsNgoJCUITMTYxLjYsMzEuOCwxNjAuMSwzNC40LDE1Ny4yLDM0LjR6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTE2OS4yLDEzLjNoNC4zdi0yNC4yaC00LjNWMTMuM3oiPgogIDwvcGF0aD4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTg2LjcsMTkuM2gtMy42VjE1aC00LjN2NC40aC0yLjZ2My4zaDIuNnYxMC4xYzAsMy40LDIuNSw1LjEsNS43LDVjMS4yLDAsMi4xLTAuMywyLjUtMC40bC0wLjctMy4zCgkJYy0wLjIsMC4xLTAuNywwLjItMS4zLDAuMmMtMS4xLDAtMS45LTAuNC0xLjktMi4xdi05LjRoMy42VjE5LjN6Ij4KICA8L3BhdGg+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTE5Ni43LDE5LjFjNC4zLDAsNi43LDIsNy4zLDVsLTMuOSwwLjRjLTAuMy0xLjItMS40LTIuMy0zLjMtMi4zYy0xLjgsMC0zLjEsMC45LTMuMSwyLjEKCQljMCwxLjEsMC43LDEuNywyLjYsMi4xbDMuMSwwLjdjMy40LDAuNyw1LjEsMi4zLDUuMSw0LjljMCwzLjQtMy4yLDUuOC03LjgsNS44Yy00LjUsMC03LjMtMi03LjgtNS4zbDQuMi0wLjQKCQljMC40LDEuNiwxLjYsMi41LDMuNiwyLjVjMiwwLDMuNC0wLjksMy40LTIuMmMwLTEtMC44LTEuNy0yLjQtMi4xbC0zLjEtMC43Yy0zLjUtMC43LTUuMS0yLjUtNS4xLTUuMQoJCUMxODkuNCwyMS4yLDE5Mi4zLDE5LjEsMTk2LjcsMTkuMXoiPgogIDwvcGF0aD4KIDwvZz4KPC9zdmc+");
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: 100% 100%; /* Adjust as needed, e.g., '18px' or '80%' */
+            background-size: 100% 100%;
         }
 
-
         .top-bar-title {
-            /* OLD: font-size: 1.3em; or 1.4em */
-            font-size: 1.1em; /* NEW: Smaller font size (adjust as needed) */
-            font-weight: 600; /* Keep or adjust weight */
+            font-size: 1.1em; 
+            font-weight: 600; 
             color: var(--top-bar-text-color);
-            margin: 0; /* Keep margin at 0 */
-            line-height: 1; /* Helps with tighter vertical alignment if font has large line-height */
+            margin: 0; 
+            line-height: 1; 
         }
 
         .version-dropdown {
             position: relative;
             display: inline-block;
         }
-        /* Version button style for black top bar */
-        /* Version button style for black top bar - now styled as a white button */
         .version-button {
-            background-color: #ffffff;         /* NEW: White background */
-            color: var(--text-color);           /* NEW: Black text */
+            background-color: #ffffff;        
+            color: var(--text-color);          
             padding: 6px 12px;
-            border: 1px solid #ffffff;         /* NEW: White border */
-            /* If you want a subtle grey border instead of white, use: */
-            /* border: 1px solid var(--border-color); */
+            border: 1px solid #ffffff;        
             border-radius: var(--button-border-radius);
             cursor: pointer;
             font-family: var(--system-font);
@@ -111,24 +101,23 @@
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .version-button:hover {
-            background-color: #f0f0f0;         /* NEW: Light grey hover */
-            border-color: #e0e0e0;             /* NEW: Slightly darker grey border on hover if desired */
-            /* or keep border-color: #ffffff; if you want the border to remain white */
+            background-color: #f0f0f0;        
+            border-color: #e0e0e0;            
         }
         .version-button:active {
-            background-color: #e0e0e0;         /* NEW: Darker grey active */
-            border-color: #d0d0d0;             /* NEW: Even darker for active if desired */
-            /* or keep border-color: #ffffff; */
+            background-color: #e0e0e0;        
+            border-color: #d0d0d0;            
             transform: scale(0.97);
         }
-        .version-button i {
+        .version-button > i.fa-solid { /* Made specific to solid font awesome */
             margin-left: 6px;
+            margin-right: 0; /* Ensure no double margin if general button i style is added */
             font-size: 0.8em;
-            color: var(--text-color);           /* NEW: Black icon */
+            color: var(--text-color);          
         }
 
         .version-dropdown-content {
-            display: none; position: absolute; background-color: var(--primary-bg); /* Dropdown itself is white */
+            display: none; position: absolute; background-color: var(--primary-bg);
             min-width: 120px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             z-index: 1001; border-radius: var(--button-border-radius);
             border: 1px solid var(--border-color); right: 0; margin-top: 4px;
@@ -151,31 +140,36 @@
         }
 
         .tool-card-title {
-            display: none;
+            display: none; /* Default for mobile */
             font-size: 1.1em;
             font-weight: 600;
             color: var(--text-color);
             margin: -5px 0 10px 0;
-            /* padding-bottom: 10px; */ /* Removed */
-            /* border-bottom: 1px solid var(--border-color); */ /* Removed */
         }
+        .tool-card-title > i.fa-solid, .tool-card-title > i.fa-regular {
+            margin-right: 8px;
+            font-size: 0.9em; /* Relative to title font size */
+            color: var(--text-color); 
+        }
+
 
         @media (min-width: 992px) {
             .main-wrapper {
                 flex-direction: row; padding: 24px; gap: 24px; align-items: stretch;
             }
             .tool-card-title {
-                display: block;
+                display: flex; /* Changed from block for icon alignment */
+                align-items: center; /* For icon vertical alignment */
             }
             .left-column-wrapper {
-                width: calc(35% - (24px * 0.35)); /* Adjusted for gap */
+                width: calc(35% - (24px * 0.35)); 
                 flex-shrink: 0;
                 gap: 24px;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
                 overflow-y: auto; padding-bottom: 1px;
             }
             .note-taker-tool {
-                width: calc(65% - (24px * 0.65)); /* Adjusted for gap */
+                width: calc(65% - (24px * 0.65)); 
                 flex-shrink: 0;
                 display: flex; flex-direction: column;
                 max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
@@ -194,7 +188,7 @@
 
         .tool-container {
              background-color: var(--container-bg); border-radius: var(--base-border-radius);
-             box-shadow: none;
+             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); /* Apple-like shadow */
              padding: 20px;
              display: flex; flex-direction: column; position: relative;
              border: 1px solid var(--border-color);
@@ -212,9 +206,9 @@
         textarea { font-family: var(--mono-font); resize: vertical; min-height: 100px; }
         textarea::placeholder, input::placeholder { color: var(--placeholder-text-color); }
         textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--border-color); /* No blue border on focus */
+            border-color: var(--border-color); 
             outline: none;
-            box-shadow: none; /* Removed focus ring */
+            box-shadow: none; 
         }
         input[type="number"] { width: auto; margin-bottom: 0; }
 
@@ -252,6 +246,12 @@
             border-color: var(--button-disabled-border);
         }
         button:disabled:active { transform: none; }
+        
+        /* Icon styling within buttons (excluding version button handled separately) */
+        button > i.fa-solid, button > i.fa-regular {
+            margin-right: 6px; /* Space between icon and text */
+            font-size: 0.9em;   /* Slightly smaller or same as button text */
+        }
 
 
         .note-taker-tool .controls-and-stats { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; margin-top: auto; }
@@ -259,7 +259,8 @@
         .note-taker-tool .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .note-taker-tool .counter-pill {
-            display: inline-flex; align-items: center; gap: 12px;
+            display: inline-flex; align-items: center; 
+            /* gap: 12px; Removed, using margins on children */
             background-color: var(--primary-bg);
             padding: 7px 14px;
             border-radius: var(--button-border-radius);
@@ -267,8 +268,26 @@
             font-size: 13px;
             font-weight: 500;
         }
-        .note-taker-tool .counter-pill p { margin: 0; color: var(--text-color); }
-        .note-taker-tool .counter-pill span { font-weight: 600; color: var(--text-color); margin-left: 2px; }
+        .note-taker-tool .counter-pill > i.fa-solid, 
+        .note-taker-tool .counter-pill > i.fa-regular {
+            margin-right: 4px; 
+            margin-left: 0; /* Ensure it's reset if it's the first item */
+            color: var(--text-color); 
+            font-size: 0.9em; 
+        }
+        /* Add margin to the left of an icon if it's NOT the first child */
+        .note-taker-tool .counter-pill > i.fa-solid:not(:first-child),
+        .note-taker-tool .counter-pill > i.fa-regular:not(:first-child) {
+            margin-left: 8px; 
+        }
+        .note-taker-tool .counter-pill p { 
+            margin: 0; 
+            color: var(--text-color); 
+        }
+        .note-taker-tool .counter-pill p span { 
+            font-weight: 600; color: var(--text-color); margin-left: 2px; 
+        }
+
 
         .merchant-actions-tool .bulk-actions {
             margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
@@ -287,7 +306,7 @@
             border: 1px solid var(--border-color);
         }
         .merchant-actions-tool .merchant-stats:hover { background-color: #f0f0f5; }
-        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } /* Or a dark theme selection */
+        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } 
         .merchant-actions-tool .merchant-stats > div { display: flex; align-items: center; justify-content: flex-start; width: 100%; gap: 8px; }
 
         .merchant-actions-tool .merchant-checkbox {
@@ -298,8 +317,8 @@
             flex-shrink: 0; background-color: var(--container-bg); margin: 0;
         }
         .merchant-actions-tool .merchant-checkbox:checked {
-            background-color: var(--text-color); /* Black background when checked */
-            border-color: var(--text-color);   /* Black border when checked */
+            background-color: var(--text-color); 
+            border-color: var(--text-color);  
         }
         .merchant-actions-tool .merchant-checkbox:checked::after {
             content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px;
@@ -319,67 +338,51 @@
 
         .parser-controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; margin-bottom: 0; padding-bottom: 4px; flex-wrap: wrap; }
         .toggle-label { font-size: 13px; color: var(--text-color); cursor: pointer; user-select: none; margin-right: 4px; }
-/* --- Container for the toggle --- */
-.toggle-switch {
-    position: relative; /* Crucial for positioning .slider within it */
-    display: inline-block;
-    width: 40px;
-    height: 22px;
-    flex-shrink: 0;
-}
-
-/* --- The hidden actual checkbox --- */
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* --- The visual track of the slider --- */
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #c7c7cc; /* Default 'off' color for the track */
-    transition: background-color 0.3s ease-in-out; /* Animate track color change */
-}
-
-/* --- The visual knob of the slider --- */
-.slider:before {
-    position: absolute; /* Crucial: positions knob relative to .slider track */
-    content: "";
-    height: 18px;   /* Knob height */
-    width: 18px;    /* Knob width */
-    left: 2px;      /* Initial horizontal position of the knob within the track */
-    bottom: 2px;    /* Initial vertical position of the knob within the track */
-    background-color: white; /* Knob color */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease-in-out; /* Animate knob's movement */
-}
-
-/* --- Styles when the toggle is ON (checkbox is checked) --- */
-
-/* 1. Change the track's background color */
-input:checked + .slider {
-    background-color: var(--text-color); /* Your desired 'on' color for the track (black) */
-}
-
-/* 2. Move the knob */
-input:checked + .slider:before {
-    transform: translateX(18px); /* Moves the knob to the right */
-}
-
-/* --- Optional: Rounded appearance --- */
-.slider.round {
-    border-radius: 22px; /* Or equal to height of .toggle-switch or .slider */
-}
-
-.slider.round:before {
-    border-radius: 50%; /* Makes knob circular */
-}
+        .toggle-switch {
+            position: relative; 
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #c7c7cc; 
+            transition: background-color 0.3s ease-in-out; 
+        }
+        .slider:before {
+            position: absolute; 
+            content: "";
+            height: 18px;  
+            width: 18px;   
+            left: 2px;     
+            bottom: 2px;   
+            background-color: white; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease-in-out; 
+        }
+        input:checked + .slider {
+            background-color: var(--text-color); 
+        }
+        input:checked + .slider:before {
+            transform: translateX(18px); 
+        }
+        .slider.round {
+            border-radius: 22px; 
+        }
+        .slider.round:before {
+            border-radius: 50%; 
+        }
 
         #parserGroupSize {
             width: 70px; padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
@@ -395,7 +398,17 @@ input:checked + .slider:before {
 
         #splitModal { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: rgba(60,60,67,0.4); }
         #splitModalContent { background-color: #f9f9f9; margin: auto; padding: 20px; border: none; border-radius: 14px; width: 90%; max-width: 480px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; gap: 12px; }
-        #splitModalContent h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; color: var(--text-color); border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; text-align: center; }
+        #splitModalContent h2 { 
+            margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; color: var(--text-color); 
+            border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        #splitModalContent h2 > i.fa-solid, #splitModalContent h2 > i.fa-regular {
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
         #splitModalContent label { font-size: 0.85rem; font-weight: 500; color: var(--secondary-text-color); margin-bottom: 4px; display: block; }
         #splitModalContent #splitOrdersPerTemplate, #splitModalContent #splitNumberInput { margin-bottom: 0; border-radius: var(--input-border-radius); }
         #splitModalContent #splitOrdersPerTemplate { width: 60px; }
@@ -409,11 +422,11 @@ input:checked + .slider:before {
 
     <div class="top-bar">
         <div class="top-bar-left">
-            <div class="icon-placeholder"></div> <!-- Replaced hamburger icon -->
+            <div class="icon-placeholder"></div> 
             <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
         </div>
         <div class="version-dropdown">
-            <button id="versionButton" class="version-button" aria-haspopup="true" aria-expanded="false">Version 1 <i class="fas fa-chevron-down"></i></button>
+            <button id="versionButton" class="version-button" aria-haspopup="true" aria-expanded="false">Version 1 <i class="fa-solid fa-chevron-down"></i></button>
             <div id="versionDropdownContent" class="version-dropdown-content" role="menu">
                 <a href="#" role="menuitem">Version 1</a>
             </div>
@@ -423,7 +436,7 @@ input:checked + .slider:before {
     <div class="main-wrapper">
         <div class="left-column-wrapper">
             <div class="tool-container parser-tool">
-                <h3 class="tool-card-title">Parser</h3>
+                <h3 class="tool-card-title"><i class="fa-solid fa-filter"></i>Parser</h3>
                 <textarea id="shipmentInput" placeholder="Paste Amazon removal shipment data here..."></textarea>
                 <div class="parser-controls">
                     <div style="display: flex; align-items: center; gap: 8px;" id="groupOrdersControl">
@@ -442,18 +455,18 @@ input:checked + .slider:before {
                 </div>
                 <div id="upsUspsOutputContainer" style="display: none;">
                     <textarea id="upsUspsOutputArea" placeholder="Extracted UPS/USPS Tracking Numbers..."></textarea>
-                    <button id="btnProcessUpsUsps">Process & Add to Notes</button>
+                    <button id="btnProcessUpsUsps"><i class="fa-solid fa-gears"></i>Process & Add to Notes</button>
                 </div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
-                <h3 class="tool-card-title">Merchants</h3>
+                <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
                 <div class="bulk-actions">
-                    <button id="btnDownloadSelected">Download Selected</button>
-                    <button id="btnClearSelected">Clear Selected</button>
-                    <button id="btnSelectAll">Select All</button>
-                    <button id="btnSplitSelected" disabled>Split Selected</button>
-                    <button id="btnDownloadAll">Download All Notes</button>
+                    <button id="btnDownloadSelected"><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <button id="btnClearSelected"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
+                    <button id="btnSelectAll"><i class="fa-regular fa-square-check"></i>Select All</button>
+                    <button id="btnSplitSelected" disabled><i class="fa-solid fa-table-columns"></i>Split Selected</button>
+                    <button id="btnDownloadAll"><i class="fa-solid fa-file-arrow-down"></i>Download All Notes</button>
                 </div>
                 <div id="merchantList">
                 </div>
@@ -461,19 +474,19 @@ input:checked + .slider:before {
         </div>
 
         <div class="tool-container note-taker-tool">
-            <h3 class="tool-card-title">Notes</h3>
+            <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
             <textarea id="noteArea" placeholder="Notes area..."></textarea>
             <div class="controls-and-stats">
                 <div class="top-controls">
                     <div class="button-group">
-                        <button id="btnAddSeparator">Add Separator</button>
-                        <button id="btnAddSpacing">Add Spacing</button>
-                        <button id="btnUndo" disabled>Undo</button>
-                        <button id="btnRedo" disabled>Redo</button>
+                        <button id="btnAddSeparator"><i class="fa-solid fa-minus"></i>Add Separator</button>
+                        <button id="btnAddSpacing"><i class="fa-solid fa-grip-lines"></i>Add Spacing</button>
+                        <button id="btnUndo" disabled><i class="fa-solid fa-rotate-left"></i>Undo</button>
+                        <button id="btnRedo" disabled><i class="fa-solid fa-rotate-right"></i>Redo</button>
                     </div>
                     <div class="counter-pill">
-                        <p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
-                        <p class="total-templates">Cases: <span id="totalTemplates">0</span></p>
+                        <i class="fa-solid fa-users"></i><p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
+                        <i class="fa-solid fa-file-lines"></i><p class="total-templates">Cases: <span id="totalTemplates">0</span></p>
                     </div>
                 </div>
             </div>
@@ -482,7 +495,7 @@ input:checked + .slider:before {
 
     <div id="splitModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; justify-content: center; align-items: center; font-family: var(--system-font);">
         <div id="splitModalContent">
-             <h2>Split Selected Merchant(s)</h2>
+             <h2><i class="fa-solid fa-table-columns"></i>Split Selected Merchant(s)</h2>
             <div id="splitMerchantInfo">
             </div>
             <div>
@@ -498,8 +511,8 @@ input:checked + .slider:before {
                 <input type="number" id="splitNumberInput" min="1" placeholder="e.g., 100">
             </div>
             <div class="modal-actions">
-                <button id="btnCancelSplit">Cancel</button>
-                <button id="btnGenerateSplits">Generate & Download Splits</button>
+                <button id="btnCancelSplit"><i class="fa-solid fa-xmark"></i>Cancel</button>
+                <button id="btnGenerateSplits"><i class="fa-solid fa-file-zipper"></i>Generate & Download Splits</button>
             </div>
         </div>
     </div>
@@ -586,20 +599,26 @@ input:checked + .slider:before {
 
         const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
 
+        // Regex for parsing input:
+        // - UPS/USPS mode: Captures TN (group 1) and "UPS" or "USPS" (group 2)
+        // - AMZL mode: Captures TN (group 1) and "AMZN", "AMZL", or "AMZL_US_PREMIUM" (group 2)
         const trackingNumberSourceRegex = isUpsUspsMode
             ? /\b([A-Z0-9]+)\s*\((UPS|USPS)\)/gi
-            : /\b([A-Z0-9]+(?:-|\s)*\(AMZ[NL]\))/g;
+            : /\b([A-Z0-9]+(?:-|\s)*?)\s*\((AMZ[NL]|AMZL_US_PREMIUM)\)/gi;
 
-        const existingTrackingNumberRegexGlobal = /\b([A-Z0-9]+(?:-|\s)*\((?:AMZ[NL]|UPS|USPS)\))/gi;
+
+        // Regex for checking existing TNS in notes/staging (must be comprehensive)
+        const existingTrackingNumberRegexGlobal = /\b([A-Z0-9]+(?:-|\s)*?\s*\((?:AMZ[NL]|AMZL_US_PREMIUM|UPS|USPS)\))/gi;
         const existingTrackingNumbers = new Set();
         let matchCheck;
         while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
-            const coreTN = matchCheck[1].replace(/\s*\((?:AMZ[NL]|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
+            // matchCheck[1] is the full "TN(CARRIER)" string
+            const coreTN = matchCheck[1].replace(/\s*\((?:AMZ[NL]|AMZL_US_PREMIUM|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
             if (coreTN) existingTrackingNumbers.add(coreTN);
         }
         if (upsUspsOutputArea && upsUspsOutputArea.value) {
             upsUspsOutputArea.value.split('\n').forEach(tn => {
-                const trimmedTn = tn.trim();
+                const trimmedTn = tn.trim(); // These are expected to be core TNS already
                 if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
             });
         }
@@ -619,7 +638,7 @@ input:checked + .slider:before {
 
         const shipmentSections = inputValue.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
         const parsedDataBlocksForAmzl = [];
-        const extractedUpsUspsNumbers = [];
+        const extractedUpsUspsNumbers = []; // For UPS/USPS mode, stores core TNS
         let validShipmentsFound = 0;
         let skippedDuplicateCount = 0;
 
@@ -630,23 +649,22 @@ input:checked + .slider:before {
             }
 
             const sectionCoreTNs = new Set();
-            const sectionFullTNs = [];
+            const sectionFullTNs = []; // Stores "TN(CARRIER)" formatted strings
+
             trackingMatches.forEach(match => {
-                let extractedPart = match[1];
-                let fullFormattedTN = '';
-                const coreTN = extractedPart.replace(/\s*\((?:AMZ[NL]|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
+                // match[1] is the raw tracking number part (e.g., "TBA123 " or "1ZXYZ")
+                // match[2] is the carrier type (e.g., "UPS", "AMZL", "AMZL_US_PREMIUM")
+                const rawTNPart = match[1].trim(); // Trim spaces from the TN part
+                const carrier = match[2];
+                const coreTN = rawTNPart.replace(/\s|-/g, ''); // Cleaned TN for comparisons
 
                 if (!coreTN) return;
 
                 sectionCoreTNs.add(coreTN);
-
-                if (isUpsUspsMode) {
-                    fullFormattedTN = `${match[1].trim()}(${match[2]})`;
-                } else {
-                    fullFormattedTN = extractedPart.replace(/\s*\((AMZ[NL])\)$/, '($1)');
-                }
+                const fullFormattedTN = `${rawTNPart}(${carrier})`; // Reconstruct consistently
                 sectionFullTNs.push(fullFormattedTN);
             });
+
 
             let hasDuplicate = false;
             const coreTNsToCheck = Array.from(sectionCoreTNs);
@@ -664,7 +682,7 @@ input:checked + .slider:before {
                 return;
             }
 
-             coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+            coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
 
             const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
             const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
@@ -673,25 +691,24 @@ input:checked + .slider:before {
             const parsedProducts = []; let currentProduct = null;
             for (let i = 0; i < productLines.length; i++) { const line = productLines[i]; if (line.startsWith('Merchant SKU:')) { if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined) { parsedProducts.push(currentProduct); } currentProduct = { merchantSku: line.substring('Merchant SKU:'.length).trim(), qty: undefined }; } else if (currentProduct) { if (line.startsWith('FNSKU:')) { currentProduct.fnsku = line.substring('FNSKU:'.length).trim(); } else if (/^\d{1,4}$/.test(line) && productLines[i - 1]?.match(/^(EAN|UPC|ISBN_10|Condition|Shipped Quantity|Cancelled Quantity):/i)) { currentProduct.qty = parseInt(line, 10); parsedProducts.push(currentProduct); currentProduct = null; } } } if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) { parsedProducts.push(currentProduct); }
 
-
             if (parsedProducts.length === 0) { return; }
 
             const outputParts = [
                 `Removal order ID:${removalOrderId}`,
                 `Shipment ID:${shipmentId}`,
-                `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`
+                `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}` // Use the formatted TNs
             ];
             const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n') );
             const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
 
             if (isUpsUspsMode) {
-                 coreTNsToCheck.forEach(coreTN => {
+                 coreTNsToCheck.forEach(coreTN => { // Store core TNs for UPS/USPS staging
                      if (!tempUpsUspsData[coreTN]) {
                            tempUpsUspsData[coreTN] = completeDataBlock;
                      }
                     extractedUpsUspsNumbers.push(coreTN);
                  });
-            } else {
+            } else { // AMZL mode (includes AMZL_US_PREMIUM here)
                 parsedDataBlocksForAmzl.push(completeDataBlock);
             }
             validShipmentsFound++;
@@ -715,11 +732,11 @@ input:checked + .slider:before {
                 input.value = '';
                  let message = "No new valid UPS/USPS shipments found. ";
                  if (skippedDuplicateCount > 0) { message += `Skipped ${skippedDuplicateCount} duplicate(s). `; }
-                 else if (shipmentSections.length > 0) { message += "Check data format or carrier type. "; }
+                 else if (shipmentSections.length > 0) { message += "Check data format or ensure carrier is UPS/USPS. "; }
                  else { message += "Check data format. "; }
                  input.placeholder = message;
             }
-        } else {
+        } else { // AMZL processing (includes AMZL_US_PREMIUM)
             let finalOutputString = '';
             if (parsedDataBlocksForAmzl.length > 0) {
                 if (groupSize > 1) {
@@ -740,20 +757,18 @@ input:checked + .slider:before {
                 noteArea.value = currentNoteTrimmed + spacing + finalOutputString;
                 noteArea.scrollTop = noteArea.scrollHeight;
 
-                countTemplatesNoteTaker(); // This will also save notes due to its internal listener
-                // saveNotesToLocalStorage(); // No longer strictly needed here if countTemplatesNoteTaker saves
-
+                countTemplatesNoteTaker(); 
                 input.value = '';
                 const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
-                let processedMessage = `Processed ${validShipmentsFound} new AMZL shipment(s). `;
+                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
                  if (skippedDuplicateCount > 0) { processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `; }
                 processedMessage += `Grouping: ${groupingStatus}. Ready...`;
                  input.placeholder = processedMessage;
             } else {
                 input.value = '';
-                 let message = "No new valid AMZL shipments found. ";
+                 let message = "No new valid AMZL-type shipments found. ";
                  if (skippedDuplicateCount > 0) { message += `Skipped ${skippedDuplicateCount} duplicate(s). `; }
-                 else if (shipmentSections.length > 0) { message += "Check data format or carrier type. "; }
+                 else if (shipmentSections.length > 0) { message += "Check data format or ensure carrier is AMZL-type. "; }
                  else { message += "Check data format. "; }
                  input.placeholder = message;
             }
@@ -788,10 +803,10 @@ input:checked + .slider:before {
 
         let processedBlocks = [];
         let notFoundCount = 0;
-        const processedTNs = new Set();
+        const processedTNs = new Set(); // these are core TNs
 
         trackingNumbersToProcess.forEach(tn => {
-            const coreTN = tn.replace(/\s|-/g, '');
+            const coreTN = tn.replace(/\s|-/g, ''); // Ensure it's clean core TN
             if (!processedTNs.has(coreTN)) {
                 if (tempUpsUspsData[coreTN]) {
                     const formattedBlock = upsUspsTemplate + "\n\n" + tempUpsUspsData[coreTN];
@@ -810,11 +825,18 @@ input:checked + .slider:before {
             noteArea.value = currentNoteTrimmed + spacing + processedBlocks.join('\n\n');
             noteArea.scrollTop = noteArea.scrollHeight;
 
-            countTemplatesNoteTaker(); // This will also save notes
-            // saveNotesToLocalStorage(); // No longer strictly needed here
+            countTemplatesNoteTaker(); 
 
-            upsUspsOutputArea.value = '';
-            tempUpsUspsData = {};
+            // Clear only the processed TNs from outputArea and tempUpsUspsData
+            const remainingOutputTNs = upsUspsOutputArea.value.split('\n')
+                .map(t => t.trim())
+                .filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
+            upsUspsOutputArea.value = remainingOutputTNs.join('\n');
+            
+            processedTNs.forEach(coreTN => {
+                delete tempUpsUspsData[coreTN];
+            });
+
 
             saveUpsUspsOutputToLocalStorage();
             saveUpsUspsContextToLocalStorage();
@@ -835,8 +857,8 @@ input:checked + .slider:before {
    }
 
 
-    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmedValue = ta.value.trimEnd(); ta.value = trimmedValue + (trimmedValue ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); /* saveNotesToLocalStorage(); // covered by countTemplates */ }
-    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); /* Only save here, no need to recount for just spacing */ }
+    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmedValue = ta.value.trimEnd(); ta.value = trimmedValue + (trimmedValue ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
+    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
     function selectAllMerchants() { document.querySelectorAll('#merchantList .merchant-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
 
 
@@ -866,26 +888,25 @@ input:checked + .slider:before {
         let replaced = false;
 
         for (let i = 0; i < parts.length; i++) {
-            if (i % 2 === 0) { // Content part
+            if (i % 2 === 0) { 
                 if (parts[i].trim() === originalSectionKey.trim()) {
                     reconstructedNotes += newSectionText;
                     replaced = true;
                 } else {
                     reconstructedNotes += parts[i];
                 }
-            } else { // Separator part
+            } else { 
                 reconstructedNotes += parts[i];
             }
         }
 
         if (replaced) {
             noteArea.value = reconstructedNotes;
-            // Call countTemplatesNoteTaker AFTER saving, as it reads from noteArea for its processing.
             saveNotesToLocalStorage();
-            countTemplatesNoteTaker(); // This will re-render the list with the new name.
+            countTemplatesNoteTaker(); 
         } else {
             console.warn("Failed to replace section text for name edit. Original section key:", originalSectionKey);
-            editableSpan.textContent = originalDisplayName; // Revert UI
+            editableSpan.textContent = originalDisplayName; 
         }
     }
 
@@ -893,19 +914,20 @@ input:checked + .slider:before {
         const noteArea = document.getElementById('noteArea');
         const fullText = noteArea.value;
         const merchantListDiv = document.getElementById('merchantList');
-        merchantListDiv.innerHTML = ''; // Clear previous items
+        merchantListDiv.innerHTML = ''; 
 
-        const trackingNumberRegex = /\b([A-Z0-9]+(?:-|\s)*\((?:AMZ[NL]|UPS|USPS)\))/gi;
+        // This regex must find all known TN formats for accurate duplicate checking in notes
+        const trackingNumberRegex = /\b([A-Z0-9]+(?:-|\s)*?\s*\((?:AMZ[NL]|AMZL_US_PREMIUM|UPS|USPS)\))/gi;
         const allTrackingNumbers = (fullText.match(trackingNumberRegex) || []);
-        const seenTrackingNumbers = new Set();
-        const duplicatedTrackingNumbers = new Set();
-        allTrackingNumbers.forEach(tn => {
-            const coreTN = tn.replace(/\s*\((?:AMZ[NL]|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
+        const seenTrackingNumbers = new Set(); // Stores core TNs
+        const duplicatedTrackingNumbers = new Set(); // Stores core TNs that are duplicated
+        allTrackingNumbers.forEach(tnString => { // tnString is "TN(CARRIER)"
+            const coreTN = tnString.replace(/\s*\((?:AMZ[NL]|AMZL_US_PREMIUM|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
             if (seenTrackingNumbers.has(coreTN)) { duplicatedTrackingNumbers.add(coreTN); }
             seenTrackingNumbers.add(coreTN);
         });
 
-        const merchantsData = {}; // Use this to hold structured data before sorting
+        const merchantsData = {}; 
         let totalTemplatesOverall = 0;
         let merchantIndex = 0;
         const sections = fullText.split(noteSeparatorRegex);
@@ -930,42 +952,40 @@ input:checked + .slider:before {
                  merchantName = `Data Entry ${merchantIndex}`;
             }
 
-            merchantsData[sectionTextOriginal] = { // Use original section text as key to preserve whitespace for replacement
+            merchantsData[sectionTextOriginal] = { 
                  displayName: merchantName,
                  isNameFromFirstLine: isNameFromFirstLine,
                  count: templateCount,
-                 text: sectionTextOriginal // Store the original, possibly non-trimmed version
+                 text: sectionTextOriginal 
             };
         });
 
         document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
         document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
 
-        // Sort by displayName for rendering
         const sortedMerchants = Object.entries(merchantsData).sort(([, a], [, b]) => a.displayName.localeCompare(b.displayName));
 
         sortedMerchants.forEach(([key, data]) => {
             const merchantDiv = document.createElement('div');
             merchantDiv.className = 'merchant-stats';
-            merchantDiv.dataset.key = key; // This key is the original section text
+            merchantDiv.dataset.key = key; 
             merchantDiv.dataset.displayName = data.displayName;
             merchantDiv.dataset.count = data.count;
 
-            const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []);
+            const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []); // "TN(CARRIER)" strings
             let sectionHasDuplicate = false;
-            const duplicatesInSectionDisplay = new Set();
-            sectionTrackingNumbersFull.forEach(tn => {
-                const coreTn = tn.replace(/\s*\((?:AMZ[NL]|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
+            const duplicatesInSectionDisplay = new Set(); // Stores "TN(CARRIER)" strings for display
+            sectionTrackingNumbersFull.forEach(tnString => {
+                const coreTn = tnString.replace(/\s*\((?:AMZ[NL]|AMZL_US_PREMIUM|UPS|USPS)\)$/i, '').replace(/\s|-/g, '');
                 if (duplicatedTrackingNumbers.has(coreTn)) {
                     sectionHasDuplicate = true;
-                    duplicatesInSectionDisplay.add(tn);
+                    duplicatesInSectionDisplay.add(tnString);
                 }
             });
 
             const titleText = `${data.displayName} (${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
 
             const innerFlexDiv = document.createElement('div');
-            // innerFlexDiv's style is set by .merchant-stats > div in CSS
 
             if (sectionHasDuplicate) {
                 const indicatorSpan = document.createElement('span');
@@ -983,15 +1003,13 @@ input:checked + .slider:before {
 
             const nameAndCountWrapper = document.createElement('span');
             nameAndCountWrapper.className = 'merchant-name-editable-container';
-            // Style from CSS
 
             const nameSpan = document.createElement('span');
             nameSpan.className = 'merchant-name-display';
             nameSpan.contentEditable = true;
             nameSpan.textContent = data.displayName;
             nameSpan.title = titleText + (sectionHasDuplicate ? ` | DUPLICATES FOUND: ${Array.from(duplicatesInSectionDisplay).join(', ')}` : '');
-            // Style from CSS
-
+            
             nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
             nameSpan.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
@@ -1002,14 +1020,13 @@ input:checked + .slider:before {
             const countSpan = document.createElement('span');
             countSpan.className = 'merchant-count-text';
             countSpan.textContent = `(${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
-            // Style from CSS
             nameAndCountWrapper.appendChild(countSpan);
             innerFlexDiv.appendChild(nameAndCountWrapper);
 
             if (sectionHasDuplicate) {
                 const duplicateListSpan = document.createElement('span');
                 const duplicateList = Array.from(duplicatesInSectionDisplay).join(', ');
-                duplicateListSpan.style.cssText = "color: #ff9f0a; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; max-width: 80px;"; // Adjusted max-width
+                duplicateListSpan.style.cssText = "color: #ff9f0a; font-size: 0.8em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; max-width: 80px;"; 
                 duplicateListSpan.title = `Duplicate TN(s): ${duplicateList}`;
                 duplicateListSpan.textContent = `(${duplicateList})`;
                 innerFlexDiv.appendChild(duplicateListSpan);
@@ -1017,7 +1034,7 @@ input:checked + .slider:before {
 
             merchantDiv.appendChild(innerFlexDiv);
             merchantDiv.onclick = (e) => {
-                 if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { // Don't toggle if clicking name
+                 if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { 
                      const cb = merchantDiv.querySelector('.merchant-checkbox');
                      if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); }
                  }
@@ -1061,7 +1078,7 @@ input:checked + .slider:before {
         const textsToDownload = [];
         let totalSelectedCases = 0;
         selectedDivs.forEach((div) => {
-            const key = div.dataset.key; // This key is the full original section text
+            const key = div.dataset.key; 
             if (key !== undefined && key !== null) {
                 textsToDownload.push(key);
                 totalSelectedCases += parseInt(div.dataset.count || '0', 10);
@@ -1070,9 +1087,9 @@ input:checked + .slider:before {
 
         if (textsToDownload.length === 0) { alert("Could not retrieve text for selected merchants."); return; }
 
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); // Use trimEnd on separator for joining
+        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
         const filename = `3COUTB_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename); // Add trailing newline to file
+        downloadText(combinedText + '\n', filename); 
     }
 
     function clearSelectedMerchants() {
@@ -1084,28 +1101,22 @@ input:checked + .slider:before {
         const keysToRemove = new Set();
         selectedDivs.forEach(div => { if (div.dataset.key !== undefined && div.dataset.key !== null) { keysToRemove.add(div.dataset.key); } });
 
-        // Refined clearing logic: Filter sections and join.
         const allSections = [];
-        // let currentSection = ""; // This variable was unused
         fullText.split(noteSeparatorRegex).forEach(s => {
-            // s is the content *between* separators.
-            // If noteArea starts/ends with a separator, or has consecutive separators,
-            // split can produce empty strings. We filter these out.
             if (s.trim() !== "") {
-                allSections.push(s); // Push the original section text (can have leading/trailing spaces if they were part of the section)
+                allSections.push(s); 
             }
         });
 
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
 
         if (remainingSections.length > 0) {
-             // Corrected line: Join remaining sections with the single, original noteSeparator
              noteArea.value = remainingSections.join(noteSeparator);
         } else {
-            noteArea.value = ""; // Clear entirely if no sections remain
+            noteArea.value = ""; 
         }
 
-        countTemplatesNoteTaker(); // This will re-render the list and save the notes
+        countTemplatesNoteTaker(); 
     }
 
     function downloadAllNotes() {
@@ -1150,19 +1161,14 @@ input:checked + .slider:before {
         const templateRegexUpsUsps = new RegExp('^\\s*' + escapedUpsUspsTemplate + '\\s*\\n*', 'gm');
 
         textToProcess = textToProcess.replace(templateRegexAmzl, '').replace(templateRegexUpsUsps, '').trim();
-
-        // Remove potential merchant name headers before splitting by RO ID
+        
         const linesForRO = textToProcess.split('\n');
         if (linesForRO.length > 2 && linesForRO[1].trim() === "" && linesForRO[2].startsWith("Removal order ID:")) {
-            // Likely 'Merchant Name\n\nRemoval order ID:...'
             textToProcess = linesForRO.slice(2).join('\n');
         } else if (linesForRO.length > 0 && linesForRO[0].startsWith("Removal order ID:")) {
-            // Already starts with RO ID
             textToProcess = linesForRO.join('\n');
         }
-        // If it was just a merchant name, it will be filtered out by processSingleROBlock anyway.
-
-
+        
         const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
 
         potentialROBlocks.forEach((roBlock) => {
@@ -1219,7 +1225,7 @@ input:checked + .slider:before {
        let containsAmzl = false;
 
         selectedDivs.forEach((div) => {
-            const key = div.dataset.key; // Full original section text
+            const key = div.dataset.key; 
             const displayName = div.dataset.displayName || `Merchant (Unknown)`;
             if (key !== undefined && key !== null) {
                 selectedMerchantDataForSplit.push({ key: key, name: displayName });
@@ -1229,7 +1235,7 @@ input:checked + .slider:before {
             }
         });
         const merchantNames = selectedMerchantDataForSplit.map(item => item.name);
-        const combinedText = combinedTextParts.join(noteSeparator.trimEnd()); // Use trimEnd on separator for joining
+        const combinedText = combinedTextParts.join(noteSeparator.trimEnd()); 
         modal.dataset.combinedText = combinedText;
         modal.dataset.containsAmzl = containsAmzl;
         modal.dataset.containsUpsUsps = containsUpsUsps;
@@ -1240,7 +1246,7 @@ input:checked + .slider:before {
         else { merchantInfoDiv.textContent = 'No valid merchants selected.'; }
 
         ordersPerTemplateInput.value = '2';
-        splitNumberInput.value = ''; // Default to empty, user must fill
+        splitNumberInput.value = ''; 
         calculatedTemplatesSpan.textContent = '0';
         updateCalculatedTemplates();
         modal.style.display = 'flex';
@@ -1297,8 +1303,6 @@ input:checked + .slider:before {
         if (containsUpsUsps && !containsAmzl) {
             templateToUse = upsUspsTemplate;
         } else if (containsUpsUsps && containsAmzl) {
-            // For mixed content, it's safer to stick to one, or this needs more complex logic.
-            // Assuming AMZL template is general enough or user is aware.
             console.warn("Split contains mixed AMZL and UPS/USPS entries. Using AMZL template for splitting. This might not be ideal for UPS/USPS only data.");
         }
 
@@ -1315,23 +1319,6 @@ input:checked + .slider:before {
         for (let i = 0; i < templateGroups.length; i += splitNumber) {
             const groupChunk = templateGroups.slice(i, i + splitNumber);
             if (groupChunk.length > 0) {
-                 let chunkText = '';
-                 groupChunk.forEach((group, index) => {
-                     // Determine which template to use based on content of *this specific group* if possible
-                     // For now, stick to the globally decided `templateToUse`
-                     chunkText += templateToUse + '\n\n' + group;
-                     if (index < groupChunk.length - 1) {
-                         chunkText += '\n\n'; // Separator between templates in the same file (if any)
-                                            // Typically, this is not a separator between templates, but between the template text and the data.
-                                            // The current structure is Template + Data1 + Data2 ...
-                                            // So, it should be: (Template + DataGroup1) \n\n (Template + DataGroup2) ... if splitNumber > 1
-                                            // No, templateGroups are already structured with N orders.
-                                            // Each item in groupChunk is already a block of text representing one filled template.
-                                            // So, join them with \n\n if a file has multiple templates.
-                     }
-                 });
-                 // Corrected logic: each templateGroup item is data for ONE template.
-                 // If splitNumber > 1, we group multiple (template+data) blocks.
                  const fileTemplates = groupChunk.map(dataForOneTemplate => templateToUse + "\n\n" + dataForOneTemplate);
                 splitOutputs.push({ text: fileTemplates.join('\n\n'), count: groupChunk.length });
             }
@@ -1340,7 +1327,7 @@ input:checked + .slider:before {
         if (splitOutputs.length === 0) { alert("No split files generated."); return; }
 
         let filenameMerchantPart = "SplitSelection";
-        let merchantDisplayStringForFile = selectedMerchantDataForSplit.map(m=>m.name).join(' & '); // Use name from data passed to modal
+        let merchantDisplayStringForFile = selectedMerchantDataForSplit.map(m=>m.name).join(' & '); 
 
         if (selectedMerchantDataForSplit.length === 1) {
             filenameMerchantPart = sanitizeFilename(selectedMerchantDataForSplit[0].name);
@@ -1353,7 +1340,6 @@ input:checked + .slider:before {
         splitOutputs.forEach((outputData, index) => {
             const partNumber = index + 1;
             const filename = `3COUTB_${dateStr}_${filenameMerchantPart}_PART_${partNumber}(${outputData.count}).txt`;
-            // Prepend the actual merchant name(s) to the file content
             const fileContent = merchantDisplayStringForFile + '\n\n' + outputData.text + '\n';
             downloadText(fileContent, filename);
         });
@@ -1370,8 +1356,6 @@ input:checked + .slider:before {
         const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const groupOrdersControl = document.getElementById('groupOrdersControl');
-        // const btnProcessUpsUsps = document.getElementById('btnProcessUpsUsps'); // Handled by container listener
-
 
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
@@ -1380,14 +1364,14 @@ input:checked + .slider:before {
              noteArea.addEventListener('input', () => {
                  clearTimeout(countTimer);
                  countTimer = setTimeout(() => {
-                     saveNotesToLocalStorage(); // Save first
-                     countTemplatesNoteTaker(); // Then recount/re-render
+                     saveNotesToLocalStorage(); 
+                     countTemplatesNoteTaker(); 
                     }, 300);
              });
              noteArea.addEventListener('paste', (e) => {
                  setTimeout(() => {
-                     saveNotesToLocalStorage(); // Save first
-                     countTemplatesNoteTaker(); // Then recount/re-render
+                     saveNotesToLocalStorage(); 
+                     countTemplatesNoteTaker(); 
                     }, 50);
              });
         } else { console.error("Note area element not found!"); }
@@ -1425,29 +1409,21 @@ input:checked + .slider:before {
 
         try { countTemplatesNoteTaker(); } catch(error) { console.error("Error during initial countTemplatesNoteTaker:", error); }
 
-         // Consolidated event listener for buttons in both merchant-actions-tool and note-taker-tool
          document.querySelector('.main-wrapper').addEventListener('click', function(event) {
             const targetButton = event.target.closest('button');
-            if (!targetButton || targetButton.closest('#splitModal')) { return; } // Ignore modal buttons
+            if (!targetButton || targetButton.closest('#splitModal')) { return; } 
 
             try {
                 switch (targetButton.id) {
-                    // Note Taker Tool Buttons
                     case 'btnAddSeparator': addSeparator(); break;
                     case 'btnAddSpacing': addSpacing(); break;
-                    // case 'btnUndo': // Placeholder, no function yet
-                    // case 'btnRedo': // Placeholder, no function yet
-
-                    // Merchant Actions Tool Buttons
                     case 'btnDownloadSelected': downloadSelectedMerchants(); break;
                     case 'btnClearSelected': clearSelectedMerchants(); break;
                     case 'btnSelectAll': selectAllMerchants(); break;
                     case 'btnDownloadAll': downloadAllNotes(); break;
                     case 'btnSplitSelected': openSplitModal(); break;
-
-                    // Parser Tool Button (specifically for btnProcessUpsUsps)
                     case 'btnProcessUpsUsps':
-                        if (targetButton.closest('.parser-tool')) { // Ensure it's the one in parser tool
+                        if (targetButton.closest('.parser-tool')) { 
                             processUpsUspsData();
                         }
                         break;
@@ -1477,10 +1453,9 @@ input:checked + .slider:before {
                   if (isUpsMode) {
                       shipmentInput.placeholder = "Paste shipment data containing UPS/USPS...";
                   } else {
-                      upsUspsOutputArea.value = '';
-                      tempUpsUspsData = {};
-                      saveUpsUspsOutputToLocalStorage();
-                      saveUpsUspsContextToLocalStorage();
+                      // Don't clear upsUspsOutputArea or tempUpsUspsData here
+                      // as they might contain staged data the user wants to process later.
+                      // Only clear them when 'Process & Add to Notes' is clicked for UPS/USPS.
                       shipmentInput.placeholder = "Paste Amazon removal shipment data here...";
                       if (groupToggle && groupSizeInput) groupSizeInput.disabled = !groupToggle.checked;
                   }
@@ -1489,7 +1464,7 @@ input:checked + .slider:before {
               upsUspsToggle.addEventListener('change', function() {
                   toggleUpsUspsMode(this.checked);
               });
-              toggleUpsUspsMode(upsUspsToggle.checked);
+              toggleUpsUspsMode(upsUspsToggle.checked); // Initialize based on current state
 
          } else { console.error("Parser UPS/USPS toggle or related elements not found!"); }
 
