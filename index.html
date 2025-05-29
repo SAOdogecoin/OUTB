@@ -145,9 +145,7 @@
              .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
              .merchant-actions-tool #merchantList { height: 220px; }
         }
-        /* Removed rule that hid .top-bar on max-width: 991px */
         @media (max-width: 991px) {
-            /* .top-bar { display: none; } */ /* This line is removed/commented out */
             .main-wrapper { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - var(--top-bar-height)); } /* Adjust max-height */
              .left-column-wrapper, .note-taker-tool { max-height: none; overflow-y: visible; }
              #noteArea { min-height: 300px; }
@@ -269,6 +267,12 @@
 
         .merchant-actions-tool .bulk-actions {
             margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
+        }
+        #merchantSearchContainer {
+            margin-bottom: 12px; /* Matches bulk-actions */
+        }
+        #merchantSearchInput {
+             margin-bottom: 0; /* Override default input margin */
         }
         .merchant-actions-tool #merchantList {
             min-height: 150px; max-height: 60vh; overflow-y: auto; resize: vertical;
@@ -420,7 +424,7 @@
         .modal-content .close-button:hover { color: var(--text-color); }
 
         .modal-content .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .modal-content .form-group label { font-size: 0.9rem; font-weight: 500; color: var(--text-color); }
+        .modal-content .form-group label.toggle-label { font-size: 0.9rem; font-weight: 500; color: var(--text-color); } /* Updated for toggle */
         .modal-content .form-group input[type="text"] { margin-bottom: 0; }
         .modal-content .form-group small { font-size: 0.8rem; color: var(--secondary-text-color); }
         .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
@@ -432,11 +436,9 @@
 
     <div class="top-bar">
         <div class="top-bar-left">
-            <!-- Icon placeholder removed -->
             <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
         </div>
         <button id="btnOpenSettings" class="settings-button" title="Settings"><i class="fa-solid fa-gear"></i></button>
-        <!-- Version dropdown removed -->
     </div>
 
     <div class="main-wrapper">
@@ -474,7 +476,11 @@
                     <button id="btnSplitSelected" disabled><i class="fa-solid fa-table-columns"></i>Split Selected</button>
                     <button id="btnDownloadAll"><i class="fa-solid fa-file-arrow-down"></i>Download All Notes</button>
                 </div>
+                <div id="merchantSearchContainer" style="display: none;"> <!-- Initially hidden -->
+                    <input type="text" id="merchantSearchInput" placeholder="Search merchants by name..." style="margin-bottom: 0;">
+                </div>
                 <div id="merchantList">
+                    <!-- Merchants will be populated here by JS -->
                 </div>
             </div>
         </div>
@@ -488,7 +494,6 @@
                         <button id="btnAddSeparator"><i class="fa-solid fa-minus"></i>Add Separator</button>
                         <button id="btnAddSpacing"><i class="fa-solid fa-grip-lines"></i>Add Spacing</button>
                         <button id="btnClearAllNotes" class="danger"><i class="fa-solid fa-eraser"></i>Clear All Notes</button>
-                        <!-- Undo/Redo buttons removed -->
                     </div>
                     <div class="counter-pill">
                         <i class="fa-solid fa-users"></i><p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
@@ -500,7 +505,7 @@
     </div>
 
     <!-- Split Modal -->
-    <div id="splitModal" class="modal-overlay" style="/* display: none; is now controlled by class or JS */">
+    <div id="splitModal" class="modal-overlay">
         <div id="splitModalContent" class="modal-content">
              <h2><i class="fa-solid fa-table-columns"></i>Split Selected Merchant(s)</h2>
             <div id="splitMerchantInfo">
@@ -549,6 +554,17 @@
                 <input type="text" id="settingsOtherCarriers" placeholder="e.g., UPS,USPS">
                 <small>Comma-separated list of carriers for the 'Extract Other Carriers' mode.</small>
             </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="settingsShowMerchantSearchToggleInput" class="toggle-label" style="margin-bottom: 0; flex-grow: 1; cursor: pointer;">Show Merchant Search Bar</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingsShowMerchantSearchToggleInput">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <small>Toggle visibility of the search bar in the Merchants panel.</small>
+            </div>
             
             <div class="modal-actions">
                 <button id="btnSaveChangesSettings"><i class="fa-solid fa-save"></i>Save Settings</button>
@@ -570,7 +586,8 @@
     let appSettings = {
         filenamePrefix: '3COUTB',
         amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
-        otherCarriers: ['UPS', 'USPS']
+        otherCarriers: ['UPS', 'USPS'],
+        showMerchantSearch: false // New setting, default to false
     };
     // Regex patterns, will be initialized/updated by loadSettings
     let regexPatterns = {
@@ -581,14 +598,14 @@
     };
 
 
-    let tempUpsUspsData = {}; // Using a more generic name now
+    let tempUpsUspsData = {}; 
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function buildCarrierRegexPart(carrierArray) {
-        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; // Fallback
+        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
         return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
     }
 
@@ -597,18 +614,11 @@
         const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
         const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
         const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
-        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); // Ensure this doesn't create an empty (?:)
+        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
 
-        // Corrected regex: added capturing group around the carrier part
         regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
         regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
-        
-        // This one is for matching the whole "TN(CARRIER)" string, so it's slightly different.
-        // The inner part (allCarrierPart) should still be a non-capturing group if it contains multiple options.
-        // The outer parentheses capture the entire "TN(CARRIER)"
         regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
-        
-        // This is for extracting the core TN by removing " (CARRIER_PART)"
         regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
     }
 
@@ -618,38 +628,68 @@
         if (savedSettings) {
             try {
                 const parsed = JSON.parse(savedSettings);
-                // Ensure default arrays if loaded ones are not arrays
                 appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
                 appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
                 appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
+                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
             } catch (e) {
                 console.error("Error parsing saved settings, using defaults.", e);
-                // Defaults are already set in appSettings
             }
         }
-        initializeRegexPatterns(); // Initialize regexes after loading settings
-        // Populate settings modal inputs
+        initializeRegexPatterns(); 
         document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
+        applyMerchantSearchVisibility();
     }
 
     function saveSettings() {
-        // Get values from modal
         appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
         
         const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
         appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM']; // Ensure not empty
+        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
 
         const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
         appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
-        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS']; // Ensure not empty
+        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
 
+        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        initializeRegexPatterns(); // Re-initialize regexes with new settings
+        initializeRegexPatterns(); 
+        applyMerchantSearchVisibility();
         alert("Settings saved!");
+    }
+
+    function applyMerchantSearchVisibility() {
+        const searchContainer = document.getElementById('merchantSearchContainer');
+        const searchInput = document.getElementById('merchantSearchInput');
+        if (searchContainer) {
+            if (appSettings.showMerchantSearch) {
+                searchContainer.style.display = 'block';
+            } else {
+                searchContainer.style.display = 'none';
+                if (searchInput) searchInput.value = ''; 
+            }
+            filterMerchants(); // Always re-filter when visibility changes or input is cleared
+        }
+    }
+
+    function filterMerchants() {
+        const searchInput = document.getElementById('merchantSearchInput');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        const merchantItems = document.querySelectorAll('#merchantList .merchant-stats');
+
+        merchantItems.forEach(item => {
+            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
+            if (displayName.includes(searchTerm)) {
+                item.style.display = 'flex'; 
+            } else {
+                item.style.display = 'none';
+            }
+        });
     }
 
 
@@ -715,7 +755,7 @@
         const noteArea = document.getElementById('noteArea');
         const groupToggle = document.getElementById('groupToggle');
         const groupSizeInput = document.getElementById('parserGroupSize');
-        const upsUspsToggle = document.getElementById('upsUspsToggle'); // Renamed to "Other Carriers" toggle in UI
+        const upsUspsToggle = document.getElementById('upsUspsToggle'); 
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         
         const inputValue = input.value; 
@@ -728,7 +768,6 @@
         const currentNoteValue = noteArea.value;
         const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
 
-        // Use pre-initialized regex patterns from appSettings
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
         const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
         const coreTNReplaceRegex = regexPatterns.coreTnExtract;
@@ -780,7 +819,7 @@
 
                 trackingMatches.forEach(match => {
                     const rawTNPart = match[1].trim(); 
-                    const carrier = match[2]; // Carrier is the second captured group
+                    const carrier = match[2]; 
                     const coreTN = rawTNPart.replace(/\s|-/g, ''); 
                     if (!coreTN) return;
                     sectionCoreTNs.add(coreTN);
@@ -882,7 +921,7 @@
         }, 5000);
     }
 
-   function processUpsUspsData() { // Renamed to be more generic internally
+   function processUpsUspsData() { 
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const noteArea = document.getElementById('noteArea');
         const shipmentInput = document.getElementById('shipmentInput');
@@ -926,7 +965,7 @@
             const noteArea = document.getElementById('noteArea');
             noteArea.value = '';
             saveNotesToLocalStorage();
-            countTemplatesNoteTaker(); // This will refresh merchant list and counts
+            countTemplatesNoteTaker(); 
         }
     }
 
@@ -984,8 +1023,10 @@
         });
         document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
         document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
-        const sortedMerchants = Object.entries(merchantsData).sort(([, a], [, b]) => a.displayName.localeCompare(b.displayName));
-        sortedMerchants.forEach(([key, data]) => {
+        
+        // Display merchants in the order they appear in notes (insertion order)
+        const merchantsInOrder = Object.entries(merchantsData); 
+        merchantsInOrder.forEach(([key, data]) => {
             const merchantDiv = document.createElement('div'); merchantDiv.className = 'merchant-stats';
             merchantDiv.dataset.key = key; merchantDiv.dataset.displayName = data.displayName; merchantDiv.dataset.count = data.count;
             const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []);
@@ -1016,6 +1057,7 @@
             merchantDiv.onclick = (e) => { if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { const cb = merchantDiv.querySelector('.merchant-checkbox'); if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); } } };
             merchantListDiv.appendChild(merchantDiv);
         });
+        filterMerchants(); // Apply current search filter to the newly populated list
         updateSelectedCountNoteTaker();
     }
 
@@ -1177,7 +1219,7 @@
    }
 
     document.addEventListener('DOMContentLoaded', () => {
-        loadSettings(); // Load settings on page load
+        loadSettings(); 
 
         const shipmentInput = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
@@ -1187,6 +1229,7 @@
         const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const groupOrdersControl = document.getElementById('groupOrdersControl');
+        const merchantSearchInput = document.getElementById('merchantSearchInput');
 
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
@@ -1203,9 +1246,13 @@
             let parseTimer;
             shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
         }
+        
+        if(merchantSearchInput) {
+            merchantSearchInput.addEventListener('input', filterMerchants);
+        }
+
         try { countTemplatesNoteTaker(); } catch(e) { console.error("Initial count error:", e); }
 
-        // Button Event Listeners
         document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
         document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
         document.getElementById('btnClearAllNotes')?.addEventListener('click', clearAllNotes);
@@ -1216,7 +1263,6 @@
         document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
         document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
         
-        // Settings Modal Listeners
         document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
         document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
         document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
@@ -1240,7 +1286,6 @@
             toggleUpsUspsMode(upsUspsToggle.checked);
         }
 
-        // Split Modal Listeners
         const splitModalEl = document.getElementById('splitModal');
         document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
         splitModalEl?.addEventListener('click', (event) => { if (event.target === splitModalEl) closeSplitModal(); });
