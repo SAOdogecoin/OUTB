@@ -596,13 +596,19 @@
         const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
         const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
         const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
-        // Ensure no empty strings if an array is empty, though buildCarrierRegexPart handles it
         const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
-        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']);
+        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); // Ensure this doesn't create an empty (?:)
 
-
-regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
-regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
+        // Corrected regex: added capturing group around the carrier part
+        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
+        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
+        
+        // This one is for matching the whole "TN(CARRIER)" string, so it's slightly different.
+        // The inner part (allCarrierPart) should still be a non-capturing group if it contains multiple options.
+        // The outer parentheses capture the entire "TN(CARRIER)"
+        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
+        
+        // This is for extracting the core TN by removing " (CARRIER_PART)"
         regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
     }
 
