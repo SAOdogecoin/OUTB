@@ -40,6 +40,9 @@
         -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         font-size: 13px;
     }
+    body.is-resizing {
+        user-select: none; /* CHANGE: Prevent text selection during resize drag */
+    }
 
     .top-bar {
         background-color: var(--bg-toolbar);
@@ -63,17 +66,13 @@
         background-color: var(--bg-window);
         border-radius: 12px;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-        padding: 20px;
+        padding: 20px 20px 25px 20px; /* CHANGE: Add padding-bottom for the handle */
         display: flex; flex-direction: column;
         position: relative;
         border: 0.5px solid rgba(0, 0, 0, 0.1);
-    }
-    
-    /* FIX #2: Add resizing capability to the Notes container */
-    .note-taker-tool {
-        resize: vertical;
-        overflow: auto;
-        min-height: 300px; /* Optional: set a minimum height */
+        overflow: hidden; /* CHANGE: Hide overflow and disable native resize */
+        resize: none;
+        min-height: 200px; /* CHANGE: Set a reasonable min-height for all containers */
     }
 
     .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
@@ -92,6 +91,7 @@
             width: calc(65% - 12px);
             flex-grow: 1;
             display: flex; flex-direction: column;
+            min-height: 400px; /* A larger default for the main notes area */
         }
         #noteArea { flex-grow: 1; min-height: 200px; }
         .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
@@ -152,8 +152,7 @@
         width: 100%; background-color: transparent; padding: 8px 10px;
         font-size: 14px; color: var(--text-primary);
     }
-    /* FIX #2: Disable resizing on the textarea itself */
-    textarea.macos-textfield { font-family: var(--mono-font); resize: none; min-height: 150px; }
+    textarea.macos-textfield { font-family: var(--mono-font); resize: none; min-height: 100px; }
     
     /* Switches */
     .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
@@ -186,10 +185,10 @@
     .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
     
     #merchantList {
-        min-height: 150px;
-        max-height: 60vh;
+        min-height: 100px; /* CHANGE: Set a smaller min-height */
+        max-height: 70vh;
         overflow-y: auto;
-        resize: vertical;
+        /* CHANGE: Removed resize: vertical */
         margin-top: 16px;
         padding: 8px;
         border: 1px solid var(--border-subtle);
@@ -198,6 +197,7 @@
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 8px;
         background-color: rgba(255,255,255,0.4);
+        flex-grow: 1; /* CHANGE: Allow the list to grow */
     }
 
     .merchant-item {
@@ -209,12 +209,30 @@
         align-items: center;
         justify-content: flex-start;
         font-size: 13px;
-        transition: background-color 0.15s ease, border-color 0.15s ease;
+        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
         cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
-    .merchant-item:hover { background-color: rgba(0,0,0,0.05); }
-    .merchant-item.selected { background-color: #e8f3ff; border-color: #b0d7ff;}
-    .merchant-item .case-count { font-size: 11px; font-weight: 500; color: var(--text-secondary); background-color: var(--border-subtle); padding: 2px 6px; border-radius: 5px; margin-left: auto; }
+    .merchant-item:hover {
+        background-color: rgba(0,0,0,0.03);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .merchant-item.selected {
+        background-color: #e8f3ff;
+        border-color: #b0d7ff;
+    }
+    
+    /* CHANGE: New styling for the case counter pill */
+    .merchant-item .case-count {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background-color: #e9e9ed;
+        padding: 3px 8px;
+        border-radius: 10px;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
     
     .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
     .macos-checkbox {
@@ -224,6 +242,7 @@
         background-image: linear-gradient(#FFFFFF, #F7F7F7);
         border: 0.5px solid #BDBDBD;
         box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.07);
+        flex-shrink: 0;
     }
     .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
     .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; line-height: 1; }
@@ -232,6 +251,24 @@
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
 
+    /* CHANGE: New styles for the custom resize handle */
+    .resize-handle {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        cursor: ns-resize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .resize-pill {
+        width: 40px;
+        height: 5px;
+        background-color: #d1d1d6;
+        border-radius: 2.5px;
+    }
 </style>
 </head>
 <body>
@@ -245,8 +282,8 @@
         <div class="left-column-wrapper">
             <div class="tool-container parser-tool">
                 <h3 class="tool-card-title"><i class="fa-solid fa-filter" style="margin-right: 8px;"></i>Parser</h3>
-                <div class="macos-textfield-container">
-                    <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
+                <div class="macos-textfield-container" style="flex-grow:1; display:flex;">
+                    <textarea id="shipmentInput" class="macos-textfield"></textarea>
                 </div>
                 <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
                     <div style="display: flex; align-items: center; gap: 8px;" id="groupOrdersControl">
@@ -265,6 +302,8 @@
                     <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
                     <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
                 </div>
+                <!-- CHANGE: Added resize handle -->
+                <div class="resize-handle"><div class="resize-pill"></div></div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
@@ -283,6 +322,8 @@
                      <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
                 <div id="merchantList"></div>
+                <!-- CHANGE: Added resize handle -->
+                <div class="resize-handle"><div class="resize-pill"></div></div>
             </div>
         </div>
 
@@ -304,6 +345,8 @@
                     </div>
                 </div>
             </div>
+            <!-- CHANGE: Added resize handle -->
+            <div class="resize-handle"><div class="resize-pill"></div></div>
         </div>
     </div>
     
@@ -377,7 +420,7 @@
         filenamePrefix: '3COUTB',
         amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
         otherCarriers: ['UPS', 'USPS'],
-        showMerchantSearch: false // New setting, default to false
+        showMerchantSearch: false
     };
     // Regex patterns, will be initialized/updated by loadSettings
     let regexPatterns = {
@@ -470,7 +513,7 @@
     function filterMerchants() {
         const searchInput = document.getElementById('merchantSearchInput');
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-        const merchantItems = document.querySelectorAll('#merchantList .merchant-stats');
+        const merchantItems = document.querySelectorAll('#merchantList .merchant-item');
 
         merchantItems.forEach(item => {
             const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
@@ -748,7 +791,7 @@
 
     function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
     function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
-    function selectAllMerchants() { document.querySelectorAll('#merchantList .merchant-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
+    function selectAllMerchants() { document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
     
     function clearAllNotes() {
         if (confirm("Are you sure you want to clear ALL notes? This action cannot be undone.")) {
@@ -815,61 +858,84 @@
         
         const merchantsInOrder = Object.entries(merchantsData); 
         merchantsInOrder.forEach(([key, data]) => {
-            const merchantDiv = document.createElement('div'); merchantDiv.className = 'merchant-stats';
-            merchantDiv.dataset.key = key; merchantDiv.dataset.displayName = data.displayName; merchantDiv.dataset.count = data.count;
-            const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []);
-            let sectionHasDuplicate = false; const duplicatesInSectionDisplay = new Set();
-            sectionTrackingNumbersFull.forEach(tnString => {
-                const coreTn = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-                if (duplicatedTrackingNumbers.has(coreTn)) { sectionHasDuplicate = true; duplicatesInSectionDisplay.add(tnString); }
-            });
-            const titleText = `${data.displayName} (${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
-            const innerFlexDiv = document.createElement('div');
-            if (sectionHasDuplicate) {
-                const indicatorSpan = document.createElement('span'); indicatorSpan.className = 'duplicate-indicator';
-                indicatorSpan.title = `Contains duplicate TN(s): ${Array.from(duplicatesInSectionDisplay).join(', ')}`;
-                innerFlexDiv.appendChild(indicatorSpan);
-            }
-            const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.className = 'merchant-checkbox';
-            checkbox.onchange = updateSelectedCountNoteTaker; innerFlexDiv.appendChild(checkbox);
-            const nameAndCountWrapper = document.createElement('span'); nameAndCountWrapper.className = 'merchant-name-editable-container';
-            const nameSpan = document.createElement('span'); nameSpan.className = 'merchant-name-display'; nameSpan.contentEditable = true;
-            nameSpan.textContent = data.displayName; nameSpan.title = titleText + (sectionHasDuplicate ? ` | DUPLICATES FOUND: ${Array.from(duplicatesInSectionDisplay).join(', ')}` : '');
+            // CHANGE: Build the new merchant item structure
+            const merchantDiv = document.createElement('div');
+            merchantDiv.className = 'merchant-item'; // Use the styled class
+            merchantDiv.dataset.key = key;
+            merchantDiv.dataset.displayName = data.displayName;
+            merchantDiv.dataset.count = data.count;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'macos-checkbox';
+            checkbox.onchange = updateSelectedCountNoteTaker;
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.contentEditable = true;
+            nameSpan.textContent = data.displayName;
+            nameSpan.style.margin = '0 8px';
+            nameSpan.style.flexGrow = '1';
+            nameSpan.style.overflow = 'hidden';
+            nameSpan.style.textOverflow = 'ellipsis';
+            nameSpan.style.whiteSpace = 'nowrap';
             nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
             nameSpan.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } else if (e.key === 'Escape') { e.preventDefault(); e.target.textContent = data.displayName; e.target.blur(); } });
-            nameAndCountWrapper.appendChild(nameSpan);
-            const countSpan = document.createElement('span'); countSpan.className = 'merchant-count-text';
-            countSpan.textContent = `(${data.count} ${data.count === 1 ? 'case' : 'cases'})`; nameAndCountWrapper.appendChild(countSpan);
-            innerFlexDiv.appendChild(nameAndCountWrapper);
-            merchantDiv.appendChild(innerFlexDiv);
-            merchantDiv.onclick = (e) => { if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { const cb = merchantDiv.querySelector('.merchant-checkbox'); if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); } } };
+
+            const countSpan = document.createElement('span');
+            countSpan.className = 'case-count';
+            countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
+
+            merchantDiv.appendChild(checkbox);
+            merchantDiv.appendChild(nameSpan);
+            merchantDiv.appendChild(countSpan);
+            
+            merchantDiv.onclick = (e) => {
+                if (e.target !== checkbox && e.target !== nameSpan) {
+                    checkbox.checked = !checkbox.checked;
+                    updateSelectedCountNoteTaker();
+                }
+            };
+
             merchantListDiv.appendChild(merchantDiv);
         });
         filterMerchants(); 
         updateSelectedCountNoteTaker();
-        
-        // FIX #1: Save to localStorage after any modification to ensure all changes are captured.
         saveNotesToLocalStorage();
     }
 
     function updateSelectedCountNoteTaker() {
-        const selectedCheckboxes = document.querySelectorAll('#merchantList .merchant-checkbox:checked');
-        const splitButton = document.getElementById('btnSplitSelected'); let selectedCaseCount = 0;
-        selectedCheckboxes.forEach(cb => { selectedCaseCount += parseInt(cb.closest('.merchant-stats')?.dataset?.count || '0', 10); });
-        const totalTemplatesSpan = document.getElementById('totalTemplates'); const merchantCountSpan = document.getElementById('merchantCount');
-        const totalMerchantCount = document.querySelectorAll('#merchantList .merchant-stats').length;
-        const totalCaseCountOverall = Array.from(document.querySelectorAll('#merchantList .merchant-stats')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
+        const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
+        const splitButton = document.getElementById('btnSplitSelected');
+        let selectedCaseCount = 0;
+        
+        document.querySelectorAll('.merchant-item').forEach(item => {
+            const cb = item.querySelector('.macos-checkbox');
+            if (cb && cb.checked) {
+                item.classList.add('selected');
+                selectedCaseCount += parseInt(item.dataset.count || '0', 10);
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+
+        const totalTemplatesSpan = document.getElementById('totalTemplates');
+        const merchantCountSpan = document.getElementById('merchantCount');
+        const totalMerchantCount = document.querySelectorAll('#merchantList .merchant-item').length;
+        const totalCaseCountOverall = Array.from(document.querySelectorAll('#merchantList .merchant-item')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
+        
         if (selectedCheckboxes.length > 0) {
-            totalTemplatesSpan.textContent = selectedCaseCount; merchantCountSpan.textContent = selectedCheckboxes.length;
+            totalTemplatesSpan.textContent = selectedCaseCount;
+            merchantCountSpan.textContent = selectedCheckboxes.length;
             if (splitButton) splitButton.disabled = false;
         } else {
-            totalTemplatesSpan.textContent = totalCaseCountOverall; merchantCountSpan.textContent = totalMerchantCount;
+            totalTemplatesSpan.textContent = totalCaseCountOverall;
+            merchantCountSpan.textContent = totalMerchantCount;
             if (splitButton) splitButton.disabled = true;
         }
     }
 
     function downloadSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) { alert('Please select merchant(s) to download.'); return; }
         const textsToDownload = []; let totalSelectedCases = 0;
         selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
@@ -880,7 +946,7 @@
     }
 
     function clearSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) { alert('Please select merchant(s) to clear.'); return; }
         if (!confirm(`Are you sure you want to clear the ${selectedDivs.length} selected merchant(s)? This cannot be undone.`)) return;
         const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
@@ -939,7 +1005,7 @@
 
     function openSplitModal() {
         selectedMerchantDataForSplit = [];
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) { alert("Please select merchant(s)."); return; }
         const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
         if (!modal || !merchantInfoDiv) { alert("Split modal error."); return; }
@@ -1009,6 +1075,40 @@
         });
         closeSplitModal();
    }
+    
+    // CHANGE: New function to initialize custom resizers
+    function initDraggableWindows() {
+        const handles = document.querySelectorAll('.resize-handle');
+        handles.forEach(handle => {
+            const container = handle.closest('.tool-container');
+            if (!container) return;
+
+            let initialHeight, initialY;
+
+            const onMouseMove = (e) => {
+                const dy = e.clientY - initialY;
+                let newHeight = initialHeight + dy;
+                const minHeight = parseInt(getComputedStyle(container).minHeight) || 150;
+                if (newHeight < minHeight) newHeight = minHeight;
+                container.style.height = `${newHeight}px`;
+            };
+
+            const onMouseUp = () => {
+                document.body.classList.remove('is-resizing');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                initialHeight = container.offsetHeight;
+                initialY = e.clientY;
+                document.body.classList.add('is-resizing');
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+        });
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         loadSettings(); 
@@ -1027,8 +1127,6 @@
             const savedNotes = localStorage.getItem(localStorageKey);
             if (savedNotes) noteArea.value = savedNotes;
             let countTimer;
-            // FIX #1: The event listener now only needs to trigger the central function.
-            // The save operation is now inside countTemplatesNoteTaker.
             noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(countTemplatesNoteTaker, 300); });
             noteArea.addEventListener('paste', () => { setTimeout(countTemplatesNoteTaker, 50); });
         }
@@ -1085,6 +1183,9 @@
         splitModalEl?.addEventListener('click', (event) => { if (event.target === splitModalEl) closeSplitModal(); });
         document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
         document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
+
+        // CHANGE: Initialize the custom draggable resizers
+        initDraggableWindows();
     });
 </script>
 
