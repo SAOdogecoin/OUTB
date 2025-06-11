@@ -6,568 +6,349 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="." />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --system-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
-            --primary-bg: #ffffff;
-            --container-bg: #ffffff;
-            --text-color: #1d1d1f; 
-            --secondary-text-color: #6e6e73;
-            --placeholder-text-color: #aaaaaf;
-            --accent-blue: #007aff;
-            --accent-blue-rgb: 0, 122, 255;
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+    :root {
+        --system-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
+        --bg-primary: #F6F6F6;
+        --bg-window: rgba(255, 255, 255, 0.8);
+        --bg-toolbar: #F0F0F0;
+        --bg-glass: rgba(240, 240, 240, 0.7);
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --text-placeholder: #aaaaaf;
+        --border-color: #C6C6C6;
+        --border-subtle: #E0E0E0;
+        --accent-blue: #007AFF;
+        --accent-blue-dark: #006ADC;
+        --accent-red: #ff3b30;
+        --accent-red-hover: #ff453a;
+        --top-bar-height: 50px;
+    }
 
-            --button-bg: #1d1d1f;
-            --button-text: #ffffff;
-            --button-border-color: #1d1d1f;
-            --button-hover-bg: #38383a;
-            --button-hover-border-color: #38383a;
-            --button-active-bg: #4f4f52;
-            --button-active-border-color: #4f4f52;
-            --button-disabled-bg: #e0e0e0;
-            --button-disabled-text: #9e9e9e;
-            --button-disabled-border: #e0e0e0;
+    /* --- Global & Layout --- */
+    html { box-sizing: border-box; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body {
+        font-family: var(--system-font);
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        margin: 0; padding: 0; display: flex; flex-direction: column;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        font-size: 13px;
+    }
 
-            --danger-button-bg: #ff3b30;
-            --danger-button-text: #ffffff;
-            --danger-button-border-color: #ff3b30;
-            --danger-button-hover-bg: #ff453a;
-            --danger-button-hover-border-color: #ff453a;
-            --danger-button-active-bg: #d63027;
-            --danger-button-active-border-color: #d63027;
+    .top-bar {
+        background-color: var(--bg-toolbar);
+        padding: 0 16px;
+        height: var(--top-bar-height);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        border-bottom: 0.5px solid var(--border-color);
+    }
+    .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); }
 
+    .main-wrapper {
+        display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
+        width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
+    }
+    .left-column-wrapper { display: flex; flex-direction: column; gap: 16px; }
 
-            --border-color: #d2d2d7;
-            --base-border-radius: 10px;
-            --button-border-radius: 6px;
-            --input-border-radius: 6px;
-            --top-bar-height: 50px;
-            --top-bar-bg: #1d1d1f; 
-            --top-bar-text-color: #ffffff; 
-        }
-        html { box-sizing: border-box; }
-        *, *:before, *:after { box-sizing: inherit; }
-        body {
-            font-family: var(--system-font); background-color: var(--primary-bg);
-            color: var(--text-color); margin: 0; padding: 0; display: flex;
-            flex-direction: column; min-height: 100vh;
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-            font-size: 14px;
-        }
-
-        .top-bar {
-            background-color: var(--top-bar-bg);
-            padding: 0 12px 0 10px; 
-            height: var(--top-bar-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .top-bar-left {
-            display: flex;
-            align-items: center; 
-            gap: 8px; 
-        }
-
-        .top-bar-title {
-            font-size: 1.1em; 
-            font-weight: 600; 
-            color: var(--top-bar-text-color);
-            margin: 0 0 0 10px; /* Added left margin since logo is removed */
-            line-height: 1; 
-        }
-        
-        .settings-button {
-            background-color: transparent;
-            color: var(--top-bar-text-color);
-            border: none;
-            font-size: 1.2em; /* Make icon a bit larger */
-            padding: 8px;
-            cursor: pointer;
-            border-radius: var(--button-border-radius);
-        }
-        .settings-button:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-        .settings-button:active {
-            background-color: rgba(255,255,255,0.2);
-        }
-
-
-        .main-wrapper {
-            display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
-            width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
-        }
-
+    .tool-container {
+        background-color: var(--bg-window);
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        display: flex; flex-direction: column;
+        position: relative;
+        border: 0.5px solid rgba(0, 0, 0, 0.1);
+    }
+    .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
+    .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
+    
+    @media (min-width: 992px) {
+        .main-wrapper { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
+        .tool-card-title { display: flex; align-items: center; }
         .left-column-wrapper {
-            display: flex; flex-direction: column; gap: 16px;
-        }
-
-        .tool-card-title {
-            display: none; /* Default for mobile */
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--text-color);
-            margin: -5px 0 10px 0;
-        }
-        .tool-card-title > i.fa-solid, .tool-card-title > i.fa-regular {
-            margin-right: 8px;
-            font-size: 0.9em; /* Relative to title font size */
-            color: var(--text-color); 
-        }
-
-
-        @media (min-width: 992px) {
-            .main-wrapper {
-                flex-direction: row; padding: 24px; gap: 24px; align-items: stretch;
-            }
-            .tool-card-title {
-                display: flex; 
-                align-items: center; 
-            }
-            .left-column-wrapper {
-                width: calc(35% - (24px * 0.35)); 
-                flex-shrink: 0;
-                gap: 24px;
-                max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
-                overflow-y: auto; padding-bottom: 1px;
-            }
-            .note-taker-tool {
-                width: calc(65% - (24px * 0.65)); 
-                flex-shrink: 0;
-                display: flex; flex-direction: column;
-                max-height: calc(100vh - var(--top-bar-height) - (2 * 24px));
-            }
-             #noteArea { flex-grow: 1; min-height: 200px; }
-             .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
-             .merchant-actions-tool #merchantList { height: 220px; }
-        }
-        @media (max-width: 991px) {
-            .main-wrapper { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - var(--top-bar-height)); } /* Adjust max-height */
-             .left-column-wrapper, .note-taker-tool { max-height: none; overflow-y: visible; }
-             #noteArea { min-height: 300px; }
-             .merchant-actions-tool #merchantList { height: 200px; }
-        }
-
-        .tool-container {
-             background-color: var(--container-bg); border-radius: var(--base-border-radius);
-             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-             padding: 20px;
-             display: flex; flex-direction: column; position: relative;
-             border: 1px solid var(--border-color);
-         }
-
-        textarea, input[type="text"], input[type="number"] {
-            width: 100%; margin-bottom: 12px; padding: 10px 12px;
-            border: 1px solid var(--border-color); border-radius: var(--input-border-radius);
-            background-color: var(--container-bg);
-            color: var(--text-color);
-            line-height: 1.5; font-family: var(--system-font); font-size: 14px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: none;
-        }
-        textarea { font-family: var(--mono-font); resize: vertical; min-height: 100px; }
-        textarea::placeholder, input::placeholder { color: var(--placeholder-text-color); }
-        textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
-            border-color: var(--border-color); 
-            outline: none;
-            box-shadow: none; 
-        }
-        input[type="number"] { width: auto; margin-bottom: 0; }
-
-       #shipmentInput { margin-bottom: 0; min-height: 150px; }
-
-        button {
-            background-color: var(--button-bg); color: var(--button-text);
-            padding: 7px 14px;
-            border: 1px solid var(--button-border-color);
-            border-radius: var(--button-border-radius); cursor: pointer; margin: 0;
-            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-            font-family: var(--system-font);
-            font-weight: 500; font-size: 13px;
-            flex-shrink: 0; text-align: center; display: inline-flex;
-            align-items: center; justify-content: center; position: relative; overflow: hidden;
-            box-shadow: none;
-        }
-        button:hover {
-            background-color: var(--button-hover-bg);
-            border-color: var(--button-hover-border-color);
-        }
-        button:active {
-            background-color: var(--button-active-bg);
-            border-color: var(--button-active-border-color);
-            transform: scale(0.97);
-        }
-        button:disabled {
-            background-color: var(--button-disabled-bg);
-            color: var(--button-disabled-text);
-            border-color: var(--button-disabled-border);
-            cursor: not-allowed;
-        }
-        button.danger {
-            background-color: var(--danger-button-bg);
-            color: var(--danger-button-text);
-            border-color: var(--danger-button-border-color);
-        }
-        button.danger:hover {
-            background-color: var(--danger-button-hover-bg);
-            border-color: var(--danger-button-hover-border-color);
-        }
-        button.danger:active {
-            background-color: var(--danger-button-active-bg);
-            border-color: var(--danger-button-active-border-color);
-        }
-
-        button:disabled:hover {
-            background-color: var(--button-disabled-bg);
-            border-color: var(--button-disabled-border);
-        }
-        button:disabled:active { transform: none; }
-        
-        button > i.fa-solid, button > i.fa-regular {
-            margin-right: 6px; 
-            font-size: 0.9em;  
-        }
-
-        .note-taker-tool .controls-and-stats { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; margin-top: auto; }
-        .note-taker-tool .top-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .note-taker-tool .button-group { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        .note-taker-tool .counter-pill {
-            display: inline-flex; align-items: center; 
-            background-color: var(--primary-bg);
-            padding: 7px 14px;
-            border-radius: var(--button-border-radius);
-            border: 1px solid var(--border-color);
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .note-taker-tool .counter-pill > i.fa-solid, 
-        .note-taker-tool .counter-pill > i.fa-regular {
-            margin-right: 4px; 
-            margin-left: 0; 
-            color: var(--text-color); 
-            font-size: 0.9em; 
-        }
-        .note-taker-tool .counter-pill > i.fa-solid:not(:first-child),
-        .note-taker-tool .counter-pill > i.fa-regular:not(:first-child) {
-            margin-left: 8px; 
-        }
-        .note-taker-tool .counter-pill p { 
-            margin: 0; 
-            color: var(--text-color); 
-        }
-        .note-taker-tool .counter-pill p span { 
-            font-weight: 600; color: var(--text-color); margin-left: 2px; 
-        }
-
-
-        .merchant-actions-tool .bulk-actions {
-            margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
-        }
-        #merchantSearchContainer {
-            margin-bottom: 12px; /* Matches bulk-actions */
-        }
-        #merchantSearchInput {
-             margin-bottom: 0; /* Override default input margin */
-        }
-        .merchant-actions-tool #merchantList {
-            min-height: 150px; max-height: 60vh; overflow-y: auto; resize: vertical;
-            margin: 0; padding: 8px; border: 1px solid var(--border-color);
-            border-radius: var(--input-border-radius); display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 8px; align-content: start;
-        }
-        .merchant-actions-tool .merchant-stats {
-            margin: 0; padding: 7px 10px; background-color: transparent; border: none;
-            border-radius: 5px; display: flex; align-items: center; justify-content: flex-start;
-            font-size: 13px; transition: background-color 0.15s ease; cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
-        .merchant-actions-tool .merchant-stats:hover { background-color: #f0f0f5; }
-        .merchant-actions-tool .merchant-stats:has(.merchant-checkbox:checked) { background-color: #e8f3ff; } 
-        .merchant-actions-tool .merchant-stats > div { display: flex; align-items: center; justify-content: flex-start; width: 100%; gap: 8px; }
-
-        .merchant-actions-tool .merchant-checkbox {
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
-            width: 16px; height: 16px; border: 1px solid #c7c7cc; border-radius: 4px;
-            outline: none; cursor: pointer; position: relative;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
-            flex-shrink: 0; background-color: var(--container-bg); margin: 0;
-        }
-        .merchant-actions-tool .merchant-checkbox:checked {
-            background-color: var(--text-color); 
-            border-color: var(--text-color);  
-        }
-        .merchant-actions-tool .merchant-checkbox:checked::after {
-            content: ''; position: absolute; top: 1px; left: 4px; width: 4px; height: 8px;
-            border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg);
-        }
-
-        .merchant-name-display { text-overflow: ellipsis; overflow: hidden; white-space: nowrap; cursor: text; padding: 2px 4px; border: 1px solid transparent; border-radius: 3px; display: inline-block; flex-grow: 1; }
-        .merchant-name-display:focus { border: 1px solid var(--border-color); background-color: var(--primary-bg); box-shadow: none; outline: none; white-space: normal; overflow: visible; }
-        .merchant-name-editable-container { display: flex; align-items: baseline; overflow: hidden; flex-grow: 1; min-width: 0; }
-        .merchant-count-text { flex-shrink: 0; margin-left: 4px; }
-
-        * { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-        *::-webkit-scrollbar { width: 9px; height: 9px; }
-        *::-webkit-scrollbar-track { background: transparent; }
-        *::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
-        *::-webkit-scrollbar-thumb:hover { background-color: #b3b3b3; }
-
-        .parser-controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; margin-bottom: 0; padding-bottom: 4px; flex-wrap: wrap; }
-        .toggle-label { font-size: 13px; color: var(--text-color); cursor: pointer; user-select: none; margin-right: 4px; }
-        .toggle-switch {
-            position: relative; 
-            display: inline-block;
-            width: 40px;
-            height: 22px;
+            width: calc(35% - 12px);
             flex-shrink: 0;
+            gap: 24px;
+            display: flex; flex-direction: column;
         }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .note-taker-tool {
+            width: calc(65% - 12px);
+            flex-grow: 1;
+            display: flex; flex-direction: column;
         }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #c7c7cc; 
-            transition: background-color 0.3s ease-in-out; 
-        }
-        .slider:before {
-            position: absolute; 
-            content: "";
-            height: 18px;  
-            width: 18px;   
-            left: 2px;     
-            bottom: 2px;   
-            background-color: white; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease-in-out; 
-        }
-        input:checked + .slider {
-            background-color: var(--text-color); 
-        }
-        input:checked + .slider:before {
-            transform: translateX(18px); 
-        }
-        .slider.round {
-            border-radius: 22px; 
-        }
-        .slider.round:before {
-            border-radius: 50%; 
-        }
+        #noteArea { flex-grow: 1; min-height: 200px; }
+        .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
+    }
 
-        #parserGroupSize {
-            width: 70px; padding: 6px 8px; font-size: 13px; margin-bottom: 0; text-align: center;
-            border: 1px solid var(--border-color); border-radius: var(--input-border-radius);
-            background-color: var(--container-bg); transition: background-color 0.3s ease, opacity 0.3s ease;
-        }
-        #parserGroupSize:disabled { background-color: #f8f8f8; color: #bbb; cursor: not-allowed; opacity: 0.7; border-color: #e8e8ed; }
+    /* --- macOS UI Components --- */
+    
+    /* Buttons */
+    button.macos {
+        font-family: var(--system-font); font-weight: 500; cursor: pointer;
+        border: none; transition: all 0.15s ease;
+        font-size: 13px; padding: 4px 14px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    button.macos.primary {
+        background-image: linear-gradient(to bottom, #0A84FF, #007AFF);
+        border: 0.5px solid transparent;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12);
+        color: white;
+    }
+    button.macos.primary:hover { background-image: linear-gradient(to bottom, #1A94FF, #118AFF); }
+    button.macos.primary:active { background-image: linear-gradient(to bottom, #006ADC, #0070E8); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); }
+    button.macos.primary:disabled { background-image: linear-gradient(to bottom, #87C9FF, #80C5FF); color: rgba(255,255,255,0.9); box-shadow: none; cursor: not-allowed; }
+    
+    button.macos.secondary {
+        background-image: linear-gradient(to bottom, #FFFFFF, #F8F8F8);
+        border: 0.5px solid var(--border-color);
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+        color: var(--text-primary);
+    }
+    button.macos.secondary:active { background-image: linear-gradient(to bottom, #F0F0F0, #F7F7F7); border-color: #AFAFAF; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
+    button.macos.secondary:disabled { background-image: linear-gradient(#FFFFFF, #F7F7F7); color: rgba(0,0,0,0.35); border-color: var(--border-subtle); cursor: not-allowed; }
 
-        .duplicate-indicator { display: inline-block; width: 8px; height: 8px; background-color: #ff9f0a; border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0; box-shadow: none; }
-        #upsUspsOutputArea { width: 100%; min-height: 80px; resize: vertical; border-radius: var(--input-border-radius); }
-        #btnProcessUpsUsps { margin-top: 8px; }
-        #upsUspsOutputContainer { margin-top: 12px; padding-bottom: 4px; }
+    button.macos.danger { background-color: var(--accent-red); color: white; border: none; box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12); }
+    button.macos.danger:hover { background-color: var(--accent-red-hover); }
+    
+    button.macos > i { margin-right: 6px; font-size: 0.9em; }
 
-        /* Split Modal */
-        #splitModal { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: rgba(60,60,67,0.4); }
-        #splitModalContent { background-color: #f9f9f9; margin: auto; padding: 20px; border: none; border-radius: 14px; width: 90%; max-width: 480px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; gap: 12px; }
-        #splitModalContent h2 { 
-            margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; color: var(--text-color); 
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        #splitModalContent h2 > i.fa-solid, #splitModalContent h2 > i.fa-regular {
-            margin-right: 8px;
-            font-size: 0.9em;
-        }
-        #splitModalContent label { font-size: 0.85rem; font-weight: 500; color: var(--secondary-text-color); margin-bottom: 4px; display: block; }
-        #splitModalContent #splitOrdersPerTemplate, #splitModalContent #splitNumberInput { margin-bottom: 0; border-radius: var(--input-border-radius); }
-        #splitModalContent #splitOrdersPerTemplate { width: 60px; }
-        #splitModalContent #splitNumberInput { width: 75px; flex-grow: 1; }
-        #splitMerchantInfo { font-size: 0.9em; color: var(--secondary-text-color); background-color: #f0f0f5; padding: 8px 12px; border-radius: var(--input-border-radius); border: 1px solid var(--border-color); }
-        #splitModalContent hr { border: none; border-top: 1px solid #e5e5ea; margin: 6px 0; }
-        #splitModalContent .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+    .macos-icon-button {
+        background: rgba(255,255,255,0.5); border: 0.5px solid var(--border-color); cursor: pointer;
+        width: 32px; height: 32px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: var(--text-secondary); transition: all 0.15s ease;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+    }
+    .macos-icon-button:hover { background-color: rgba(255,255,255,0.9); }
+    .macos-icon-button:active { background-color: #e5e5e5; }
 
-        /* Settings Modal */
-        .modal-overlay {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-            width: 100%; height: 100%; overflow: auto; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            background-color: rgba(60,60,67,0.4); font-family: var(--system-font);
-        }
-        .modal-content {
-            background-color: #f9f9f9; margin: auto; padding: 20px; border: none;
-            border-radius: 14px; width: 90%; max-width: 520px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; gap: 15px;
-        }
-        .modal-content h2 {
-            margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; color: var(--text-color);
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 10px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-         .modal-content h2 > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
-        .modal-content .close-button {
-            font-size: 1.3em; color: var(--secondary-text-color); cursor: pointer; background: none; border: none; padding: 0 5px;
-        }
-        .modal-content .close-button:hover { color: var(--text-color); }
+    /* Inputs & Textareas */
+    textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
+    .macos-textfield-container {
+        width: 100%; border-radius: 10px; border: 0.5px solid var(--border-color);
+        background-color: white; box-shadow: 0 1px 1px rgba(0,0,0,0.02) inset;
+        transition: all 0.15s ease;
+    }
+    .macos-textfield-container:focus-within { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3); }
+    .macos-textfield-container input, .macos-textfield-container textarea {
+        width: 100%; background-color: transparent; padding: 8px 10px;
+        font-size: 14px; color: var(--text-primary);
+    }
+    textarea.macos-textfield { font-family: var(--mono-font); resize: vertical; min-height: 150px; }
+    
+    /* Switches */
+    .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
+    .macos-switch input { opacity: 0; width: 0; height: 0; }
+    .macos-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .2s; border-radius: 34px; }
+    .macos-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .macos-switch input:checked + .slider { background-color: var(--accent-blue); }
+    .macos-switch input:checked + .slider:before { transform: translateX(18px); }
 
-        .modal-content .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .modal-content .form-group label.toggle-label { font-size: 0.9rem; font-weight: 500; color: var(--text-color); } /* Updated for toggle */
-        .modal-content .form-group input[type="text"] { margin-bottom: 0; }
-        .modal-content .form-group small { font-size: 0.8rem; color: var(--secondary-text-color); }
-        .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
-        .modal-actions button { padding: 8px 16px; }
+    /* Modals */
+    .modal-overlay {
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+        width: 100%; height: 100%; justify-content: center; align-items: center;
+        background-color: rgba(60,60,67,0.3);
+    }
+    .modal-content {
+        background-color: var(--bg-glass);
+        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        padding: 20px; border: 0.5px solid rgba(0,0,0,0.2);
+        border-radius: 14px; width: 90%; max-width: 520px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex; flex-direction: column; gap: 15px;
+    }
+     .modal-content h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; display:flex; align-items:center; justify-content:space-between; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+    
+    /* Specifics */
+    .left-column-wrapper, #merchantList, #noteArea { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar { width: 9px; }
+    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    
+    #merchantList {
+        min-height: 150px;
+        max-height: 60vh;
+        overflow-y: auto;
+        resize: vertical;
+        margin-top: 16px;
+        padding: 8px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 8px;
+        background-color: rgba(255,255,255,0.4);
+    }
 
-    </style>
+    .merchant-item {
+        padding: 8px 12px;
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 13px;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+        cursor: pointer;
+    }
+    .merchant-item:hover { background-color: rgba(0,0,0,0.05); }
+    .merchant-item.selected { background-color: #e8f3ff; border-color: #b0d7ff;}
+    .merchant-item .case-count { font-size: 11px; font-weight: 500; color: var(--text-secondary); background-color: var(--border-subtle); padding: 2px 6px; border-radius: 5px; margin-left: auto; }
+    
+    .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
+    .macos-checkbox {
+        appearance: none; -webkit-appearance: none; margin: 0;
+        width: 15px; height: 15px; border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+        background-image: linear-gradient(#FFFFFF, #F7F7F7);
+        border: 0.5px solid #BDBDBD;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.07);
+    }
+    .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
+    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; line-height: 1; }
+
+    .counter-pill { display: flex; align-items: center; gap: 15px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.5); }
+    .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
+    .counter-pill p > i { color: var(--text-secondary); }
+
+</style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div class="top-bar-left">
-            <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
-        </div>
-        <button id="btnOpenSettings" class="settings-button" title="Settings"><i class="fa-solid fa-gear"></i></button>
+        <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
+        <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
     </div>
 
     <div class="main-wrapper">
         <div class="left-column-wrapper">
             <div class="tool-container parser-tool">
-                <h3 class="tool-card-title"><i class="fa-solid fa-filter"></i>Parser</h3>
-                <textarea id="shipmentInput" placeholder="Paste Amazon removal shipment data here..."></textarea>
-                <div class="parser-controls">
+                <h3 class="tool-card-title"><i class="fa-solid fa-filter" style="margin-right: 8px;"></i>Parser</h3>
+                <div class="macos-textfield-container">
+                    <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
+                </div>
+                <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
                     <div style="display: flex; align-items: center; gap: 8px;" id="groupOrdersControl">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="groupToggle"> <span class="slider round"></span>
-                        </label>
-                        <label for="groupToggle" class="toggle-label">Group Orders (AMZL-type)</label>
-                        <input type="number" id="parserGroupSize" min="1" value="2" disabled>
+                        <label class="macos-switch"><input type="checkbox" id="groupToggle"><span class="slider"></span></label>
+                        <label for="groupToggle">Group Orders</label>
+                        <div class="macos-textfield-container" style="width: 70px;">
+                            <input type="number" id="parserGroupSize" class="macos-textfield" style="text-align:center;" min="1" value="2" disabled>
+                        </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="upsUspsToggle"> <span class="slider round"></span>
-                        </label>
-                        <label for="upsUspsToggle" class="toggle-label">Extract Other Carriers</label>
+                        <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
+                        <label for="upsUspsToggle">Extract Other Carriers</label>
                     </div>
                 </div>
-                <div id="upsUspsOutputContainer" style="display: none;">
-                    <textarea id="upsUspsOutputArea" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea>
-                    <button id="btnProcessUpsUsps"><i class="fa-solid fa-gears"></i>Process & Add to Notes</button>
+                 <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
+                    <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
+                    <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
                 </div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
-                <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
-                <div class="bulk-actions">
-                    <button id="btnDownloadSelected"><i class="fa-solid fa-download"></i>Download Selected</button>
-                    <button id="btnClearSelected" class="danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
-                    <button id="btnSelectAll"><i class="fa-regular fa-square-check"></i>Select All</button>
-                    <button id="btnSplitSelected" disabled><i class="fa-solid fa-table-columns"></i>Split Selected</button>
-                    <button id="btnDownloadAll"><i class="fa-solid fa-file-arrow-down"></i>Download All Notes</button>
+                <h3 class="tool-card-title"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>Merchants</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button id="btnDownloadSelected" class="macos primary"><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i>Select All</button>
+                    <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
+                    <button id="btnSplitSelected" class="macos primary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
+                    <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                 </div>
-                <div id="merchantSearchContainer" style="display: none;"> <!-- Initially hidden -->
-                    <input type="text" id="merchantSearchInput" placeholder="Search merchants by name..." style="margin-bottom: 0;">
+                 <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative;">
+                    <div class="macos-textfield-container">
+                         <input type="text" id="merchantSearchInput" class="macos-textfield" style="padding-left:30px" placeholder="Search merchants...">
+                    </div>
+                     <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
-                <div id="merchantList">
-                    <!-- Merchants will be populated here by JS -->
-                </div>
+                <div id="merchantList"></div>
             </div>
         </div>
 
         <div class="tool-container note-taker-tool">
-            <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
-            <textarea id="noteArea" placeholder="Notes area..."></textarea>
-            <div class="controls-and-stats">
-                <div class="top-controls">
-                    <div class="button-group">
-                        <button id="btnAddSeparator"><i class="fa-solid fa-minus"></i>Add Separator</button>
-                        <button id="btnAddSpacing"><i class="fa-solid fa-grip-lines"></i>Add Spacing</button>
-                        <button id="btnClearAllNotes" class="danger"><i class="fa-solid fa-eraser"></i>Clear All Notes</button>
+            <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square" style="margin-right: 8px;"></i>Notes</h3>
+            <div class="macos-textfield-container" style="flex-grow: 1; display:flex;">
+                <textarea id="noteArea" class="macos-textfield" placeholder="Notes area..."></textarea>
+            </div>
+            <div class="controls-and-stats" style="margin-top:16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <div style="display: flex; gap: 8px;">
+                        <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-minus"></i>Separator</button>
+                        <button id="btnAddSpacing" class="macos secondary"><i class="fa-solid fa-grip-lines"></i>Spacing</button>
+                        <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
                     </div>
-                    <div class="counter-pill">
-                        <i class="fa-solid fa-users"></i><p class="merchant-count">Merchants: <span id="merchantCount">0</span></p>
-                        <i class="fa-solid fa-file-lines"></i><p class="total-templates">Cases: <span id="totalTemplates">0</span></p>
+                     <div class="counter-pill">
+                        <p><i class="fa-solid fa-users"></i>Merchants: <span id="merchantCount">0</span></p>
+                        <p><i class="fa-solid fa-file-lines"></i>Cases: <span id="totalTemplates">0</span></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Split Modal -->
+    
     <div id="splitModal" class="modal-overlay">
-        <div id="splitModalContent" class="modal-content">
-             <h2><i class="fa-solid fa-table-columns"></i>Split Selected Merchant(s)</h2>
-            <div id="splitMerchantInfo">
-            </div>
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-table-columns" style="margin-right:8px;"></i>Split Selected Merchant(s)</h2>
+            <div id="splitMerchantInfo" style="font-size: 0.9em; color: var(--text-secondary); background-color: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"></div>
             <div>
                 <label for="splitOrdersPerTemplate">Removal Orders per Template:</label>
-                <input type="number" id="splitOrdersPerTemplate" min="1" value="2">
+                <div class="macos-textfield-container" style="width: 80px; margin-top: 4px;">
+                    <input type="number" id="splitOrdersPerTemplate" class="macos-textfield" style="text-align:center;" min="1" value="2">
+                </div>
             </div>
-            <div style="font-size: 0.9em; color: var(--secondary-text-color);">
-                Calculated Total Templates: <span id="splitCalculatedTemplates" style="font-weight: 600; color: var(--text-color);">0</span>
+            <div style="font-size: 0.9em; color: var(--text-secondary);">
+                Calculated Total Templates: <span id="splitCalculatedTemplates" style="font-weight: 600; color: var(--text-primary);">0</span>
             </div>
-            <hr>
+            <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 6px 0;">
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <label for="splitNumberInput" style="flex-shrink: 0;">Templates per Split File:</label>
-                <input type="number" id="splitNumberInput" min="1" placeholder="e.g., 100">
+                <div class="macos-textfield-container" style="width: 100px;">
+                    <input type="number" id="splitNumberInput" class="macos-textfield" style="text-align:center;" min="1" placeholder="e.g., 100">
+                </div>
             </div>
             <div class="modal-actions">
-                <button id="btnCancelSplit"><i class="fa-solid fa-xmark"></i>Cancel</button>
-                <button id="btnGenerateSplits"><i class="fa-solid fa-file-zipper"></i>Generate & Download Splits</button>
+                <button id="btnCancelSplit" class="macos secondary"><i class="fa-solid fa-xmark"></i>Cancel</button>
+                <button id="btnGenerateSplits" class="macos primary"><i class="fa-solid fa-file-zipper"></i>Generate & Download</button>
             </div>
         </div>
     </div>
-
-    <!-- Settings Modal -->
+    
     <div id="settingsModal" class="modal-overlay">
-        <div id="settingsModalContent" class="modal-content">
-            <h2>
-                <span><i class="fa-solid fa-sliders"></i>Application Settings</span>
-                <button class="close-button" id="btnCloseSettingsModal" title="Close Settings">×</button>
-            </h2>
-            
-            <div class="form-group">
-                <label for="settingsFilenamePrefix">Filename Prefix:</label>
-                <input type="text" id="settingsFilenamePrefix" placeholder="e.g., 3COUTB">
-                <small>Prefix used for downloaded files.</small>
-            </div>
-
-            <div class="form-group">
-                <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
-                <input type="text" id="settingsAmzlCarriers" placeholder="e.g., AMZL,AMZN,AMZL_US_PREMIUM">
-                <small>Comma-separated list of carrier names treated like AMZL.</small>
-            </div>
-
-            <div class="form-group">
-                <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
-                <input type="text" id="settingsOtherCarriers" placeholder="e.g., UPS,USPS">
-                <small>Comma-separated list of carriers for the 'Extract Other Carriers' mode.</small>
-            </div>
-
-            <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label for="settingsShowMerchantSearchToggleInput" class="toggle-label" style="margin-bottom: 0; flex-grow: 1; cursor: pointer;">Show Merchant Search Bar</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="settingsShowMerchantSearchToggleInput">
-                        <span class="slider round"></span>
-                    </label>
+        <div class="modal-content">
+             <h2><span><i class="fa-solid fa-sliders"></i>Settings</span></h2>
+            <div style="display:flex; flex-direction:column; gap: 15px;">
+                <div style="display:flex; flex-direction:column; gap: 5px;">
+                    <label for="settingsFilenamePrefix">Filename Prefix:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsFilenamePrefix" class="macos-textfield" placeholder="e.g., 3COUTB"></div>
                 </div>
-                <small>Toggle visibility of the search bar in the Merchants panel.</small>
+                 <div style="display:flex; flex-direction:column; gap: 5px;">
+                     <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
+                     <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap: 5px;">
+                     <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
+                     <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
+                </div>
+                 <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="settingsShowMerchantSearchToggleInput">Show Merchant Search Bar</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
+                </div>
             </div>
-            
             <div class="modal-actions">
-                <button id="btnSaveChangesSettings"><i class="fa-solid fa-save"></i>Save Settings</button>
+                <button id="btnCloseSettingsModal" class="macos secondary">Cancel</button>
+                <button id="btnSaveChangesSettings" class="macos primary"><i class="fa-solid fa-save"></i>Save Settings</button>
             </div>
         </div>
     </div>
