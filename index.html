@@ -354,161 +354,140 @@
             </div>
         </div>
     </div>
-    
+
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
-    const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n';
-    const noteSeparatorRegex = /\n\n-{41}\n/g;
-    const localStorageKey = 'savedNotesContent_amzlTool';
-    const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
-    const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
+    const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
+    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n';
+    const noteSeparatorRegex = /\n\n-{41}\n/g;
+    const localStorageKey = 'savedNotesContent_amzlTool';
+    const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
+    const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
 
-    // Settings Keys
-    const settingsKey = 'outboundToolSettings_v1';
-    let appSettings = {
-        filenamePrefix: '3COUTB',
-        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
-        otherCarriers: ['UPS', 'USPS'],
-        showMerchantSearch: false // New setting, default to false
-    };
-    // Regex patterns, will be initialized/updated by loadSettings
-    let regexPatterns = {
-        amzlSource: null,
-        otherSource: null,
-        allExisting: null,
-        coreTnExtract: null
-    };
-
-
-    let tempUpsUspsData = {}; 
-
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    function buildCarrierRegexPart(carrierArray) {
-        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
-        return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
-    }
-
-    function initializeRegexPatterns() {
-        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
-        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
-        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
-        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
-        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
-
-        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
-        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
-        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
-        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
-    }
+    // Settings Keys
+    const settingsKey = 'outboundToolSettings_v1';
+    let appSettings = {
+        filenamePrefix: '3COUTB',
+        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
+        otherCarriers: ['UPS', 'USPS'],
+        showMerchantSearch: false // New setting, default to false
+    };
+    // Regex patterns, will be initialized/updated by loadSettings
+    let regexPatterns = {
+        amzlSource: null,
+        otherSource: null,
+        allExisting: null,
+        coreTnExtract: null
+    };
 
 
-    function loadSettings() {
-        const savedSettings = localStorage.getItem(settingsKey);
-        if (savedSettings) {
-            try {
-                const parsed = JSON.parse(savedSettings);
-                appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
-                appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-                appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
-                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
-            } catch (e) {
-                console.error("Error parsing saved settings, using defaults.", e);
-            }
-        }
-        initializeRegexPatterns(); 
-        document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
-        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
-        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
-        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        applyMerchantSearchVisibility();
-    }
+    let tempUpsUspsData = {}; 
 
-    function saveSettings() {
-        appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
-        
-        const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
-        const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
-        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
+    function buildCarrierRegexPart(carrierArray) {
+        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
+        return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
+    }
 
-        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+    function initializeRegexPatterns() {
+        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
+        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
+        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
+        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
+        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
 
-        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        initializeRegexPatterns(); 
-        applyMerchantSearchVisibility();
-        alert("Settings saved!");
-    }
-
-    function applyMerchantSearchVisibility() {
-        const searchContainer = document.getElementById('merchantSearchContainer');
-        const searchInput = document.getElementById('merchantSearchInput');
-        if (searchContainer) {
-            if (appSettings.showMerchantSearch) {
-                searchContainer.style.display = 'block';
-            } else {
-                searchContainer.style.display = 'none';
-                if (searchInput) searchInput.value = ''; 
-            }
-            filterMerchants(); // Always re-filter when visibility changes or input is cleared
-        }
-    }
-
-    function filterMerchants() {
-        const searchInput = document.getElementById('merchantSearchInput');
-        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-        const merchantItems = document.querySelectorAll('#merchantList .merchant-stats');
-
-        merchantItems.forEach(item => {
-            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
-            if (displayName.includes(searchTerm)) {
-                item.style.display = 'flex'; 
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
+        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
+        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
+        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
+        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
+    }
 
 
-    function saveNotesToLocalStorage() {
-        const noteArea = document.getElementById('noteArea');
-        if (noteArea) {
-            localStorage.setItem(localStorageKey, noteArea.value);
-        }
-    }
+    function loadSettings() {
+        const savedSettings = localStorage.getItem(settingsKey);
+        if (savedSettings) {
+            try {
+                const parsed = JSON.parse(savedSettings);
+                appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
+                appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+                appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
+                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
+            } catch (e) {
+                console.error("Error parsing saved settings, using defaults.", e);
+            }
+        }
+        initializeRegexPatterns(); 
+        document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
+        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
+        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
+        applyMerchantSearchVisibility();
+    }
 
-    function saveUpsUspsOutputToLocalStorage() {
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        if (upsUspsOutputArea) {
-            localStorage.setItem(upsUspsOutputKey, upsUspsOutputArea.value);
-        }
-    }
+    function saveSettings() {
+        appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
+        
+        const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
+        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
 
-    function saveUpsUspsContextToLocalStorage() {
-        try {
-            localStorage.setItem(upsUspsContextKey, JSON.stringify(tempUpsUspsData));
-        } catch (error) {
-            console.error("Error saving Other Carrier context to localStorage:", error);
-        }
-    }
+        const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
+        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
+        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
 
+        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+
+        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        initializeRegexPatterns(); 
+        applyMerchantSearchVisibility();
+        alert("Settings saved!");
+    }
+
+    function applyMerchantSearchVisibility() {
+        const searchContainer = document.getElementById('merchantSearchContainer');
+        const searchInput = document.getElementById('merchantSearchInput');
+        if (searchContainer) {
+            if (appSettings.showMerchantSearch) {
+                searchContainer.style.display = 'block';
+            } else {
+                searchContainer.style.display = 'none';
+                if (searchInput) searchInput.value = ''; 
+            }
+            filterMerchants();
+        }
+    }
+
+    function filterMerchants() {
+        const searchInput = document.getElementById('merchantSearchInput');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        const merchantItems = document.querySelectorAll('#merchantList .merchant-item');
+
+        merchantItems.forEach(item => {
+            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
+            if (displayName.includes(searchTerm)) {
+                item.style.display = 'flex'; 
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+
+    function saveNotesToLocalStorage() {
+        const noteArea = document.getElementById('noteArea');
+        if (noteArea) {
+            localStorage.setItem(localStorageKey, noteArea.value);
+        }
+    }
+    
     function getFormattedDate() {
         const date = new Date();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         return `${month}-${day}`;
-    }
-
-    function countTemplatesInText(text, templateString) {
-        if (!text || !templateString) return 0;
-        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
     }
 
     function downloadText(text, filename) {
@@ -532,550 +511,213 @@
     function sanitizeFilename(name) {
         return name.replace(/[\s\\/:"*?<>|]+/g, '_').substring(0, 50);
     }
+    
+    function countTemplatesInText(text, templateString) {
+        if (!text || !templateString) return 0;
+        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
+    }
 
     function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
+        if (!input.value.trim()) return;
+        
         const noteArea = document.getElementById('noteArea');
         const groupToggle = document.getElementById('groupToggle');
         const groupSizeInput = document.getElementById('parserGroupSize');
-        const upsUspsToggle = document.getElementById('upsUspsToggle'); 
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        
-        const inputValue = input.value; 
-        if (inputValue.trim()) {
-            input.value = ''; 
-        } else {
-            return; 
-        }
 
-        const currentNoteValue = noteArea.value;
-        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
+        const inputValue = input.value;
+        input.value = ''; 
 
-        const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
-        const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
-        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
+        const existingTrackingNumbers = new Set(
+            (noteArea.value.match(regexPatterns.allExisting) || [])
+            .map(tn => tn.replace(regexPatterns.coreTnExtract, '').replace(/\s|-/g, ''))
+            .filter(Boolean)
+        );
 
-        const existingTrackingNumbers = new Set();
-        let matchCheck;
-        while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
-            const coreTN = matchCheck[1].replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-            if (coreTN) existingTrackingNumbers.add(coreTN);
-        }
-        if (upsUspsOutputArea && upsUspsOutputArea.value) {
-            upsUspsOutputArea.value.split('\n').forEach(tn => {
-                const trimmedTn = tn.trim();
-                if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
-            });
-        }
-        const seenTrackingNumbersInCurrentInput = new Set();
+        const seenInBatch = new Set();
+        let skippedCount = 0;
+        const merchantBlocks = {};
 
-        let groupSize = 1;
-        const isGroupingActive = !isUpsUspsMode && groupToggle ? groupToggle.checked : false;
-        if (isGroupingActive && groupSizeInput) {
-            const parsedValue = parseInt(groupSizeInput.value, 10);
-            groupSize = (!isNaN(parsedValue) && parsedValue >= 1) ? parsedValue : 2;
-        }
-        
-        const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
-        const parsedDataBlocksForAmzl = [];
-        const extractedUpsUspsNumbers = [];
-        let validShipmentsFound = 0;
-        let skippedDuplicateCount = 0;
-        let currentBlockRemovalOrderId = '';
-
-        overallBlocks.forEach(block => {
+        const removalBlocks = inputValue.split(/(?=Removal order ID:)/g);
+        removalBlocks.forEach(block => {
             if (!block.trim()) return;
-            const blockRoMatch = block.match(/Removal order ID:\s*([^\n]+)/);
-            if (blockRoMatch) {
-                currentBlockRemovalOrderId = blockRoMatch[1].trim();
-            }
-            const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
 
+            const roMatch = block.match(/Removal order ID:\s*(\S+)/);
+            if (!roMatch) return;
+            const removalOrderId = roMatch[1];
+            
+            const shipmentSections = block.split(/(?=Shipment ID:)/g);
             shipmentSections.forEach(section => {
-                if (section.trim().startsWith("Removal order ID:")) return;
-
-                const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
-                if (!trackingMatches || trackingMatches.length === 0) return;
-
-                const sectionCoreTNs = new Set();
-                const sectionFullTNs = []; 
-
-                trackingMatches.forEach(match => {
-                    const rawTNPart = match[1].trim(); 
-                    const carrier = match[2]; 
-                    const coreTN = rawTNPart.replace(/\s|-/g, ''); 
-                    if (!coreTN) return;
-                    sectionCoreTNs.add(coreTN);
-                    const fullFormattedTN = `${rawTNPart}(${carrier})`; 
-                    sectionFullTNs.push(fullFormattedTN);
-                });
-
-                let hasDuplicate = false;
-                const coreTNsToCheck = Array.from(sectionCoreTNs);
-                for (const coreTn of coreTNsToCheck) {
-                    if (existingTrackingNumbers.has(coreTn) || seenTrackingNumbersInCurrentInput.has(coreTn)) {
-                        hasDuplicate = true;
-                        break;
-                    }
-                }
-
-                if (hasDuplicate) {
-                    skippedDuplicateCount++;
-                    coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+                const tnMatch = section.match(regexPatterns.amzlSource);
+                if (!tnMatch) return;
+                
+                const trackingNumber = tnMatch[1].replace(/\s|-/g, '');
+                if (existingTrackingNumbers.has(trackingNumber) || seenInBatch.has(trackingNumber)) {
+                    skippedCount++;
                     return;
                 }
-                coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+                seenInBatch.add(trackingNumber);
 
-                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
-                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
-                const productLines = section.split('\n').map(line => line.trim());
-                const parsedProducts = []; let currentProduct = null;
-                for (let i = 0; i < productLines.length; i++) { const line = productLines[i]; if (line.startsWith('Merchant SKU:')) { if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined) { parsedProducts.push(currentProduct); } currentProduct = { merchantSku: line.substring('Merchant SKU:'.length).trim(), qty: undefined }; } else if (currentProduct) { if (line.startsWith('FNSKU:')) { currentProduct.fnsku = line.substring('FNSKU:'.length).trim(); } else if (/^\d{1,4}$/.test(line) && productLines[i - 1]?.match(/^(EAN|UPC|ISBN_10|Condition|Shipped Quantity|Cancelled Quantity):/i)) { currentProduct.qty = parseInt(line, 10); parsedProducts.push(currentProduct); currentProduct = null; } } } if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) { parsedProducts.push(currentProduct); }
-
-                if (parsedProducts.length === 0) return;
-                const roIdToUse = currentBlockRemovalOrderId || "N/A";
-                const outputParts = [ `Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}` ];
-                const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n') );
-                const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
-
-                if (isUpsUspsMode) {
-                    coreTNsToCheck.forEach(coreTN => { 
-                        if (!tempUpsUspsData[coreTN]) tempUpsUspsData[coreTN] = completeDataBlock;
-                        extractedUpsUspsNumbers.push(coreTN);
-                    });
-                } else { 
-                    parsedDataBlocksForAmzl.push(completeDataBlock);
+                const merchantSkuMatch = section.match(/Merchant SKU:\s*([^\n]+)/);
+                const merchantName = merchantSkuMatch ? merchantSkuMatch[1].split('-')[0] : 'Unknown';
+                
+                if (!merchantBlocks[merchantName]) {
+                    merchantBlocks[merchantName] = [];
                 }
-                validShipmentsFound++;
+                merchantBlocks[merchantName].push(removalOrderId);
             });
         });
 
-        if (isUpsUspsMode) {
-            if (extractedUpsUspsNumbers.length > 0) {
-                const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
-                upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
-                upsUspsOutputArea.scrollTop = upsUspsOutputArea.scrollHeight;
-                saveUpsUspsOutputToLocalStorage();
-                saveUpsUspsContextToLocalStorage();
-                let processedMessage = `Extracted ${uniqueNumbersToAdd.length} unique Other Carrier number(s) from batch. `;
-                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                processedMessage += `Click 'Process' to add to notes.`;
-                 input.placeholder = processedMessage;
-            } else {
-                 let message = "No new valid Other Carrier shipments found in batch. ";
-                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                 input.placeholder = message;
-            }
-        } else { 
-            let finalOutputString = '';
-            if (parsedDataBlocksForAmzl.length > 0) {
-                if (groupSize > 1) {
-                    const groupedOutputs = [];
-                    for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
-                        const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
-                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
-                    }
-                    finalOutputString = groupedOutputs.join('\n\n');
-                } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock ).join('\n\n');
-                }
-                const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
-                noteArea.scrollTop = noteArea.scrollHeight;
-                countTemplatesNoteTaker(); 
-                const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
-                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s) from batch. `;
-                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                processedMessage += `Grouping: ${groupingStatus}. Ready...`;
-                 input.placeholder = processedMessage;
-            } else {
-                 let message = "No new valid AMZL-type shipments found in batch. ";
-                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                 input.placeholder = message;
-            }
-        }
-        setTimeout(() => {
-            if (input && !input.value.trim()) {
-                const currentModeIsUps = document.getElementById('upsUspsToggle')?.checked;
-                input.placeholder = currentModeIsUps
-                    ? "Paste shipment data for Other Carriers..."
-                    : "Paste Amazon removal shipment data here...";
-            }
-        }, 5000);
-    }
+        let finalNoteText = noteArea.value.trim() ? noteArea.value.trim() + noteSeparator : "";
+        const groupSize = groupToggle.checked ? parseInt(groupSizeInput.value, 10) : 1;
 
-   function processUpsUspsData() { 
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        const noteArea = document.getElementById('noteArea');
-        const shipmentInput = document.getElementById('shipmentInput');
-        if (!upsUspsOutputArea || !noteArea || !shipmentInput) return;
-
-        const trackingNumbersToProcess = upsUspsOutputArea.value.split('\n').map(tn => tn.trim()).filter(tn => tn);
-        if (trackingNumbersToProcess.length === 0) { alert("No Other Carrier tracking numbers found in the staging area."); return; }
-
-        let processedBlocks = []; let notFoundCount = 0; const processedTNs = new Set();
-        trackingNumbersToProcess.forEach(tn => {
-            const coreTN = tn.replace(/\s|-/g, '');
-            if (!processedTNs.has(coreTN)) {
-                if (tempUpsUspsData[coreTN]) {
-                    processedBlocks.push(upsUspsTemplate + "\n\n" + tempUpsUspsData[coreTN]);
-                    processedTNs.add(coreTN);
-                } else { notFoundCount++; }
+        Object.keys(merchantBlocks).forEach(merchantName => {
+            const roIds = merchantBlocks[merchantName];
+            for (let i = 0; i < roIds.length; i += groupSize) {
+                const chunk = roIds.slice(i, i + groupSize);
+                finalNoteText += `${merchantName}\n${amzlTemplate}\nRemoval order ID: ${chunk.join(', ')}\n\n`;
             }
         });
-
-        if (processedBlocks.length > 0) {
-            const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
-            noteArea.scrollTop = noteArea.scrollHeight;
-            countTemplatesNoteTaker(); 
-            const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
-            upsUspsOutputArea.value = remainingOutputTNs.join('\n');
-            processedTNs.forEach(coreTN => { delete tempUpsUspsData[coreTN]; });
-            saveUpsUspsOutputToLocalStorage(); saveUpsUspsContextToLocalStorage();
-            shipmentInput.placeholder = `Added ${processedBlocks.length} Other Carrier entries to notes. Ready...`;
-            setTimeout(() => { if (shipmentInput) shipmentInput.placeholder = "Paste shipment data for Other Carriers..."; }, 3000);
-        } else { alert("No data could be processed."); }
-        if (notFoundCount > 0) alert(`Warning: Could not find original data for ${notFoundCount} tracking number(s).`);
-   }
-
-    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
-    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
-    function selectAllMerchants() { document.querySelectorAll('#merchantList .merchant-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
+        
+        noteArea.value = finalNoteText.trim() + '\n';
+        saveNotesToLocalStorage();
+        countTemplatesNoteTaker();
+        input.placeholder = `Processed ${seenInBatch.size} new shipments. Skipped ${skippedCount} duplicates.`;
+    }
     
-    function clearAllNotes() {
-        if (confirm("Are you sure you want to clear ALL notes? This action cannot be undone.")) {
-            const noteArea = document.getElementById('noteArea');
-            noteArea.value = '';
-            saveNotesToLocalStorage();
-            countTemplatesNoteTaker(); 
-        }
-    }
-
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
-        const editableSpan = event.target; const newName = editableSpan.textContent.trim();
-        if (!newName || newName === originalDisplayName) { editableSpan.textContent = originalDisplayName; return; }
-        const noteArea = document.getElementById('noteArea'); const currentNotes = noteArea.value; let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
-            const lines = originalSectionKey.split('\n');
-            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
-        } else { newSectionText = newName + '\n\n' + originalSectionKey; }
-        const noteSeparatorCaptureRegex = new RegExp('(' + noteSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
-        const parts = currentNotes.split(noteSeparatorCaptureRegex); let reconstructedNotes = ""; let replaced = false;
-        for (let i = 0; i < parts.length; i++) {
-            if (i % 2 === 0) { 
-                if (parts[i].trim() === originalSectionKey.trim()) { reconstructedNotes += newSectionText; replaced = true; }
-                else { reconstructedNotes += parts[i]; }
-            } else { reconstructedNotes += parts[i]; }
-        }
-        if (replaced) { noteArea.value = reconstructedNotes; saveNotesToLocalStorage(); countTemplatesNoteTaker(); }
-        else { editableSpan.textContent = originalDisplayName; }
-    }
-
     function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
-        const fullText = noteArea.value;
         const merchantListDiv = document.getElementById('merchantList');
-        merchantListDiv.innerHTML = ''; 
+        const fullText = noteArea.value;
 
-        const trackingNumberRegex = regexPatterns.allExisting; 
-        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
+        merchantListDiv.innerHTML = '';
+        if (!fullText.trim()) {
+            document.getElementById('merchantCount').textContent = '0';
+            document.getElementById('totalTemplates').textContent = '0';
+            return;
+        }
 
-        const allTrackingNumbers = (fullText.match(trackingNumberRegex) || []);
-        const seenTrackingNumbers = new Set(); 
-        const duplicatedTrackingNumbers = new Set(); 
-        allTrackingNumbers.forEach(tnString => {
-            const coreTN = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-            if (seenTrackingNumbers.has(coreTN)) { duplicatedTrackingNumbers.add(coreTN); }
-            seenTrackingNumbers.add(coreTN);
-        });
-
-        const merchantsData = {}; let totalTemplatesOverall = 0; let merchantIndex = 0;
         const sections = fullText.split(noteSeparatorRegex);
-        sections.forEach((sectionTextOriginal) => {
-            const sectionText = sectionTextOriginal.trim(); if (!sectionText) return;
-            const amzlTemplateCount = countTemplatesInText(sectionText, amzlTemplate);
-            const upsUspsTemplateCount = countTemplatesInText(sectionText, upsUspsTemplate);
-            const templateCount = amzlTemplateCount + upsUspsTemplateCount;
-            totalTemplatesOverall += templateCount;
-            let merchantName = `Entry ${++merchantIndex}`; const firstLine = sectionText.split('\n')[0]?.trim(); let isNameFromFirstLine = false;
-            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0,10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
-                merchantName = firstLine; isNameFromFirstLine = true;
-            } else if (sectionText.includes('Removal order ID:')) { merchantName = `Data Entry ${merchantIndex}`; }
-            merchantsData[sectionTextOriginal] = { displayName: merchantName, isNameFromFirstLine: isNameFromFirstLine, count: templateCount, text: sectionTextOriginal };
+        let merchantCount = 0;
+        let totalTemplates = 0;
+
+        sections.forEach(section => {
+            if (!section.trim()) return;
+            merchantCount++;
+            const templateCount = (section.match(new RegExp(amzlTemplate, 'g')) || []).length;
+            totalTemplates += templateCount;
+            
+            const lines = section.trim().split('\n');
+            const merchantName = lines[0] || `Merchant ${merchantCount}`;
+
+            const merchantItem = document.createElement('div');
+            merchantItem.className = 'merchant-item';
+            merchantItem.dataset.key = section;
+            merchantItem.dataset.displayName = merchantName;
+            merchantItem.dataset.count = templateCount;
+            
+            const checkboxContainer = document.createElement('label');
+            checkboxContainer.className = 'macos-checkbox-container';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'macos-checkbox';
+            checkbox.onchange = () => merchantItem.classList.toggle('selected', checkbox.checked);
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = merchantName;
+            nameSpan.style.flexGrow = '1';
+
+            const caseCountSpan = document.createElement('span');
+            caseCountSpan.className = 'case-count';
+            caseCountSpan.textContent = `${templateCount} case${templateCount !== 1 ? 's' : ''}`;
+            
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(nameSpan);
+            merchantItem.appendChild(checkboxContainer);
+            merchantItem.appendChild(caseCountSpan);
+
+            merchantListDiv.appendChild(merchantItem);
         });
-        document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
-        document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
-        
-        // Display merchants in the order they appear in notes (insertion order)
-        const merchantsInOrder = Object.entries(merchantsData); 
-        merchantsInOrder.forEach(([key, data]) => {
-            const merchantDiv = document.createElement('div'); merchantDiv.className = 'merchant-stats';
-            merchantDiv.dataset.key = key; merchantDiv.dataset.displayName = data.displayName; merchantDiv.dataset.count = data.count;
-            const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []);
-            let sectionHasDuplicate = false; const duplicatesInSectionDisplay = new Set();
-            sectionTrackingNumbersFull.forEach(tnString => {
-                const coreTn = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-                if (duplicatedTrackingNumbers.has(coreTn)) { sectionHasDuplicate = true; duplicatesInSectionDisplay.add(tnString); }
-            });
-            const titleText = `${data.displayName} (${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
-            const innerFlexDiv = document.createElement('div');
-            if (sectionHasDuplicate) {
-                const indicatorSpan = document.createElement('span'); indicatorSpan.className = 'duplicate-indicator';
-                indicatorSpan.title = `Contains duplicate TN(s): ${Array.from(duplicatesInSectionDisplay).join(', ')}`;
-                innerFlexDiv.appendChild(indicatorSpan);
-            }
-            const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.className = 'merchant-checkbox';
-            checkbox.onchange = updateSelectedCountNoteTaker; innerFlexDiv.appendChild(checkbox);
-            const nameAndCountWrapper = document.createElement('span'); nameAndCountWrapper.className = 'merchant-name-editable-container';
-            const nameSpan = document.createElement('span'); nameSpan.className = 'merchant-name-display'; nameSpan.contentEditable = true;
-            nameSpan.textContent = data.displayName; nameSpan.title = titleText + (sectionHasDuplicate ? ` | DUPLICATES FOUND: ${Array.from(duplicatesInSectionDisplay).join(', ')}` : '');
-            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
-            nameSpan.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } else if (e.key === 'Escape') { e.preventDefault(); e.target.textContent = data.displayName; e.target.blur(); } });
-            nameAndCountWrapper.appendChild(nameSpan);
-            const countSpan = document.createElement('span'); countSpan.className = 'merchant-count-text';
-            countSpan.textContent = `(${data.count} ${data.count === 1 ? 'case' : 'cases'})`; nameAndCountWrapper.appendChild(countSpan);
-            innerFlexDiv.appendChild(nameAndCountWrapper);
-            merchantDiv.appendChild(innerFlexDiv);
-            merchantDiv.onclick = (e) => { if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { const cb = merchantDiv.querySelector('.merchant-checkbox'); if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); } } };
-            merchantListDiv.appendChild(merchantDiv);
-        });
-        filterMerchants(); // Apply current search filter to the newly populated list
-        updateSelectedCountNoteTaker();
+
+        document.getElementById('merchantCount').textContent = merchantCount;
+        document.getElementById('totalTemplates').textContent = totalTemplates;
     }
-
-    function updateSelectedCountNoteTaker() {
-        const selectedCheckboxes = document.querySelectorAll('#merchantList .merchant-checkbox:checked');
-        const splitButton = document.getElementById('btnSplitSelected'); let selectedCaseCount = 0;
-        selectedCheckboxes.forEach(cb => { selectedCaseCount += parseInt(cb.closest('.merchant-stats')?.dataset?.count || '0', 10); });
-        const totalTemplatesSpan = document.getElementById('totalTemplates'); const merchantCountSpan = document.getElementById('merchantCount');
-        const totalMerchantCount = document.querySelectorAll('#merchantList .merchant-stats').length;
-        const totalCaseCountOverall = Array.from(document.querySelectorAll('#merchantList .merchant-stats')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
-        if (selectedCheckboxes.length > 0) {
-            totalTemplatesSpan.textContent = selectedCaseCount; merchantCountSpan.textContent = selectedCheckboxes.length;
-            if (splitButton) splitButton.disabled = false;
-        } else {
-            totalTemplatesSpan.textContent = totalCaseCountOverall; merchantCountSpan.textContent = totalMerchantCount;
-            if (splitButton) splitButton.disabled = true;
-        }
-    }
-
-    function downloadSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
-        if (selectedDivs.length === 0) { alert('Please select merchant(s) to download.'); return; }
-        const textsToDownload = []; let totalSelectedCases = 0;
-        selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
-        if (textsToDownload.length === 0) { alert("Could not retrieve text."); return; }
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename); 
-    }
-
-    function clearSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
-        if (selectedDivs.length === 0) { alert('Please select merchant(s) to clear.'); return; }
-        const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
-        selectedDivs.forEach(div => { if (div.dataset.key) keysToRemove.add(div.dataset.key); });
-        const allSections = fullText.split(noteSeparatorRegex).filter(s => s.trim() !== "");
-        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
-        noteArea.value = remainingSections.length > 0 ? remainingSections.join(noteSeparator) : "";
-        countTemplatesNoteTaker(); 
-    }
-
-    function downloadAllNotes() {
-        const noteArea = document.getElementById('noteArea'); const textToDownload = noteArea.value.trim();
-        if (!textToDownload) { alert("Nothing to download."); return; }
-        const totalTemplatesCount = document.getElementById('totalTemplates').textContent;
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalTemplatesCount}).txt`;
-        downloadText(textToDownload + '\n', filename);
-    }
-
-    function processSingleROBlock(roBlockText, removalOrdersArray) {
-        const roIdLineMatch = roBlockText.match(/^\s*Removal order ID:[^\n]+/); if (!roIdLineMatch) return;
-        const currentRoIdLine = roIdLineMatch[0].trim(); const remainingText = roBlockText.substring(roIdLineMatch[0].length).trim(); if (!remainingText) return;
-        const shipmentBlocks = remainingText.split(/(?=^\s*Shipment ID:)/m);
-        shipmentBlocks.forEach((shipmentBlock) => {
-             const trimmed = shipmentBlock.trim();
-             if (trimmed.startsWith('Shipment ID:') && trimmed.includes('Merchant SKU:')) removalOrdersArray.push(currentRoIdLine + '\n' + trimmed);
-        });
-    }
-
-   function splitTextIntoRemovalOrders(inputText) {
-        const removalOrders = []; if (!inputText) return removalOrders;
-        let textToProcess = inputText.trim();
-        const escapedAmzl = amzlTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const escapedUps = upsUspsTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        textToProcess = textToProcess.replace(new RegExp('^\\s*' + escapedAmzl + '\\s*\\n*', 'gm'), '').replace(new RegExp('^\\s*' + escapedUps + '\\s*\\n*', 'gm'), '').trim();
-        const lines = textToProcess.split('\n');
-        if (lines.length > 2 && lines[1].trim() === "" && lines[2].startsWith("Removal order ID:")) textToProcess = lines.slice(2).join('\n');
-        else if (lines.length > 0 && lines[0].startsWith("Removal order ID:")) textToProcess = lines.join('\n');
-        const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
-        potentialROBlocks.forEach((roBlock) => {
-            const trimmed = roBlock.trim(); if (!trimmed) return;
-            if (trimmed.startsWith('Removal order ID:')) processSingleROBlock(trimmed, removalOrders);
-        });
-        return removalOrders;
-   }
-
-   function createTemplates(removalOrders, ordersPerTemplate) {
-        const templates = []; if (!removalOrders || removalOrders.length === 0 || ordersPerTemplate <= 0) return templates;
-        for (let i = 0; i < removalOrders.length; i += ordersPerTemplate) {
-            const chunk = removalOrders.slice(i, i + ordersPerTemplate).filter(o => o && typeof o === 'string');
-            if (chunk.length > 0) templates.push(chunk.join('\n\n'));
-        }
-        return templates;
-   }
-
-    let selectedMerchantDataForSplit = [];
-
-    function openSplitModal() {
-        selectedMerchantDataForSplit = [];
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
-        if (selectedDivs.length === 0) { alert("Please select merchant(s)."); return; }
-        const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
-        if (!modal || !merchantInfoDiv) { alert("Split modal error."); return; }
-        let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
-        selectedDivs.forEach((div) => {
-            const key = div.dataset.key; const name = div.dataset.displayName || `Unknown`;
-            if (key) { selectedMerchantDataForSplit.push({ key, name }); combinedTextParts.push(key);
-                if (key.includes(upsUspsTemplate)) containsUpsUsps = true; if (key.includes(amzlTemplate)) containsAmzl = true;
-            }
-        });
-        const names = selectedMerchantDataForSplit.map(item => item.name);
-        modal.dataset.combinedText = combinedTextParts.join(noteSeparator.trimEnd());
-        modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
-        if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
-        else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
-        else merchantInfoDiv.textContent = 'No valid merchants.';
-        document.getElementById('splitOrdersPerTemplate').value = '2'; document.getElementById('splitNumberInput').value = '';
-        updateCalculatedTemplates(); modal.style.display = 'flex';
-    }
-
-    function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
-    function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
-
-
-    function updateCalculatedTemplates() {
-         const modal = document.getElementById('splitModal'); if (!modal) return;
-         const combinedText = modal.dataset.combinedText || '';
-         const ordersInput = document.getElementById('splitOrdersPerTemplate');
-         const calcSpan = document.getElementById('splitCalculatedTemplates'); if (!ordersInput || !calcSpan) return;
-         const ordersPer = parseInt(ordersInput.value) || 0;
-         if (ordersPer > 0 && combinedText) {
-             const ros = splitTextIntoRemovalOrders(combinedText);
-             calcSpan.textContent = createTemplates(ros, ordersPer).length;
-         } else calcSpan.textContent = '0';
-       }
-
-   function generateAndDownloadSplits() {
-        const modal = document.getElementById('splitModal'); if (!modal) return;
-        const combinedText = modal.dataset.combinedText || '';
-        const ordersPerInput = document.getElementById('splitOrdersPerTemplate');
-        const splitNumInput = document.getElementById('splitNumberInput');
-        const containsAmzl = modal.dataset.containsAmzl === 'true'; const containsUpsUsps = modal.dataset.containsUpsUsps === 'true';
-        if (!ordersPerInput || !splitNumInput) { alert("Modal input error."); return; }
-        const ordersPer = parseInt(ordersPerInput.value); const splitNum = parseInt(splitNumInput.value);
-        if (!combinedText) { alert("No text for selected merchants."); return; }
-        if (isNaN(ordersPer) || ordersPer < 1) { alert("Invalid 'Orders per Template'."); return; }
-        if (isNaN(splitNum) || splitNum < 1) { alert("Invalid 'Templates per Split File'."); return; }
-        let templateToUse = amzlTemplate;
-        if (containsUpsUsps && !containsAmzl) templateToUse = upsUspsTemplate;
-        else if (containsUpsUsps && containsAmzl) console.warn("Mixed entries, using AMZL template.");
-        const ros = splitTextIntoRemovalOrders(combinedText); if (ros.length === 0) { alert("No valid removal orders found."); return; }
-        const templateGroups = createTemplates(ros, ordersPer); if (templateGroups.length === 0) { alert("Failed to generate template groups."); return; }
-        const splitOutputs = [];
-        for (let i = 0; i < templateGroups.length; i += splitNum) {
-            const chunk = templateGroups.slice(i, i + splitNum);
-            if (chunk.length > 0) splitOutputs.push({ text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'), count: chunk.length });
-        }
-        if (splitOutputs.length === 0) { alert("No split files generated."); return; }
-        let filenamePart = "SplitSelection"; let merchantDisplay = selectedMerchantDataForSplit.map(m=>m.name).join(' & ');
-        if (selectedMerchantDataForSplit.length === 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name);
-        else if (selectedMerchantDataForSplit.length > 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name) + "_Multi";
-        const dateStr = getFormattedDate();
-        splitOutputs.forEach((output, index) => {
-            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
-            downloadText(merchantDisplay + '\n\n' + output.text + '\n', filename);
-        });
-        closeSplitModal();
-   }
 
     document.addEventListener('DOMContentLoaded', () => {
-        loadSettings(); 
-
-        const shipmentInput = document.getElementById('shipmentInput');
+        loadSettings();
+        
         const noteArea = document.getElementById('noteArea');
-        const groupToggle = document.getElementById('groupToggle');
-        const groupSizeInput = document.getElementById('parserGroupSize');
-        const upsUspsToggle = document.getElementById('upsUspsToggle');
-        const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        const groupOrdersControl = document.getElementById('groupOrdersControl');
-        const merchantSearchInput = document.getElementById('merchantSearchInput');
-
         if (noteArea) {
-            const savedNotes = localStorage.getItem(localStorageKey);
-            if (savedNotes) noteArea.value = savedNotes;
-            let countTimer;
-            noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 300); });
-            noteArea.addEventListener('paste', () => { setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 50); });
+            noteArea.value = localStorage.getItem(localStorageKey) || "";
+            let timer;
+            noteArea.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    saveNotesToLocalStorage();
+                    countTemplatesNoteTaker();
+                }, 300);
+            });
+            countTemplatesNoteTaker();
         }
-        if (upsUspsOutputArea) { const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved; }
-        try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
-        catch (e) { tempUpsUspsData = {}; }
 
-        if (shipmentInput) {
-            let parseTimer;
-            shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
-        }
+        document.getElementById('shipmentInput').addEventListener('paste', () => setTimeout(parseShipmentData, 50));
         
-        if(merchantSearchInput) {
-            merchantSearchInput.addEventListener('input', filterMerchants);
-        }
+        document.getElementById('btnOpenSettings').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'flex');
+        document.getElementById('btnCloseSettingsModal').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'none');
+        document.getElementById('btnSaveChangesSettings').addEventListener('click', () => {
+            saveSettings();
+            document.getElementById('settingsModal').style.display = 'none';
+        });
 
-        try { countTemplatesNoteTaker(); } catch(e) { console.error("Initial count error:", e); }
+        document.getElementById('groupToggle').addEventListener('change', (e) => {
+            document.getElementById('parserGroupSize').disabled = !e.target.checked;
+        });
 
-        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
-        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
-        document.getElementById('btnClearAllNotes')?.addEventListener('click', clearAllNotes);
-        document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
-        document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
-        document.getElementById('btnSelectAll')?.addEventListener('click', selectAllMerchants);
-        document.getElementById('btnDownloadAll')?.addEventListener('click', downloadAllNotes);
-        document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
-        document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
+        // Event listeners for buttons
+        document.getElementById('btnDownloadSelected').addEventListener('click', () => {
+            const selected = Array.from(document.querySelectorAll('#merchantList .merchant-item.selected'));
+            if (selected.length === 0) return alert("No merchants selected.");
+            const text = selected.map(el => el.dataset.key).join(noteSeparator);
+            const caseCount = selected.reduce((sum, el) => sum + parseInt(el.dataset.count, 10), 0);
+            downloadText(text, `${appSettings.filenamePrefix}_${getFormattedDate()}_(${caseCount}).txt`);
+        });
+
+        document.getElementById('btnSelectAll').addEventListener('click', () => {
+             document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => {
+                if (!cb.checked) {
+                    cb.checked = true;
+                    cb.closest('.merchant-item')?.classList.add('selected');
+                }
+             });
+        });
         
-        document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
-        document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
-        document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
-        document.getElementById('settingsModal').addEventListener('click', (event) => { if (event.target === document.getElementById('settingsModal')) closeSettingsModal(); });
+        document.getElementById('btnClearSelected').addEventListener('click', () => {
+             if (!confirm("Are you sure you want to clear selected merchants from notes?")) return;
+             const selectedKeys = new Set(Array.from(document.querySelectorAll('#merchantList .merchant-item.selected')).map(el => el.dataset.key));
+             const sections = noteArea.value.split(noteSeparatorRegex);
+             const newText = sections.filter(s => s.trim() && !selectedKeys.has(s)).join(noteSeparator);
+             noteArea.value = newText;
+             saveNotesToLocalStorage();
+             countTemplatesNoteTaker();
+        });
 
+        document.getElementById('btnAddSeparator').addEventListener('click', () => {
+            noteArea.value = noteArea.value.trim() + noteSeparator;
+        });
 
-        if (groupToggle && groupSizeInput) {
-            groupToggle.addEventListener('change', function() { groupSizeInput.disabled = !this.checked; });
-            groupSizeInput.disabled = !groupToggle.checked;
-        }
-        if (upsUspsToggle && upsUspsOutputContainer && groupOrdersControl && shipmentInput && upsUspsOutputArea) {
-            function toggleUpsUspsMode(isUpsMode) {
-                upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
-                groupOrdersControl.style.opacity = isUpsMode ? '0.5' : '1';
-                groupOrdersControl.style.pointerEvents = isUpsMode ? 'none' : 'auto';
-                if (isUpsMode && groupToggle) { groupToggle.checked = false; if (groupSizeInput) groupSizeInput.disabled = true; }
-                shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
-                if (!isUpsMode && groupToggle && groupSizeInput) groupSizeInput.disabled = !groupToggle.checked;
+        document.getElementById('btnAddSpacing').addEventListener('click', () => {
+             noteArea.value = noteArea.value.trim() + '\n\n';
+        });
+
+        document.getElementById('btnClearAllNotes').addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear ALL notes?")) {
+                noteArea.value = "";
+                saveNotesToLocalStorage();
+                countTemplatesNoteTaker();
             }
-            upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
-            toggleUpsUspsMode(upsUspsToggle.checked);
-        }
-
-        const splitModalEl = document.getElementById('splitModal');
-        document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
-        splitModalEl?.addEventListener('click', (event) => { if (event.target === splitModalEl) closeSplitModal(); });
-        document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
-        document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
+        });
     });
 </script>
-
 </body>
 </html>
