@@ -8,224 +8,222 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-    <style>
-        :root {
-            --system-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
-            --bg-primary: #F6F6F6;
-            --bg-window: rgba(255, 255, 255, 0.8);
-            --bg-toolbar: #F0F0F0;
-            --bg-glass: rgba(240, 240, 240, 0.7);
-            --text-primary: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --text-placeholder: #aaaaaf;
-            --border-color: #C6C6C6;
-            --border-subtle: #E0E0E0;
-            --accent-blue: #007AFF;
-            --accent-blue-dark: #006ADC;
-            --accent-red: #ff3b30;
-            --accent-red-hover: #ff453a;
-            --top-bar-height: 50px;
-        }
+<style>
+    :root {
+        --system-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
+        --bg-primary: #F6F6F6;
+        --bg-window: rgba(255, 255, 255, 0.8);
+        --bg-toolbar: #F0F0F0;
+        --bg-glass: rgba(240, 240, 240, 0.7);
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --text-placeholder: #aaaaaf;
+        --border-color: #C6C6C6;
+        --border-subtle: #E0E0E0;
+        --accent-blue: #007AFF;
+        --accent-blue-dark: #006ADC;
+        --accent-red: #ff3b30;
+        --accent-red-hover: #ff453a;
+        --top-bar-height: 50px;
+    }
 
-        /* --- Global & Layout --- */
-        html { box-sizing: border-box; }
-        *, *:before, *:after { box-sizing: inherit; }
-        body {
-            font-family: var(--system-font);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            margin: 0; padding: 0; display: flex; flex-direction: column;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-            font-size: 13px;
-        }
+    /* --- Global & Layout --- */
+    html { box-sizing: border-box; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body {
+        font-family: var(--system-font);
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        margin: 0; padding: 0; display: flex; flex-direction: column;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+        font-size: 13px;
+    }
 
-        .top-bar {
-            background-color: var(--bg-toolbar);
-            padding: 0 16px;
-            height: var(--top-bar-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    .top-bar {
+        background-color: var(--bg-toolbar);
+        padding: 0 16px;
+        height: var(--top-bar-height);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        border-bottom: 0.5px solid var(--border-color);
+    }
+    .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); }
+
+    .main-wrapper {
+        display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
+        width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
+    }
+    .left-column-wrapper { display: flex; flex-direction: column; gap: 16px; }
+
+    .tool-container {
+        background-color: var(--bg-window);
+        border-radius: 12px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        display: flex; flex-direction: column;
+        position: relative;
+        border: 0.5px solid rgba(0, 0, 0, 0.1);
+    }
+    .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
+    .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
+    
+    @media (min-width: 992px) {
+        .main-wrapper { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
+        .tool-card-title { display: flex; align-items: center; }
+        .left-column-wrapper {
+            width: calc(35% - 12px);
             flex-shrink: 0;
-            border-bottom: 0.5px solid var(--border-color);
-        }
-        .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); }
-
-        .main-wrapper {
-            display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
-            width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
-        }
-        .left-column-wrapper { display: flex; flex-direction: column; gap: 16px; }
-
-        .tool-container {
-            background-color: var(--bg-window);
-            border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-            padding: 20px;
+            gap: 24px;
             display: flex; flex-direction: column;
-            position: relative;
-            border: 0.5px solid rgba(0, 0, 0, 0.1);
         }
-        .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
-        .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
-        
-        @media (min-width: 992px) {
-            .main-wrapper { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
-            .tool-card-title { display: flex; align-items: center; }
-            .left-column-wrapper {
-                width: calc(35% - 12px);
-                flex-shrink: 0;
-                gap: 24px;
-                display: flex;
-                flex-direction: column;
-            }
-            .note-taker-tool {
-                width: calc(65% - 12px);
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            #noteArea { flex-grow: 1; min-height: 200px; resize: none; }
-            .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
+        .note-taker-tool {
+            width: calc(65% - 12px);
+            flex-grow: 1;
+            display: flex; flex-direction: column;
         }
+        #noteArea { flex-grow: 1; min-height: 200px; }
+        .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
+    }
 
-        /* --- macOS UI Components --- */
-        
-        /* Buttons */
-        button.macos {
-            font-family: var(--system-font); font-weight: 500; cursor: pointer;
-            border: none; transition: all 0.15s ease;
-            font-size: 13px; padding: 4px 14px; border-radius: 8px;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        button.macos.primary {
-            background-image: linear-gradient(to bottom, #0A84FF, #007AFF);
-            border: 0.5px solid transparent;
-            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12);
-            color: white;
-        }
-        button.macos.primary:hover { background-image: linear-gradient(to bottom, #1A94FF, #118AFF); }
-        button.macos.primary:active { background-image: linear-gradient(to bottom, #006ADC, #0070E8); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); }
-        button.macos.primary:disabled { background-image: linear-gradient(to bottom, #87C9FF, #80C5FF); color: rgba(255,255,255,0.9); box-shadow: none; cursor: not-allowed; }
-        
-        button.macos.secondary {
-            background-image: linear-gradient(to bottom, #FFFFFF, #F8F8F8);
-            border: 0.5px solid var(--border-color);
-            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
-            color: var(--text-primary);
-        }
-        button.macos.secondary:active { background-image: linear-gradient(to bottom, #F0F0F0, #F7F7F7); border-color: #AFAFAF; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
-        button.macos.secondary:disabled { background-image: linear-gradient(#FFFFFF, #F7F7F7); color: rgba(0,0,0,0.35); border-color: var(--border-subtle); cursor: not-allowed; }
+    /* --- macOS UI Components --- */
+    
+    /* Buttons */
+    button.macos {
+        font-family: var(--system-font); font-weight: 500; cursor: pointer;
+        border: none; transition: all 0.15s ease;
+        font-size: 13px; padding: 4px 14px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    button.macos.primary {
+        background-image: linear-gradient(to bottom, #0A84FF, #007AFF);
+        border: 0.5px solid transparent;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12);
+        color: white;
+    }
+    button.macos.primary:hover { background-image: linear-gradient(to bottom, #1A94FF, #118AFF); }
+    button.macos.primary:active { background-image: linear-gradient(to bottom, #006ADC, #0070E8); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); }
+    button.macos.primary:disabled { background-image: linear-gradient(to bottom, #87C9FF, #80C5FF); color: rgba(255,255,255,0.9); box-shadow: none; cursor: not-allowed; }
+    
+    button.macos.secondary {
+        background-image: linear-gradient(to bottom, #FFFFFF, #F8F8F8);
+        border: 0.5px solid var(--border-color);
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+        color: var(--text-primary);
+    }
+    button.macos.secondary:active { background-image: linear-gradient(to bottom, #F0F0F0, #F7F7F7); border-color: #AFAFAF; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
+    button.macos.secondary:disabled { background-image: linear-gradient(#FFFFFF, #F7F7F7); color: rgba(0,0,0,0.35); border-color: var(--border-subtle); cursor: not-allowed; }
 
-        button.macos.danger { background-color: var(--accent-red); color: white; border: none; box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12); }
-        button.macos.danger:hover { background-color: var(--accent-red-hover); }
-        
-        button.macos > i { margin-right: 6px; font-size: 0.9em; }
+    button.macos.danger { background-color: var(--accent-red); color: white; border: none; box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12); }
+    button.macos.danger:hover { background-color: var(--accent-red-hover); }
+    
+    button.macos > i { margin-right: 6px; font-size: 0.9em; }
 
-        .macos-icon-button {
-            background: rgba(255,255,255,0.5); border: 0.5px solid var(--border-color); cursor: pointer;
-            width: 32px; height: 32px; border-radius: 8px;
-            display: inline-flex; align-items: center; justify-content: center;
-            color: var(--text-secondary); transition: all 0.15s ease;
-            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
-        }
-        .macos-icon-button:hover { background-color: rgba(255,255,255,0.9); }
-        .macos-icon-button:active { background-color: #e5e5e5; }
+    .macos-icon-button {
+        background: rgba(255,255,255,0.5); border: 0.5px solid var(--border-color); cursor: pointer;
+        width: 32px; height: 32px; border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: var(--text-secondary); transition: all 0.15s ease;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
+    }
+    .macos-icon-button:hover { background-color: rgba(255,255,255,0.9); }
+    .macos-icon-button:active { background-color: #e5e5e5; }
 
-        /* Inputs & Textareas */
-        textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
-        .macos-textfield-container {
-            width: 100%; border-radius: 10px; border: 0.5px solid var(--border-color);
-            background-color: white; box-shadow: 0 1px 1px rgba(0,0,0,0.02) inset;
-            transition: all 0.15s ease;
-        }
-        .macos-textfield-container:focus-within { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3); }
-        .macos-textfield-container input, .macos-textfield-container textarea {
-            width: 100%; background-color: transparent; padding: 8px 10px;
-            font-size: 14px; color: var(--text-primary);
-        }
-        textarea.macos-textfield { font-family: var(--mono-font); resize: vertical; min-height: 150px; }
-        
-        /* Switches */
-        .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
-        .macos-switch input { opacity: 0; width: 0; height: 0; }
-        .macos-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .2s; border-radius: 34px; }
-        .macos-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-        .macos-switch input:checked + .slider { background-color: var(--accent-blue); }
-        .macos-switch input:checked + .slider:before { transform: translateX(18px); }
+    /* Inputs & Textareas */
+    textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
+    .macos-textfield-container {
+        width: 100%; border-radius: 10px; border: 0.5px solid var(--border-color);
+        background-color: white; box-shadow: 0 1px 1px rgba(0,0,0,0.02) inset;
+        transition: all 0.15s ease;
+    }
+    .macos-textfield-container:focus-within { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3); }
+    .macos-textfield-container input, .macos-textfield-container textarea {
+        width: 100%; background-color: transparent; padding: 8px 10px;
+        font-size: 14px; color: var(--text-primary);
+    }
+    textarea.macos-textfield { font-family: var(--mono-font); resize: vertical; min-height: 150px; }
+    
+    /* Switches */
+    .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
+    .macos-switch input { opacity: 0; width: 0; height: 0; }
+    .macos-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .2s; border-radius: 34px; }
+    .macos-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .macos-switch input:checked + .slider { background-color: var(--accent-blue); }
+    .macos-switch input:checked + .slider:before { transform: translateX(18px); }
 
-        /* Modals */
-        .modal-overlay {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-            width: 100%; height: 100%; justify-content: center; align-items: center;
-            background-color: rgba(60,60,67,0.3);
-        }
-        .modal-content {
-            background-color: var(--bg-glass);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            padding: 20px; border: 0.5px solid rgba(0,0,0,0.2);
-            border-radius: 14px; width: 90%; max-width: 520px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; gap: 15px;
-        }
-         .modal-content h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; display:flex; align-items:center; justify-content:space-between; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
-        
-        /* Specifics */
-        .left-column-wrapper, #merchantList, #noteArea { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-        .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar { width: 9px; }
-        .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
-        
-        #merchantList {
-            min-height: 150px;
-            max-height: 60vh;
-            overflow-y: auto;
-            resize: vertical;
-            margin-top: 16px;
-            padding: 8px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 8px;
-            background-color: rgba(255,255,255,0.4);
-        }
+    /* Modals */
+    .modal-overlay {
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+        width: 100%; height: 100%; justify-content: center; align-items: center;
+        background-color: rgba(60,60,67,0.3);
+    }
+    .modal-content {
+        background-color: var(--bg-glass);
+        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+        padding: 20px; border: 0.5px solid rgba(0,0,0,0.2);
+        border-radius: 14px; width: 90%; max-width: 520px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex; flex-direction: column; gap: 15px;
+    }
+     .modal-content h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; display:flex; align-items:center; justify-content:space-between; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+    
+    /* Specifics */
+    .left-column-wrapper, #merchantList, #noteArea { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar { width: 9px; }
+    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    
+    #merchantList {
+        min-height: 150px;
+        max-height: 60vh;
+        overflow-y: auto;
+        resize: vertical;
+        margin-top: 16px;
+        padding: 8px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 8px;
+        background-color: rgba(255,255,255,0.4);
+    }
 
-        .merchant-item {
-            padding: 8px 12px;
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid var(--border-subtle);
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            font-size: 13px;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
-            cursor: pointer;
-        }
-        .merchant-item:hover { background-color: rgba(0,0,0,0.05); }
-        .merchant-item.selected { background-color: #e8f3ff; border-color: #b0d7ff;}
-        .merchant-item .case-count { font-size: 11px; font-weight: 500; color: var(--text-secondary); background-color: var(--border-subtle); padding: 2px 6px; border-radius: 5px; margin-left: auto; }
-        
-        .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
-        .macos-checkbox {
-            appearance: none; -webkit-appearance: none; margin: 0;
-            width: 15px; height: 15px; border-radius: 4px;
-            display: flex; align-items: center; justify-content: center;
-            background-image: linear-gradient(#FFFFFF, #F7F7F7);
-            border: 0.5px solid #BDBDBD;
-            box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.07);
-        }
-        .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
-        .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; line-height: 1; }
+    .merchant-item {
+        padding: 8px 12px;
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: 13px;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+        cursor: pointer;
+    }
+    .merchant-item:hover { background-color: rgba(0,0,0,0.05); }
+    .merchant-item.selected { background-color: #e8f3ff; border-color: #b0d7ff;}
+    .merchant-item .case-count { font-size: 11px; font-weight: 500; color: var(--text-secondary); background-color: var(--border-subtle); padding: 2px 6px; border-radius: 5px; margin-left: auto; }
+    
+    .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
+    .macos-checkbox {
+        appearance: none; -webkit-appearance: none; margin: 0;
+        width: 15px; height: 15px; border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+        background-image: linear-gradient(#FFFFFF, #F7F7F7);
+        border: 0.5px solid #BDBDBD;
+        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.07);
+    }
+    .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
+    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; line-height: 1; }
 
-        .counter-pill { display: flex; align-items: center; gap: 15px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.5); }
-        .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
-        .counter-pill p > i { color: var(--text-secondary); }
+    .counter-pill { display: flex; align-items: center; gap: 15px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.5); }
+    .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
+    .counter-pill p > i { color: var(--text-secondary); }
 
-    </style>
+</style>
 </head>
 <body>
 
@@ -357,137 +355,158 @@
     
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
-    const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n';
-    const noteSeparatorRegex = /\n\n-{41}\n/g;
-    const localStorageKey = 'savedNotesContent_amzlTool';
-    const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
-    const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
+    const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
+    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n';
+    const noteSeparatorRegex = /\n\n-{41}\n/g;
+    const localStorageKey = 'savedNotesContent_amzlTool';
+    const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
+    const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
 
-    // Settings Keys
-    const settingsKey = 'outboundToolSettings_v1';
-    let appSettings = {
-        filenamePrefix: '3COUTB',
-        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
-        otherCarriers: ['UPS', 'USPS'],
-        showMerchantSearch: false // New setting, default to false
-    };
-    // Regex patterns, will be initialized/updated by loadSettings
-    let regexPatterns = {
-        amzlSource: null,
-        otherSource: null,
-        allExisting: null,
-        coreTnExtract: null
-    };
-
-
-    let tempUpsUspsData = {}; 
-
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    function buildCarrierRegexPart(carrierArray) {
-        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
-        return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
-    }
-
-    function initializeRegexPatterns() {
-        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
-        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
-        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
-        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
-        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
-
-        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
-        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
-        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
-        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
-    }
+    // Settings Keys
+    const settingsKey = 'outboundToolSettings_v1';
+    let appSettings = {
+        filenamePrefix: '3COUTB',
+        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
+        otherCarriers: ['UPS', 'USPS'],
+        showMerchantSearch: false // New setting, default to false
+    };
+    // Regex patterns, will be initialized/updated by loadSettings
+    let regexPatterns = {
+        amzlSource: null,
+        otherSource: null,
+        allExisting: null,
+        coreTnExtract: null
+    };
 
 
-    function loadSettings() {
-        const savedSettings = localStorage.getItem(settingsKey);
-        if (savedSettings) {
-            try {
-                const parsed = JSON.parse(savedSettings);
-                appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
-                appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-                appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
-                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
-            } catch (e) {
-                console.error("Error parsing saved settings, using defaults.", e);
-            }
-        }
-        initializeRegexPatterns(); 
-        document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
-        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
-        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
-        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        applyMerchantSearchVisibility();
-    }
+    let tempUpsUspsData = {}; 
 
-    function saveSettings() {
-        appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
-        
-        const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
-        const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
-        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
+    function buildCarrierRegexPart(carrierArray) {
+        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
+        return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
+    }
 
-        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+    function initializeRegexPatterns() {
+        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
+        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
+        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
+        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
+        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
 
-        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        initializeRegexPatterns(); 
-        applyMerchantSearchVisibility();
-        alert("Settings saved!");
-    }
-
-    function applyMerchantSearchVisibility() {
-        const searchContainer = document.getElementById('merchantSearchContainer');
-        const searchInput = document.getElementById('merchantSearchInput');
-        if (searchContainer) {
-            if (appSettings.showMerchantSearch) {
-                searchContainer.style.display = 'block';
-            } else {
-                searchContainer.style.display = 'none';
-                if (searchInput) searchInput.value = ''; 
-            }
-            filterMerchants();
-        }
-    }
-
-    function filterMerchants() {
-        const searchInput = document.getElementById('merchantSearchInput');
-        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-        const merchantItems = document.querySelectorAll('#merchantList .merchant-item');
-
-        merchantItems.forEach(item => {
-            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
-            if (displayName.includes(searchTerm)) {
-                item.style.display = 'flex'; 
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
+        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
+        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
+        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
+        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
+    }
 
 
-    function saveNotesToLocalStorage() {
-        const noteArea = document.getElementById('noteArea');
-        if (noteArea) {
-            localStorage.setItem(localStorageKey, noteArea.value);
-        }
-    }
-    
+    function loadSettings() {
+        const savedSettings = localStorage.getItem(settingsKey);
+        if (savedSettings) {
+            try {
+                const parsed = JSON.parse(savedSettings);
+                appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
+                appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+                appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
+                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
+            } catch (e) {
+                console.error("Error parsing saved settings, using defaults.", e);
+            }
+        }
+        initializeRegexPatterns(); 
+        document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
+        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
+        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
+        applyMerchantSearchVisibility();
+    }
+
+    function saveSettings() {
+        appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
+        
+        const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
+        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+
+        const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
+        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
+        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
+
+        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+
+        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        initializeRegexPatterns(); 
+        applyMerchantSearchVisibility();
+        alert("Settings saved!");
+    }
+
+    function applyMerchantSearchVisibility() {
+        const searchContainer = document.getElementById('merchantSearchContainer');
+        const searchInput = document.getElementById('merchantSearchInput');
+        if (searchContainer) {
+            if (appSettings.showMerchantSearch) {
+                searchContainer.style.display = 'block';
+            } else {
+                searchContainer.style.display = 'none';
+                if (searchInput) searchInput.value = ''; 
+            }
+            filterMerchants(); // Always re-filter when visibility changes or input is cleared
+        }
+    }
+
+    function filterMerchants() {
+        const searchInput = document.getElementById('merchantSearchInput');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        const merchantItems = document.querySelectorAll('#merchantList .merchant-stats');
+
+        merchantItems.forEach(item => {
+            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
+            if (displayName.includes(searchTerm)) {
+                item.style.display = 'flex'; 
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+
+    function saveNotesToLocalStorage() {
+        const noteArea = document.getElementById('noteArea');
+        if (noteArea) {
+            localStorage.setItem(localStorageKey, noteArea.value);
+        }
+    }
+
+    function saveUpsUspsOutputToLocalStorage() {
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        if (upsUspsOutputArea) {
+            localStorage.setItem(upsUspsOutputKey, upsUspsOutputArea.value);
+        }
+    }
+
+    function saveUpsUspsContextToLocalStorage() {
+        try {
+            localStorage.setItem(upsUspsContextKey, JSON.stringify(tempUpsUspsData));
+        } catch (error) {
+            console.error("Error saving Other Carrier context to localStorage:", error);
+        }
+    }
+
     function getFormattedDate() {
         const date = new Date();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
         return `${month}-${day}`;
+    }
+
+    function countTemplatesInText(text, templateString) {
+        if (!text || !templateString) return 0;
+        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
     }
 
     function downloadText(text, filename) {
@@ -511,213 +530,550 @@
     function sanitizeFilename(name) {
         return name.replace(/[\s\\/:"*?<>|]+/g, '_').substring(0, 50);
     }
-    
-    function countTemplatesInText(text, templateString) {
-        if (!text || !templateString) return 0;
-        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
-    }
 
     function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
-        if (!input.value.trim()) return;
-        
         const noteArea = document.getElementById('noteArea');
         const groupToggle = document.getElementById('groupToggle');
         const groupSizeInput = document.getElementById('parserGroupSize');
+        const upsUspsToggle = document.getElementById('upsUspsToggle'); 
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        
+        const inputValue = input.value; 
+        if (inputValue.trim()) {
+            input.value = ''; 
+        } else {
+            return; 
+        }
 
-        const inputValue = input.value;
-        input.value = ''; 
+        const currentNoteValue = noteArea.value;
+        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
 
-        const existingTrackingNumbers = new Set(
-            (noteArea.value.match(regexPatterns.allExisting) || [])
-            .map(tn => tn.replace(regexPatterns.coreTnExtract, '').replace(/\s|-/g, ''))
-            .filter(Boolean)
-        );
+        const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
+        const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
+        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
 
-        const seenInBatch = new Set();
-        let skippedCount = 0;
-        const merchantBlocks = {};
+        const existingTrackingNumbers = new Set();
+        let matchCheck;
+        while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
+            const coreTN = matchCheck[1].replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
+            if (coreTN) existingTrackingNumbers.add(coreTN);
+        }
+        if (upsUspsOutputArea && upsUspsOutputArea.value) {
+            upsUspsOutputArea.value.split('\n').forEach(tn => {
+                const trimmedTn = tn.trim();
+                if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
+            });
+        }
+        const seenTrackingNumbersInCurrentInput = new Set();
 
-        const removalBlocks = inputValue.split(/(?=Removal order ID:)/g);
-        removalBlocks.forEach(block => {
+        let groupSize = 1;
+        const isGroupingActive = !isUpsUspsMode && groupToggle ? groupToggle.checked : false;
+        if (isGroupingActive && groupSizeInput) {
+            const parsedValue = parseInt(groupSizeInput.value, 10);
+            groupSize = (!isNaN(parsedValue) && parsedValue >= 1) ? parsedValue : 2;
+        }
+        
+        const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
+        const parsedDataBlocksForAmzl = [];
+        const extractedUpsUspsNumbers = [];
+        let validShipmentsFound = 0;
+        let skippedDuplicateCount = 0;
+        let currentBlockRemovalOrderId = '';
+
+        overallBlocks.forEach(block => {
             if (!block.trim()) return;
+            const blockRoMatch = block.match(/Removal order ID:\s*([^\n]+)/);
+            if (blockRoMatch) {
+                currentBlockRemovalOrderId = blockRoMatch[1].trim();
+            }
+            const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
 
-            const roMatch = block.match(/Removal order ID:\s*(\S+)/);
-            if (!roMatch) return;
-            const removalOrderId = roMatch[1];
-            
-            const shipmentSections = block.split(/(?=Shipment ID:)/g);
             shipmentSections.forEach(section => {
-                const tnMatch = section.match(regexPatterns.amzlSource);
-                if (!tnMatch) return;
-                
-                const trackingNumber = tnMatch[1].replace(/\s|-/g, '');
-                if (existingTrackingNumbers.has(trackingNumber) || seenInBatch.has(trackingNumber)) {
-                    skippedCount++;
+                if (section.trim().startsWith("Removal order ID:")) return;
+
+                const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
+                if (!trackingMatches || trackingMatches.length === 0) return;
+
+                const sectionCoreTNs = new Set();
+                const sectionFullTNs = []; 
+
+                trackingMatches.forEach(match => {
+                    const rawTNPart = match[1].trim(); 
+                    const carrier = match[2]; 
+                    const coreTN = rawTNPart.replace(/\s|-/g, ''); 
+                    if (!coreTN) return;
+                    sectionCoreTNs.add(coreTN);
+                    const fullFormattedTN = `${rawTNPart}(${carrier})`; 
+                    sectionFullTNs.push(fullFormattedTN);
+                });
+
+                let hasDuplicate = false;
+                const coreTNsToCheck = Array.from(sectionCoreTNs);
+                for (const coreTn of coreTNsToCheck) {
+                    if (existingTrackingNumbers.has(coreTn) || seenTrackingNumbersInCurrentInput.has(coreTn)) {
+                        hasDuplicate = true;
+                        break;
+                    }
+                }
+
+                if (hasDuplicate) {
+                    skippedDuplicateCount++;
+                    coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
                     return;
                 }
-                seenInBatch.add(trackingNumber);
+                coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
 
-                const merchantSkuMatch = section.match(/Merchant SKU:\s*([^\n]+)/);
-                const merchantName = merchantSkuMatch ? merchantSkuMatch[1].split('-')[0] : 'Unknown';
-                
-                if (!merchantBlocks[merchantName]) {
-                    merchantBlocks[merchantName] = [];
+                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
+                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
+                const productLines = section.split('\n').map(line => line.trim());
+                const parsedProducts = []; let currentProduct = null;
+                for (let i = 0; i < productLines.length; i++) { const line = productLines[i]; if (line.startsWith('Merchant SKU:')) { if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined) { parsedProducts.push(currentProduct); } currentProduct = { merchantSku: line.substring('Merchant SKU:'.length).trim(), qty: undefined }; } else if (currentProduct) { if (line.startsWith('FNSKU:')) { currentProduct.fnsku = line.substring('FNSKU:'.length).trim(); } else if (/^\d{1,4}$/.test(line) && productLines[i - 1]?.match(/^(EAN|UPC|ISBN_10|Condition|Shipped Quantity|Cancelled Quantity):/i)) { currentProduct.qty = parseInt(line, 10); parsedProducts.push(currentProduct); currentProduct = null; } } } if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) { parsedProducts.push(currentProduct); }
+
+                if (parsedProducts.length === 0) return;
+                const roIdToUse = currentBlockRemovalOrderId || "N/A";
+                const outputParts = [ `Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}` ];
+                const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n') );
+                const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
+
+                if (isUpsUspsMode) {
+                    coreTNsToCheck.forEach(coreTN => { 
+                        if (!tempUpsUspsData[coreTN]) tempUpsUspsData[coreTN] = completeDataBlock;
+                        extractedUpsUspsNumbers.push(coreTN);
+                    });
+                } else { 
+                    parsedDataBlocksForAmzl.push(completeDataBlock);
                 }
-                merchantBlocks[merchantName].push(removalOrderId);
+                validShipmentsFound++;
             });
         });
 
-        let finalNoteText = noteArea.value.trim() ? noteArea.value.trim() + noteSeparator : "";
-        const groupSize = groupToggle.checked ? parseInt(groupSizeInput.value, 10) : 1;
+        if (isUpsUspsMode) {
+            if (extractedUpsUspsNumbers.length > 0) {
+                const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
+                upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
+                upsUspsOutputArea.scrollTop = upsUspsOutputArea.scrollHeight;
+                saveUpsUspsOutputToLocalStorage();
+                saveUpsUspsContextToLocalStorage();
+                let processedMessage = `Extracted ${uniqueNumbersToAdd.length} unique Other Carrier number(s) from batch. `;
+                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                processedMessage += `Click 'Process' to add to notes.`;
+                 input.placeholder = processedMessage;
+            } else {
+                 let message = "No new valid Other Carrier shipments found in batch. ";
+                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                 input.placeholder = message;
+            }
+        } else { 
+            let finalOutputString = '';
+            if (parsedDataBlocksForAmzl.length > 0) {
+                if (groupSize > 1) {
+                    const groupedOutputs = [];
+                    for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
+                        const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
+                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
+                    }
+                    finalOutputString = groupedOutputs.join('\n\n');
+                } else {
+                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock ).join('\n\n');
+                }
+                const currentNoteTrimmed = noteArea.value.trimEnd();
+                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
+                noteArea.scrollTop = noteArea.scrollHeight;
+                countTemplatesNoteTaker(); 
+                const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
+                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s) from batch. `;
+                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                processedMessage += `Grouping: ${groupingStatus}. Ready...`;
+                 input.placeholder = processedMessage;
+            } else {
+                 let message = "No new valid AMZL-type shipments found in batch. ";
+                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                 input.placeholder = message;
+            }
+        }
+        setTimeout(() => {
+            if (input && !input.value.trim()) {
+                const currentModeIsUps = document.getElementById('upsUspsToggle')?.checked;
+                input.placeholder = currentModeIsUps
+                    ? "Paste shipment data for Other Carriers..."
+                    : "Paste Amazon removal shipment data here...";
+            }
+        }, 5000);
+    }
 
-        Object.keys(merchantBlocks).forEach(merchantName => {
-            const roIds = merchantBlocks[merchantName];
-            for (let i = 0; i < roIds.length; i += groupSize) {
-                const chunk = roIds.slice(i, i + groupSize);
-                finalNoteText += `${merchantName}\n${amzlTemplate}\nRemoval order ID: ${chunk.join(', ')}\n\n`;
+   function processUpsUspsData() { 
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        const noteArea = document.getElementById('noteArea');
+        const shipmentInput = document.getElementById('shipmentInput');
+        if (!upsUspsOutputArea || !noteArea || !shipmentInput) return;
+
+        const trackingNumbersToProcess = upsUspsOutputArea.value.split('\n').map(tn => tn.trim()).filter(tn => tn);
+        if (trackingNumbersToProcess.length === 0) { alert("No Other Carrier tracking numbers found in the staging area."); return; }
+
+        let processedBlocks = []; let notFoundCount = 0; const processedTNs = new Set();
+        trackingNumbersToProcess.forEach(tn => {
+            const coreTN = tn.replace(/\s|-/g, '');
+            if (!processedTNs.has(coreTN)) {
+                if (tempUpsUspsData[coreTN]) {
+                    processedBlocks.push(upsUspsTemplate + "\n\n" + tempUpsUspsData[coreTN]);
+                    processedTNs.add(coreTN);
+                } else { notFoundCount++; }
             }
         });
-        
-        noteArea.value = finalNoteText.trim() + '\n';
-        saveNotesToLocalStorage();
-        countTemplatesNoteTaker();
-        input.placeholder = `Processed ${seenInBatch.size} new shipments. Skipped ${skippedCount} duplicates.`;
-    }
+
+        if (processedBlocks.length > 0) {
+            const currentNoteTrimmed = noteArea.value.trimEnd();
+            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
+            noteArea.scrollTop = noteArea.scrollHeight;
+            countTemplatesNoteTaker(); 
+            const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
+            upsUspsOutputArea.value = remainingOutputTNs.join('\n');
+            processedTNs.forEach(coreTN => { delete tempUpsUspsData[coreTN]; });
+            saveUpsUspsOutputToLocalStorage(); saveUpsUspsContextToLocalStorage();
+            shipmentInput.placeholder = `Added ${processedBlocks.length} Other Carrier entries to notes. Ready...`;
+            setTimeout(() => { if (shipmentInput) shipmentInput.placeholder = "Paste shipment data for Other Carriers..."; }, 3000);
+        } else { alert("No data could be processed."); }
+        if (notFoundCount > 0) alert(`Warning: Could not find original data for ${notFoundCount} tracking number(s).`);
+   }
+
+    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
+    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
+    function selectAllMerchants() { document.querySelectorAll('#merchantList .merchant-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
     
+    function clearAllNotes() {
+        if (confirm("Are you sure you want to clear ALL notes? This action cannot be undone.")) {
+            const noteArea = document.getElementById('noteArea');
+            noteArea.value = '';
+            saveNotesToLocalStorage();
+            countTemplatesNoteTaker(); 
+        }
+    }
+
+    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
+        const editableSpan = event.target; const newName = editableSpan.textContent.trim();
+        if (!newName || newName === originalDisplayName) { editableSpan.textContent = originalDisplayName; return; }
+        const noteArea = document.getElementById('noteArea'); const currentNotes = noteArea.value; let newSectionText;
+        if (isNameOriginallyFromFirstLine) {
+            const lines = originalSectionKey.split('\n');
+            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
+        } else { newSectionText = newName + '\n\n' + originalSectionKey; }
+        const noteSeparatorCaptureRegex = new RegExp('(' + noteSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
+        const parts = currentNotes.split(noteSeparatorCaptureRegex); let reconstructedNotes = ""; let replaced = false;
+        for (let i = 0; i < parts.length; i++) {
+            if (i % 2 === 0) { 
+                if (parts[i].trim() === originalSectionKey.trim()) { reconstructedNotes += newSectionText; replaced = true; }
+                else { reconstructedNotes += parts[i]; }
+            } else { reconstructedNotes += parts[i]; }
+        }
+        if (replaced) { noteArea.value = reconstructedNotes; saveNotesToLocalStorage(); countTemplatesNoteTaker(); }
+        else { editableSpan.textContent = originalDisplayName; }
+    }
+
     function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
-        const merchantListDiv = document.getElementById('merchantList');
         const fullText = noteArea.value;
+        const merchantListDiv = document.getElementById('merchantList');
+        merchantListDiv.innerHTML = ''; 
 
-        merchantListDiv.innerHTML = '';
-        if (!fullText.trim()) {
-            document.getElementById('merchantCount').textContent = '0';
-            document.getElementById('totalTemplates').textContent = '0';
-            return;
-        }
+        const trackingNumberRegex = regexPatterns.allExisting; 
+        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
 
-        const sections = fullText.split(noteSeparatorRegex);
-        let merchantCount = 0;
-        let totalTemplates = 0;
-
-        sections.forEach(section => {
-            if (!section.trim()) return;
-            merchantCount++;
-            const templateCount = (section.match(new RegExp(amzlTemplate, 'g')) || []).length;
-            totalTemplates += templateCount;
-            
-            const lines = section.trim().split('\n');
-            const merchantName = lines[0] || `Merchant ${merchantCount}`;
-
-            const merchantItem = document.createElement('div');
-            merchantItem.className = 'merchant-item';
-            merchantItem.dataset.key = section;
-            merchantItem.dataset.displayName = merchantName;
-            merchantItem.dataset.count = templateCount;
-            
-            const checkboxContainer = document.createElement('label');
-            checkboxContainer.className = 'macos-checkbox-container';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'macos-checkbox';
-            checkbox.onchange = () => merchantItem.classList.toggle('selected', checkbox.checked);
-            
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = merchantName;
-            nameSpan.style.flexGrow = '1';
-
-            const caseCountSpan = document.createElement('span');
-            caseCountSpan.className = 'case-count';
-            caseCountSpan.textContent = `${templateCount} case${templateCount !== 1 ? 's' : ''}`;
-            
-            checkboxContainer.appendChild(checkbox);
-            checkboxContainer.appendChild(nameSpan);
-            merchantItem.appendChild(checkboxContainer);
-            merchantItem.appendChild(caseCountSpan);
-
-            merchantListDiv.appendChild(merchantItem);
+        const allTrackingNumbers = (fullText.match(trackingNumberRegex) || []);
+        const seenTrackingNumbers = new Set(); 
+        const duplicatedTrackingNumbers = new Set(); 
+        allTrackingNumbers.forEach(tnString => {
+            const coreTN = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
+            if (seenTrackingNumbers.has(coreTN)) { duplicatedTrackingNumbers.add(coreTN); }
+            seenTrackingNumbers.add(coreTN);
         });
 
-        document.getElementById('merchantCount').textContent = merchantCount;
-        document.getElementById('totalTemplates').textContent = totalTemplates;
+        const merchantsData = {}; let totalTemplatesOverall = 0; let merchantIndex = 0;
+        const sections = fullText.split(noteSeparatorRegex);
+        sections.forEach((sectionTextOriginal) => {
+            const sectionText = sectionTextOriginal.trim(); if (!sectionText) return;
+            const amzlTemplateCount = countTemplatesInText(sectionText, amzlTemplate);
+            const upsUspsTemplateCount = countTemplatesInText(sectionText, upsUspsTemplate);
+            const templateCount = amzlTemplateCount + upsUspsTemplateCount;
+            totalTemplatesOverall += templateCount;
+            let merchantName = `Entry ${++merchantIndex}`; const firstLine = sectionText.split('\n')[0]?.trim(); let isNameFromFirstLine = false;
+            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0,10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
+                merchantName = firstLine; isNameFromFirstLine = true;
+            } else if (sectionText.includes('Removal order ID:')) { merchantName = `Data Entry ${merchantIndex}`; }
+            merchantsData[sectionTextOriginal] = { displayName: merchantName, isNameFromFirstLine: isNameFromFirstLine, count: templateCount, text: sectionTextOriginal };
+        });
+        document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
+        document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
+        
+        // Display merchants in the order they appear in notes (insertion order)
+        const merchantsInOrder = Object.entries(merchantsData); 
+        merchantsInOrder.forEach(([key, data]) => {
+            const merchantDiv = document.createElement('div'); merchantDiv.className = 'merchant-stats';
+            merchantDiv.dataset.key = key; merchantDiv.dataset.displayName = data.displayName; merchantDiv.dataset.count = data.count;
+            const sectionTrackingNumbersFull = (data.text.match(trackingNumberRegex) || []);
+            let sectionHasDuplicate = false; const duplicatesInSectionDisplay = new Set();
+            sectionTrackingNumbersFull.forEach(tnString => {
+                const coreTn = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
+                if (duplicatedTrackingNumbers.has(coreTn)) { sectionHasDuplicate = true; duplicatesInSectionDisplay.add(tnString); }
+            });
+            const titleText = `${data.displayName} (${data.count} ${data.count === 1 ? 'case' : 'cases'})`;
+            const innerFlexDiv = document.createElement('div');
+            if (sectionHasDuplicate) {
+                const indicatorSpan = document.createElement('span'); indicatorSpan.className = 'duplicate-indicator';
+                indicatorSpan.title = `Contains duplicate TN(s): ${Array.from(duplicatesInSectionDisplay).join(', ')}`;
+                innerFlexDiv.appendChild(indicatorSpan);
+            }
+            const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.className = 'merchant-checkbox';
+            checkbox.onchange = updateSelectedCountNoteTaker; innerFlexDiv.appendChild(checkbox);
+            const nameAndCountWrapper = document.createElement('span'); nameAndCountWrapper.className = 'merchant-name-editable-container';
+            const nameSpan = document.createElement('span'); nameSpan.className = 'merchant-name-display'; nameSpan.contentEditable = true;
+            nameSpan.textContent = data.displayName; nameSpan.title = titleText + (sectionHasDuplicate ? ` | DUPLICATES FOUND: ${Array.from(duplicatesInSectionDisplay).join(', ')}` : '');
+            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
+            nameSpan.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } else if (e.key === 'Escape') { e.preventDefault(); e.target.textContent = data.displayName; e.target.blur(); } });
+            nameAndCountWrapper.appendChild(nameSpan);
+            const countSpan = document.createElement('span'); countSpan.className = 'merchant-count-text';
+            countSpan.textContent = `(${data.count} ${data.count === 1 ? 'case' : 'cases'})`; nameAndCountWrapper.appendChild(countSpan);
+            innerFlexDiv.appendChild(nameAndCountWrapper);
+            merchantDiv.appendChild(innerFlexDiv);
+            merchantDiv.onclick = (e) => { if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { const cb = merchantDiv.querySelector('.merchant-checkbox'); if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); } } };
+            merchantListDiv.appendChild(merchantDiv);
+        });
+        filterMerchants(); // Apply current search filter to the newly populated list
+        updateSelectedCountNoteTaker();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        loadSettings();
-        
-        const noteArea = document.getElementById('noteArea');
-        if (noteArea) {
-            noteArea.value = localStorage.getItem(localStorageKey) || "";
-            let timer;
-            noteArea.addEventListener('input', () => {
-                clearTimeout(timer);
-                timer = setTimeout(() => {
-                    saveNotesToLocalStorage();
-                    countTemplatesNoteTaker();
-                }, 300);
-            });
-            countTemplatesNoteTaker();
+    function updateSelectedCountNoteTaker() {
+        const selectedCheckboxes = document.querySelectorAll('#merchantList .merchant-checkbox:checked');
+        const splitButton = document.getElementById('btnSplitSelected'); let selectedCaseCount = 0;
+        selectedCheckboxes.forEach(cb => { selectedCaseCount += parseInt(cb.closest('.merchant-stats')?.dataset?.count || '0', 10); });
+        const totalTemplatesSpan = document.getElementById('totalTemplates'); const merchantCountSpan = document.getElementById('merchantCount');
+        const totalMerchantCount = document.querySelectorAll('#merchantList .merchant-stats').length;
+        const totalCaseCountOverall = Array.from(document.querySelectorAll('#merchantList .merchant-stats')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
+        if (selectedCheckboxes.length > 0) {
+            totalTemplatesSpan.textContent = selectedCaseCount; merchantCountSpan.textContent = selectedCheckboxes.length;
+            if (splitButton) splitButton.disabled = false;
+        } else {
+            totalTemplatesSpan.textContent = totalCaseCountOverall; merchantCountSpan.textContent = totalMerchantCount;
+            if (splitButton) splitButton.disabled = true;
         }
+    }
 
-        document.getElementById('shipmentInput').addEventListener('paste', () => setTimeout(parseShipmentData, 50));
-        
-        document.getElementById('btnOpenSettings').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'flex');
-        document.getElementById('btnCloseSettingsModal').addEventListener('click', () => document.getElementById('settingsModal').style.display = 'none');
-        document.getElementById('btnSaveChangesSettings').addEventListener('click', () => {
-            saveSettings();
-            document.getElementById('settingsModal').style.display = 'none';
-        });
+    function downloadSelectedMerchants() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        if (selectedDivs.length === 0) { alert('Please select merchant(s) to download.'); return; }
+        const textsToDownload = []; let totalSelectedCases = 0;
+        selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
+        if (textsToDownload.length === 0) { alert("Could not retrieve text."); return; }
+        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
+        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
+        downloadText(combinedText + '\n', filename); 
+    }
 
-        document.getElementById('groupToggle').addEventListener('change', (e) => {
-            document.getElementById('parserGroupSize').disabled = !e.target.checked;
-        });
+    function clearSelectedMerchants() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        if (selectedDivs.length === 0) { alert('Please select merchant(s) to clear.'); return; }
+        const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
+        selectedDivs.forEach(div => { if (div.dataset.key) keysToRemove.add(div.dataset.key); });
+        const allSections = fullText.split(noteSeparatorRegex).filter(s => s.trim() !== "");
+        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
+        noteArea.value = remainingSections.length > 0 ? remainingSections.join(noteSeparator) : "";
+        countTemplatesNoteTaker(); 
+    }
 
-        // Event listeners for buttons
-        document.getElementById('btnDownloadSelected').addEventListener('click', () => {
-            const selected = Array.from(document.querySelectorAll('#merchantList .merchant-item.selected'));
-            if (selected.length === 0) return alert("No merchants selected.");
-            const text = selected.map(el => el.dataset.key).join(noteSeparator);
-            const caseCount = selected.reduce((sum, el) => sum + parseInt(el.dataset.count, 10), 0);
-            downloadText(text, `${appSettings.filenamePrefix}_${getFormattedDate()}_(${caseCount}).txt`);
-        });
+    function downloadAllNotes() {
+        const noteArea = document.getElementById('noteArea'); const textToDownload = noteArea.value.trim();
+        if (!textToDownload) { alert("Nothing to download."); return; }
+        const totalTemplatesCount = document.getElementById('totalTemplates').textContent;
+        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalTemplatesCount}).txt`;
+        downloadText(textToDownload + '\n', filename);
+    }
 
-        document.getElementById('btnSelectAll').addEventListener('click', () => {
-             document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => {
-                if (!cb.checked) {
-                    cb.checked = true;
-                    cb.closest('.merchant-item')?.classList.add('selected');
-                }
-             });
+    function processSingleROBlock(roBlockText, removalOrdersArray) {
+        const roIdLineMatch = roBlockText.match(/^\s*Removal order ID:[^\n]+/); if (!roIdLineMatch) return;
+        const currentRoIdLine = roIdLineMatch[0].trim(); const remainingText = roBlockText.substring(roIdLineMatch[0].length).trim(); if (!remainingText) return;
+        const shipmentBlocks = remainingText.split(/(?=^\s*Shipment ID:)/m);
+        shipmentBlocks.forEach((shipmentBlock) => {
+             const trimmed = shipmentBlock.trim();
+             if (trimmed.startsWith('Shipment ID:') && trimmed.includes('Merchant SKU:')) removalOrdersArray.push(currentRoIdLine + '\n' + trimmed);
         });
-        
-        document.getElementById('btnClearSelected').addEventListener('click', () => {
-             if (!confirm("Are you sure you want to clear selected merchants from notes?")) return;
-             const selectedKeys = new Set(Array.from(document.querySelectorAll('#merchantList .merchant-item.selected')).map(el => el.dataset.key));
-             const sections = noteArea.value.split(noteSeparatorRegex);
-             const newText = sections.filter(s => s.trim() && !selectedKeys.has(s)).join(noteSeparator);
-             noteArea.value = newText;
-             saveNotesToLocalStorage();
-             countTemplatesNoteTaker();
-        });
+    }
 
-        document.getElementById('btnAddSeparator').addEventListener('click', () => {
-            noteArea.value = noteArea.value.trim() + noteSeparator;
+   function splitTextIntoRemovalOrders(inputText) {
+        const removalOrders = []; if (!inputText) return removalOrders;
+        let textToProcess = inputText.trim();
+        const escapedAmzl = amzlTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedUps = upsUspsTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        textToProcess = textToProcess.replace(new RegExp('^\\s*' + escapedAmzl + '\\s*\\n*', 'gm'), '').replace(new RegExp('^\\s*' + escapedUps + '\\s*\\n*', 'gm'), '').trim();
+        const lines = textToProcess.split('\n');
+        if (lines.length > 2 && lines[1].trim() === "" && lines[2].startsWith("Removal order ID:")) textToProcess = lines.slice(2).join('\n');
+        else if (lines.length > 0 && lines[0].startsWith("Removal order ID:")) textToProcess = lines.join('\n');
+        const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
+        potentialROBlocks.forEach((roBlock) => {
+            const trimmed = roBlock.trim(); if (!trimmed) return;
+            if (trimmed.startsWith('Removal order ID:')) processSingleROBlock(trimmed, removalOrders);
         });
+        return removalOrders;
+   }
 
-        document.getElementById('btnAddSpacing').addEventListener('click', () => {
-             noteArea.value = noteArea.value.trim() + '\n\n';
-        });
+   function createTemplates(removalOrders, ordersPerTemplate) {
+        const templates = []; if (!removalOrders || removalOrders.length === 0 || ordersPerTemplate <= 0) return templates;
+        for (let i = 0; i < removalOrders.length; i += ordersPerTemplate) {
+            const chunk = removalOrders.slice(i, i + ordersPerTemplate).filter(o => o && typeof o === 'string');
+            if (chunk.length > 0) templates.push(chunk.join('\n\n'));
+        }
+        return templates;
+   }
 
-        document.getElementById('btnClearAllNotes').addEventListener('click', () => {
-            if (confirm("Are you sure you want to clear ALL notes?")) {
-                noteArea.value = "";
-                saveNotesToLocalStorage();
-                countTemplatesNoteTaker();
+    let selectedMerchantDataForSplit = [];
+
+    function openSplitModal() {
+        selectedMerchantDataForSplit = [];
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
+        if (selectedDivs.length === 0) { alert("Please select merchant(s)."); return; }
+        const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
+        if (!modal || !merchantInfoDiv) { alert("Split modal error."); return; }
+        let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
+        selectedDivs.forEach((div) => {
+            const key = div.dataset.key; const name = div.dataset.displayName || `Unknown`;
+            if (key) { selectedMerchantDataForSplit.push({ key, name }); combinedTextParts.push(key);
+                if (key.includes(upsUspsTemplate)) containsUpsUsps = true; if (key.includes(amzlTemplate)) containsAmzl = true;
             }
         });
+        const names = selectedMerchantDataForSplit.map(item => item.name);
+        modal.dataset.combinedText = combinedTextParts.join(noteSeparator.trimEnd());
+        modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
+        if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
+        else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
+        else merchantInfoDiv.textContent = 'No valid merchants.';
+        document.getElementById('splitOrdersPerTemplate').value = '2'; document.getElementById('splitNumberInput').value = '';
+        updateCalculatedTemplates(); modal.style.display = 'flex';
+    }
+
+    function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
+    function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
+    function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+
+    function updateCalculatedTemplates() {
+         const modal = document.getElementById('splitModal'); if (!modal) return;
+         const combinedText = modal.dataset.combinedText || '';
+         const ordersInput = document.getElementById('splitOrdersPerTemplate');
+         const calcSpan = document.getElementById('splitCalculatedTemplates'); if (!ordersInput || !calcSpan) return;
+         const ordersPer = parseInt(ordersInput.value) || 0;
+         if (ordersPer > 0 && combinedText) {
+             const ros = splitTextIntoRemovalOrders(combinedText);
+             calcSpan.textContent = createTemplates(ros, ordersPer).length;
+         } else calcSpan.textContent = '0';
+       }
+
+   function generateAndDownloadSplits() {
+        const modal = document.getElementById('splitModal'); if (!modal) return;
+        const combinedText = modal.dataset.combinedText || '';
+        const ordersPerInput = document.getElementById('splitOrdersPerTemplate');
+        const splitNumInput = document.getElementById('splitNumberInput');
+        const containsAmzl = modal.dataset.containsAmzl === 'true'; const containsUpsUsps = modal.dataset.containsUpsUsps === 'true';
+        if (!ordersPerInput || !splitNumInput) { alert("Modal input error."); return; }
+        const ordersPer = parseInt(ordersPerInput.value); const splitNum = parseInt(splitNumInput.value);
+        if (!combinedText) { alert("No text for selected merchants."); return; }
+        if (isNaN(ordersPer) || ordersPer < 1) { alert("Invalid 'Orders per Template'."); return; }
+        if (isNaN(splitNum) || splitNum < 1) { alert("Invalid 'Templates per Split File'."); return; }
+        let templateToUse = amzlTemplate;
+        if (containsUpsUsps && !containsAmzl) templateToUse = upsUspsTemplate;
+        else if (containsUpsUsps && containsAmzl) console.warn("Mixed entries, using AMZL template.");
+        const ros = splitTextIntoRemovalOrders(combinedText); if (ros.length === 0) { alert("No valid removal orders found."); return; }
+        const templateGroups = createTemplates(ros, ordersPer); if (templateGroups.length === 0) { alert("Failed to generate template groups."); return; }
+        const splitOutputs = [];
+        for (let i = 0; i < templateGroups.length; i += splitNum) {
+            const chunk = templateGroups.slice(i, i + splitNum);
+            if (chunk.length > 0) splitOutputs.push({ text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'), count: chunk.length });
+        }
+        if (splitOutputs.length === 0) { alert("No split files generated."); return; }
+        let filenamePart = "SplitSelection"; let merchantDisplay = selectedMerchantDataForSplit.map(m=>m.name).join(' & ');
+        if (selectedMerchantDataForSplit.length === 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name);
+        else if (selectedMerchantDataForSplit.length > 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name) + "_Multi";
+        const dateStr = getFormattedDate();
+        splitOutputs.forEach((output, index) => {
+            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            downloadText(merchantDisplay + '\n\n' + output.text + '\n', filename);
+        });
+        closeSplitModal();
+   }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadSettings(); 
+
+        const shipmentInput = document.getElementById('shipmentInput');
+        const noteArea = document.getElementById('noteArea');
+        const groupToggle = document.getElementById('groupToggle');
+        const groupSizeInput = document.getElementById('parserGroupSize');
+        const upsUspsToggle = document.getElementById('upsUspsToggle');
+        const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        const groupOrdersControl = document.getElementById('groupOrdersControl');
+        const merchantSearchInput = document.getElementById('merchantSearchInput');
+
+        if (noteArea) {
+            const savedNotes = localStorage.getItem(localStorageKey);
+            if (savedNotes) noteArea.value = savedNotes;
+            let countTimer;
+            noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 300); });
+            noteArea.addEventListener('paste', () => { setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 50); });
+        }
+        if (upsUspsOutputArea) { const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved; }
+        try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
+        catch (e) { tempUpsUspsData = {}; }
+
+        if (shipmentInput) {
+            let parseTimer;
+            shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
+        }
+        
+        if(merchantSearchInput) {
+            merchantSearchInput.addEventListener('input', filterMerchants);
+        }
+
+        try { countTemplatesNoteTaker(); } catch(e) { console.error("Initial count error:", e); }
+
+        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
+        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
+        document.getElementById('btnClearAllNotes')?.addEventListener('click', clearAllNotes);
+        document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
+        document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
+        document.getElementById('btnSelectAll')?.addEventListener('click', selectAllMerchants);
+        document.getElementById('btnDownloadAll')?.addEventListener('click', downloadAllNotes);
+        document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
+        document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
+        
+        document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
+        document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
+        document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
+        document.getElementById('settingsModal').addEventListener('click', (event) => { if (event.target === document.getElementById('settingsModal')) closeSettingsModal(); });
+
+
+        if (groupToggle && groupSizeInput) {
+            groupToggle.addEventListener('change', function() { groupSizeInput.disabled = !this.checked; });
+            groupSizeInput.disabled = !groupToggle.checked;
+        }
+        if (upsUspsToggle && upsUspsOutputContainer && groupOrdersControl && shipmentInput && upsUspsOutputArea) {
+            function toggleUpsUspsMode(isUpsMode) {
+                upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
+                groupOrdersControl.style.opacity = isUpsMode ? '0.5' : '1';
+                groupOrdersControl.style.pointerEvents = isUpsMode ? 'none' : 'auto';
+                if (isUpsMode && groupToggle) { groupToggle.checked = false; if (groupSizeInput) groupSizeInput.disabled = true; }
+                shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
+                if (!isUpsMode && groupToggle && groupSizeInput) groupSizeInput.disabled = !groupToggle.checked;
+            }
+            upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
+            toggleUpsUspsMode(upsUspsToggle.checked);
+        }
+
+        const splitModalEl = document.getElementById('splitModal');
+        document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
+        splitModalEl?.addEventListener('click', (event) => { if (event.target === splitModalEl) closeSplitModal(); });
+        document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
+        document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
     });
 </script>
+
 </body>
 </html>
