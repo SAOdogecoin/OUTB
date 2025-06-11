@@ -68,6 +68,14 @@
         position: relative;
         border: 0.5px solid rgba(0, 0, 0, 0.1);
     }
+    
+    /* FIX #2: Add resizing capability to the Notes container */
+    .note-taker-tool {
+        resize: vertical;
+        overflow: auto;
+        min-height: 300px; /* Optional: set a minimum height */
+    }
+
     .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
@@ -144,7 +152,8 @@
         width: 100%; background-color: transparent; padding: 8px 10px;
         font-size: 14px; color: var(--text-primary);
     }
-    textarea.macos-textfield { font-family: var(--mono-font); resize: vertical; min-height: 150px; }
+    /* FIX #2: Disable resizing on the textarea itself */
+    textarea.macos-textfield { font-family: var(--mono-font); resize: none; min-height: 150px; }
     
     /* Switches */
     .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
@@ -745,7 +754,6 @@
         if (confirm("Are you sure you want to clear ALL notes? This action cannot be undone.")) {
             const noteArea = document.getElementById('noteArea');
             noteArea.value = '';
-            saveNotesToLocalStorage();
             countTemplatesNoteTaker(); 
         }
     }
@@ -766,7 +774,7 @@
                 else { reconstructedNotes += parts[i]; }
             } else { reconstructedNotes += parts[i]; }
         }
-        if (replaced) { noteArea.value = reconstructedNotes; saveNotesToLocalStorage(); countTemplatesNoteTaker(); }
+        if (replaced) { noteArea.value = reconstructedNotes; countTemplatesNoteTaker(); }
         else { editableSpan.textContent = originalDisplayName; }
     }
 
@@ -805,7 +813,6 @@
         document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
         document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
         
-        // Display merchants in the order they appear in notes (insertion order)
         const merchantsInOrder = Object.entries(merchantsData); 
         merchantsInOrder.forEach(([key, data]) => {
             const merchantDiv = document.createElement('div'); merchantDiv.className = 'merchant-stats';
@@ -838,8 +845,11 @@
             merchantDiv.onclick = (e) => { if (e.target.type !== 'checkbox' && e.target.contentEditable !== true) { const cb = merchantDiv.querySelector('.merchant-checkbox'); if (cb) { cb.checked = !cb.checked; updateSelectedCountNoteTaker(); } } };
             merchantListDiv.appendChild(merchantDiv);
         });
-        filterMerchants(); // Apply current search filter to the newly populated list
+        filterMerchants(); 
         updateSelectedCountNoteTaker();
+        
+        // FIX #1: Save to localStorage after any modification to ensure all changes are captured.
+        saveNotesToLocalStorage();
     }
 
     function updateSelectedCountNoteTaker() {
@@ -872,6 +882,7 @@
     function clearSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-stats:has(.merchant-checkbox:checked)');
         if (selectedDivs.length === 0) { alert('Please select merchant(s) to clear.'); return; }
+        if (!confirm(`Are you sure you want to clear the ${selectedDivs.length} selected merchant(s)? This cannot be undone.`)) return;
         const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
         selectedDivs.forEach(div => { if (div.dataset.key) keysToRemove.add(div.dataset.key); });
         const allSections = fullText.split(noteSeparatorRegex).filter(s => s.trim() !== "");
@@ -1016,8 +1027,10 @@
             const savedNotes = localStorage.getItem(localStorageKey);
             if (savedNotes) noteArea.value = savedNotes;
             let countTimer;
-            noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 300); });
-            noteArea.addEventListener('paste', () => { setTimeout(() => { saveNotesToLocalStorage(); countTemplatesNoteTaker(); }, 50); });
+            // FIX #1: The event listener now only needs to trigger the central function.
+            // The save operation is now inside countTemplatesNoteTaker.
+            noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(countTemplatesNoteTaker, 300); });
+            noteArea.addEventListener('paste', () => { setTimeout(countTemplatesNoteTaker, 50); });
         }
         if (upsUspsOutputArea) { const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved; }
         try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
