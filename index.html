@@ -78,14 +78,16 @@
             width: calc(35% - 12px);
             flex-shrink: 0;
             gap: 24px;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
         }
         .note-taker-tool {
             width: calc(65% - 12px);
             flex-grow: 1;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
         }
-        #noteArea { flex-grow: 1; min-height: 200px; }
+        #noteArea { flex-grow: 1; min-height: 200px; resize: none; }
         .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
     }
 
