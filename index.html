@@ -75,7 +75,7 @@
         justify-content: space-between;
         flex-shrink: 0;
         gap: 16px;
-        position: relative; /* For positioning the search popout */
+        position: relative; 
     }
     .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin-right: auto; white-space: nowrap; }
     .toolbar-right { display: flex; align-items: center; gap: 16px; }
@@ -87,47 +87,7 @@
         padding: 2px;
         background-color: var(--bg-primary);
     }
-
-    /* Search Popout Styles */
-    #notesSearchPopoutContainer { /* This is the new clickable icon's group */
-        position: relative; /* For positioning the actual search input */
-    }
-    #notesSearchContainer {
-        display: none; /* Hidden by default */
-        position: absolute;
-        top: calc(100% + 5px); /* Below the top bar */
-        right: 0; /* Align to the right of its icon group or toolbar-right */
-        width: 300px; /* Fixed width for the popout */
-        background-color: var(--bg-window);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        padding: 10px;
-        z-index: 1001; /* Above other top bar items */
-        flex-direction: column; /* Stack input and nav */
-        gap: 8px;
-    }
-    #notesSearchContainer.active {
-        display: flex; /* Show when active */
-    }
-    #notesSearchInputWrapper { /* Wrapper for input and its internal icon */
-        position: relative;
-        width: 100%;
-    }
-    #notesSearchInput {
-        all: unset; box-sizing: border-box; width: 100%; height: 32px;
-        background-color: var(--bg-input);
-        border-radius: 8px; border: 1px solid var(--border-subtle);
-        padding: 0 10px 0 34px; font-size: 13px;
-    }
-    #notesSearchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder); }
     
-    #notesSearchNav { display: none; align-items: center; font-size: 0.9em; color: var(--text-secondary); justify-content: space-between; width: 100%;}
-    #notesSearchNav.active { display: flex; } /* Show nav when there are matches */
-    #notesSearchNav button { all: unset; cursor: pointer; padding: 0 4px; color: var(--accent-blue); }
-    #notesSearchNav button:disabled { color: var(--text-placeholder); cursor: not-allowed; }
-
-
     .main-wrapper {
         display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
         width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
@@ -168,7 +128,6 @@
     .main-wrapper.layout-stacked .top-bar .toolbar-right {
         gap: 8px;
     }
-    /* No need to shrink #notesSearchContainer here as it's a popout */
 
     button.macos {
         font-family: var(--system-font); font-weight: 500; cursor: pointer;
@@ -391,26 +350,11 @@
         </div>
     </div>
 
+
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
-            <div id="notesSearchPopoutContainer" class="toolbar-icon-group"> <!-- New wrapper for the icon -->
-                <button id="btnToggleNotesSearch" class="macos-icon-button" title="Search Notes">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-                <div id="notesSearchContainer"> <!-- This is the popout, initially hidden -->
-                    <div id="notesSearchInputWrapper">
-                        <i id="notesSearchIcon" class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="notesSearchInput" placeholder="Search in notes...">
-                    </div>
-                    <button id="btnDoNotesSearch" class="macos primary" style="width:100%; margin-top:8px;">Search</button>
-                    <div id="notesSearchNav">
-                        <span id="notesSearchMatchCount"></span>
-                        <button id="notesSearchPrev" title="Previous Match"><i class="fa-solid fa-chevron-up"></i></button>
-                        <button id="notesSearchNext" title="Next Match"><i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                </div>
-            </div>
+            <!-- Notes Search elements removed -->
             <div class="toolbar-icon-group">
                 <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
                 <button id="btnLayoutSide" class="macos-icon-button" title="Side-by-Side View"><i class="fa-solid fa-table-columns"></i></button>
@@ -598,8 +542,7 @@
     };
 
     let tempUpsUspsData = {};
-    let notesSearchMatches = [];
-    let currentMatchIndex = -1;
+    // Notes search variables removed
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -776,91 +719,6 @@
         });
     }
     
-    function updateNotesSearchUI() {
-        const navUI = document.getElementById('notesSearchNav');
-        const matchCountUI = document.getElementById('notesSearchMatchCount');
-        const prevBtn = document.getElementById('notesSearchPrev');
-        const nextBtn = document.getElementById('notesSearchNext');
-
-        if (notesSearchMatches.length > 0) {
-            navUI.classList.add('active'); // Use class for display
-            matchCountUI.textContent = `${currentMatchIndex + 1} of ${notesSearchMatches.length}`;
-            prevBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex <= 0;
-            nextBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex >= notesSearchMatches.length - 1;
-        } else {
-            navUI.classList.remove('active');
-            matchCountUI.textContent = "";
-        }
-    }
-
-    function selectAndScrollToMatch(noteArea, match) {
-        if (typeof noteArea.setSelectionRange === 'function' && match) {
-            noteArea.focus(); 
-            noteArea.setSelectionRange(match.index, match.index + match.term.length);
-            
-            const textBefore = noteArea.value.substring(0, match.index);
-            const linesToMatch = textBefore.split('\n').length;
-            const lineHeight = parseFloat(getComputedStyle(noteArea).lineHeight) || 16;
-            const visibleLines = Math.floor(noteArea.clientHeight / lineHeight);
-            let scrollTarget = (linesToMatch - Math.floor(visibleLines / 2) -1 ) * lineHeight;
-            scrollTarget = Math.max(0, scrollTarget);
-
-            const matchTopPosition = (linesToMatch - 1) * lineHeight;
-            const matchBottomPosition = linesToMatch * lineHeight;
-            const viewTop = noteArea.scrollTop;
-            const viewBottom = noteArea.scrollTop + noteArea.clientHeight;
-
-            if (matchTopPosition < viewTop || matchBottomPosition > viewBottom - lineHeight) {
-                 noteArea.scrollTop = scrollTarget;
-            }
-        }
-    }
-    
-    function findAndHighlightAllMatches() {
-        const noteArea = document.getElementById('noteArea');
-        const searchTerm = document.getElementById('notesSearchInput').value;
-        notesSearchMatches = [];
-        currentMatchIndex = -1;
-
-        if (!searchTerm.trim()) {
-            updateNotesSearchUI();
-             if (typeof noteArea.setSelectionRange === 'function') { 
-                const currentCaretPos = noteArea.selectionStart;
-                noteArea.setSelectionRange(currentCaretPos, currentCaretPos);
-            }
-            return;
-        }
-
-        const text = noteArea.value;
-        const regex = new RegExp(escapeRegExp(searchTerm), 'gi'); 
-        let matchInstance;
-        while((matchInstance = regex.exec(text)) !== null) { 
-            notesSearchMatches.push({ index: matchInstance.index, term: matchInstance[0] });
-        }
-
-        if (notesSearchMatches.length > 0) {
-            currentMatchIndex = 0;
-            selectAndScrollToMatch(noteArea, notesSearchMatches[currentMatchIndex]);
-        } else {
-             if (typeof noteArea.setSelectionRange === 'function') { 
-                const currentCaretPos = noteArea.selectionStart;
-                noteArea.setSelectionRange(currentCaretPos, currentCaretPos);
-            }
-        }
-        updateNotesSearchUI();
-    }
-
-    function navigateSearchMatches(direction) {
-        if (notesSearchMatches.length === 0) return;
-        currentMatchIndex += direction;
-        if (currentMatchIndex < 0) currentMatchIndex = notesSearchMatches.length - 1;
-        else if (currentMatchIndex >= notesSearchMatches.length) currentMatchIndex = 0;
-        
-        const noteArea = document.getElementById('noteArea');
-        selectAndScrollToMatch(noteArea, notesSearchMatches[currentMatchIndex]);
-        updateNotesSearchUI();
-    }
-
     function showCaseAddedNotification(count) {
         if (count <= 0) return;
         const popup = document.getElementById('caseAddedPopup');
@@ -1516,13 +1374,6 @@
         const groupOrdersControl = document.getElementById('groupOrdersControl');
         const merchantSearchInput = document.getElementById('merchantSearchInput');
         
-        const btnToggleNotesSearch = document.getElementById('btnToggleNotesSearch');
-        const notesSearchContainer = document.getElementById('notesSearchContainer');
-        const notesSearchInput = document.getElementById('notesSearchInput');
-        const btnDoNotesSearch = document.getElementById('btnDoNotesSearch');
-        const notesSearchPrevBtn = document.getElementById('notesSearchPrev');
-        const notesSearchNextBtn = document.getElementById('notesSearchNext');
-        
         const clearAllConfirmModal = document.getElementById('clearAllConfirmModal');
         const cancelClearAllBtn = document.getElementById('cancelClearAllBtn');
         const confirmClearAllBtn = document.getElementById('confirmClearAllBtn');
@@ -1559,38 +1410,6 @@
         if(merchantSearchInput) {
             merchantSearchInput.addEventListener('input', filterMerchants);
         }
-
-        if(btnToggleNotesSearch && notesSearchContainer) {
-            btnToggleNotesSearch.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent click from closing it immediately if body listener is active
-                notesSearchContainer.classList.toggle('active');
-                if (notesSearchContainer.classList.contains('active')) {
-                    notesSearchInput.focus();
-                }
-            });
-            // Optional: Click outside to close search popout
-            document.addEventListener('click', (e) => {
-                if (notesSearchContainer.classList.contains('active') && 
-                    !notesSearchContainer.contains(e.target) && 
-                    e.target !== btnToggleNotesSearch && !btnToggleNotesSearch.contains(e.target) ) {
-                    notesSearchContainer.classList.remove('active');
-                }
-            });
-        }
-
-        if(notesSearchInput) {
-             notesSearchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    findAndHighlightAllMatches();
-                }
-            });
-        }
-        if(btnDoNotesSearch) {
-            btnDoNotesSearch.addEventListener('click', findAndHighlightAllMatches);
-        }
-        if(notesSearchPrevBtn) notesSearchPrevBtn.addEventListener('click', () => navigateSearchMatches(-1));
-        if(notesSearchNextBtn) notesSearchNextBtn.addEventListener('click', () => navigateSearchMatches(1));
         
         if(cancelClearAllBtn) cancelClearAllBtn.addEventListener('click', hideClearAllConfirmPrompt);
         if(confirmClearAllBtn) confirmClearAllBtn.addEventListener('click', confirmAndClearAllNotes);
