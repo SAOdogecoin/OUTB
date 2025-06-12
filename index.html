@@ -75,6 +75,7 @@
         justify-content: space-between;
         flex-shrink: 0;
         gap: 16px;
+        position: relative; /* For positioning the search popout */
     }
     .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin-right: auto; white-space: nowrap; }
     .toolbar-right { display: flex; align-items: center; gap: 16px; }
@@ -86,35 +87,46 @@
         padding: 2px;
         background-color: var(--bg-primary);
     }
+
+    /* Search Popout Styles */
+    #notesSearchPopoutContainer { /* This is the new clickable icon's group */
+        position: relative; /* For positioning the actual search input */
+    }
     #notesSearchContainer {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: calc(100% + 5px); /* Below the top bar */
+        right: 0; /* Align to the right of its icon group or toolbar-right */
+        width: 300px; /* Fixed width for the popout */
+        background-color: var(--bg-window);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        padding: 10px;
+        z-index: 1001; /* Above other top bar items */
+        flex-direction: column; /* Stack input and nav */
+        gap: 8px;
+    }
+    #notesSearchContainer.active {
+        display: flex; /* Show when active */
+    }
+    #notesSearchInputWrapper { /* Wrapper for input and its internal icon */
         position: relative;
         width: 100%;
-        max-width: 300px; 
-        display: flex; 
-        align-items: center;
     }
     #notesSearchInput {
         all: unset; box-sizing: border-box; width: 100%; height: 32px;
         background-color: var(--bg-input);
         border-radius: 8px; border: 1px solid var(--border-subtle);
         padding: 0 10px 0 34px; font-size: 13px;
-        flex-grow: 1; 
     }
     #notesSearchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder); }
-    #btnDoNotesSearch { 
-        flex-shrink: 0; 
-        margin-left: 5px;
-        width:auto; padding: 0 8px; height: 30px; border-radius: 6px;
-        background-color: var(--bg-input);
-        border: 1px solid var(--border-subtle);
-    }
-     #btnDoNotesSearch i { margin-right: 0;}
-    #btnDoNotesSearch:hover {
-        background-color: var(--bg-hover);
-    }
-    #notesSearchNav { display: none; align-items: center; margin-left: 8px; font-size: 0.9em; color: var(--text-secondary); }
+    
+    #notesSearchNav { display: none; align-items: center; font-size: 0.9em; color: var(--text-secondary); justify-content: space-between; width: 100%;}
+    #notesSearchNav.active { display: flex; } /* Show nav when there are matches */
     #notesSearchNav button { all: unset; cursor: pointer; padding: 0 4px; color: var(--accent-blue); }
     #notesSearchNav button:disabled { color: var(--text-placeholder); cursor: not-allowed; }
+
 
     .main-wrapper {
         display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
@@ -156,10 +168,7 @@
     .main-wrapper.layout-stacked .top-bar .toolbar-right {
         gap: 8px;
     }
-     .main-wrapper.layout-stacked .top-bar #notesSearchContainer {
-        max-width: 180px; /* Adjusted for button */
-        min-width: 130px;
-    }
+    /* No need to shrink #notesSearchContainer here as it's a popout */
 
     button.macos {
         font-family: var(--system-font); font-weight: 500; cursor: pointer;
@@ -267,11 +276,11 @@
     
     #merchantList {
         min-height: 100px;
-        max-height: 70vh;
+        max-height: 70vh; 
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: hidden; 
         margin-top: 16px;
-        padding: 0;
+        padding: 0; 
         border: none;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -279,7 +288,7 @@
         background-color: transparent;
         flex-grow: 1;
         align-content: start;
-        max-width: 100%;
+        max-width: 100%; 
     }
 
     .merchant-item {
@@ -382,20 +391,24 @@
         </div>
     </div>
 
-
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
-            <div id="notesSearchContainer">
-                <i id="notesSearchIcon" class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="notesSearchInput" placeholder="Search in notes...">
-                 <button id="btnDoNotesSearch" class="macos-icon-button" title="Search Notes" style="margin-left: 5px; width:auto; padding: 0 8px; height: 30px; border-radius: 6px;">
-                    <i class="fa-solid fa-search" style="margin-right:0;"></i>
+            <div id="notesSearchPopoutContainer" class="toolbar-icon-group"> <!-- New wrapper for the icon -->
+                <button id="btnToggleNotesSearch" class="macos-icon-button" title="Search Notes">
+                    <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
-                <div id="notesSearchNav">
-                    <span id="notesSearchMatchCount"></span>
-                    <button id="notesSearchPrev" title="Previous Match"><i class="fa-solid fa-chevron-up"></i></button>
-                    <button id="notesSearchNext" title="Next Match"><i class="fa-solid fa-chevron-down"></i></button>
+                <div id="notesSearchContainer"> <!-- This is the popout, initially hidden -->
+                    <div id="notesSearchInputWrapper">
+                        <i id="notesSearchIcon" class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="notesSearchInput" placeholder="Search in notes...">
+                    </div>
+                    <button id="btnDoNotesSearch" class="macos primary" style="width:100%; margin-top:8px;">Search</button>
+                    <div id="notesSearchNav">
+                        <span id="notesSearchMatchCount"></span>
+                        <button id="notesSearchPrev" title="Previous Match"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button id="notesSearchNext" title="Next Match"><i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="toolbar-icon-group">
@@ -770,19 +783,19 @@
         const nextBtn = document.getElementById('notesSearchNext');
 
         if (notesSearchMatches.length > 0) {
-            navUI.style.display = 'flex';
+            navUI.classList.add('active'); // Use class for display
             matchCountUI.textContent = `${currentMatchIndex + 1} of ${notesSearchMatches.length}`;
             prevBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex <= 0;
             nextBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex >= notesSearchMatches.length - 1;
         } else {
-            navUI.style.display = 'none';
+            navUI.classList.remove('active');
             matchCountUI.textContent = "";
         }
     }
 
     function selectAndScrollToMatch(noteArea, match) {
         if (typeof noteArea.setSelectionRange === 'function' && match) {
-            noteArea.focus(); // Focus the textarea to make selection visible
+            noteArea.focus(); 
             noteArea.setSelectionRange(match.index, match.index + match.term.length);
             
             const textBefore = noteArea.value.substring(0, match.index);
@@ -878,10 +891,6 @@
     function showClearAllSuccessNotification() {
         const modal = document.getElementById('clearAllSuccessPopup');
         if (modal) modal.style.display = 'flex';
-        // Auto-hide can be added here if needed, or rely on OK button
-        // setTimeout(() => {
-        // if (modal) modal.style.display = 'none';
-        // }, 2500); 
     }
 
 
@@ -1506,6 +1515,9 @@
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const groupOrdersControl = document.getElementById('groupOrdersControl');
         const merchantSearchInput = document.getElementById('merchantSearchInput');
+        
+        const btnToggleNotesSearch = document.getElementById('btnToggleNotesSearch');
+        const notesSearchContainer = document.getElementById('notesSearchContainer');
         const notesSearchInput = document.getElementById('notesSearchInput');
         const btnDoNotesSearch = document.getElementById('btnDoNotesSearch');
         const notesSearchPrevBtn = document.getElementById('notesSearchPrev');
@@ -1547,6 +1559,25 @@
         if(merchantSearchInput) {
             merchantSearchInput.addEventListener('input', filterMerchants);
         }
+
+        if(btnToggleNotesSearch && notesSearchContainer) {
+            btnToggleNotesSearch.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent click from closing it immediately if body listener is active
+                notesSearchContainer.classList.toggle('active');
+                if (notesSearchContainer.classList.contains('active')) {
+                    notesSearchInput.focus();
+                }
+            });
+            // Optional: Click outside to close search popout
+            document.addEventListener('click', (e) => {
+                if (notesSearchContainer.classList.contains('active') && 
+                    !notesSearchContainer.contains(e.target) && 
+                    e.target !== btnToggleNotesSearch && !btnToggleNotesSearch.contains(e.target) ) {
+                    notesSearchContainer.classList.remove('active');
+                }
+            });
+        }
+
         if(notesSearchInput) {
              notesSearchInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
