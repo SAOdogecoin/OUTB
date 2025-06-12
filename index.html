@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>Outbound AMZL Tool</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="." />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://rsms.me/">
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 <style>
     :root {
         --system-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --mono-font: 'SF Mono', Consolas, 'Courier New', Courier, monospace;
-        --bg-primary: #F6F6F6;
-        --bg-window: rgba(255, 255, 255, 0.8);
-        --bg-toolbar: #F0F0F0;
-        --bg-glass: rgba(240, 240, 240, 0.7);
+        --bg-primary: #F3F3F3;
+        --bg-window: #FFFFFF;
+        --bg-toolbar: #F3F3F3; 
+        --bg-input: #FFFFFF;
+        --bg-hover: rgba(0, 0, 0, 0.05);
         --text-primary: #1d1d1f;
         --text-secondary: #6e6e73;
         --text-placeholder: #aaaaaf;
@@ -25,11 +26,33 @@
         --accent-blue-dark: #006ADC;
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
+        --highlight-bg: #B4D7FF; 
+        --highlight-text: #000000; 
         --top-bar-height: 50px;
+        color-scheme: light;
     }
 
-    /* --- Global & Layout --- */
-    html { box-sizing: border-box; }
+    html[data-theme="dark"] {
+        --bg-primary: #1c1c1e;
+        --bg-window: #2c2c2e;
+        --bg-toolbar: #1c1c1e; 
+        --bg-input: #3a3a3c;
+        --bg-hover: rgba(255, 255, 255, 0.1);
+        --text-primary: #f2f2f7;
+        --text-secondary: #9a9a9e;
+        --text-placeholder: #8e8e93;
+        --border-color: #545458;
+        --border-subtle: #424245;
+        --accent-blue: #0A84FF; 
+        --accent-blue-dark: #007AFF;
+        --accent-red: #ff453a;
+        --accent-red-hover: #ff3b30;
+        --highlight-bg: #0052A3; 
+        --highlight-text: #FFFFFF; 
+        color-scheme: dark;
+    }
+
+    html { box-sizing: border-box; background-color: var(--bg-primary); }
     *, *:before, *:after { box-sizing: inherit; }
     body {
         font-family: var(--system-font);
@@ -39,22 +62,59 @@
         min-height: 100vh;
         -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         font-size: 13px;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
-    body.is-resizing {
-        user-select: none; /* CHANGE: Prevent text selection during resize drag */
-    }
+    body.is-resizing { user-select: none; }
 
     .top-bar {
         background-color: var(--bg-toolbar);
         padding: 0 16px;
-        height: var(--top-bar-height);
+        min-height: var(--top-bar-height);
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-shrink: 0;
-        border-bottom: 0.5px solid var(--border-color);
+        gap: 16px;
     }
-    .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); }
+    .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin-right: auto; white-space: nowrap; }
+    .toolbar-right { display: flex; align-items: center; gap: 16px; }
+    .toolbar-icon-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 2px;
+        background-color: var(--bg-primary);
+    }
+    #notesSearchContainer {
+        position: relative;
+        width: 100%;
+        max-width: 300px; 
+        display: flex; 
+        align-items: center;
+    }
+    #notesSearchInput {
+        all: unset; box-sizing: border-box; width: 100%; height: 32px;
+        background-color: var(--bg-input);
+        border-radius: 8px; border: 1px solid var(--border-subtle);
+        padding: 0 10px 0 34px; font-size: 13px;
+        flex-grow: 1; 
+    }
+    #notesSearchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder); }
+    #btnDoNotesSearch { 
+        flex-shrink: 0; 
+        margin-left: 5px;
+        width:auto; padding: 0 8px; height: 30px; border-radius: 6px;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-subtle);
+    }
+     #btnDoNotesSearch i { margin-right: 0;}
+    #btnDoNotesSearch:hover {
+        background-color: var(--bg-hover);
+    }
+    #notesSearchNav { display: none; align-items: center; margin-left: 8px; font-size: 0.9em; color: var(--text-secondary); }
+    #notesSearchNav button { all: unset; cursor: pointer; padding: 0 4px; color: var(--accent-blue); }
+    #notesSearchNav button:disabled { color: var(--text-placeholder); cursor: not-allowed; }
 
     .main-wrapper {
         display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
@@ -66,286 +126,360 @@
         background-color: var(--bg-window);
         border-radius: 12px;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-        padding: 20px 20px 25px 20px; /* CHANGE: Add padding-bottom for the handle */
+        padding: 20px 20px 25px 20px;
         display: flex; flex-direction: column;
         position: relative;
-        border: 0.5px solid rgba(0, 0, 0, 0.1);
-        overflow: hidden; /* CHANGE: Hide overflow and disable native resize */
+        border: 0.5px solid var(--border-color);
+        overflow: hidden;
         resize: none;
-        min-height: 200px; /* CHANGE: Set a reasonable min-height for all containers */
+        min-height: 200px;
     }
+    .parser-tool { padding-bottom: 20px; }
+    .merchant-actions-tool, .note-taker-tool { padding-bottom: 25px; }
 
-    .tool-card-title { display: none; font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0; }
+    .tool-card-title {
+        display: flex;
+        align-items: center;
+        font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0;
+        flex-shrink: 0;
+    }
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
-    @media (min-width: 992px) {
-        .main-wrapper { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
-        .tool-card-title { display: flex; align-items: center; }
-        .left-column-wrapper {
-            width: calc(35% - 12px);
-            flex-shrink: 0;
-            gap: 24px;
-            display: flex; flex-direction: column;
-        }
-        .note-taker-tool {
-            width: calc(65% - 12px);
-            flex-grow: 1;
-            display: flex; flex-direction: column;
-            min-height: 400px; /* A larger default for the main notes area */
-        }
-        #noteArea { flex-grow: 1; min-height: 200px; }
-        .note-taker-tool .controls-and-stats { flex-shrink: 0; margin-top: 16px; }
+    .main-wrapper.layout-side-by-side { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
+    .main-wrapper.layout-side-by-side .left-column-wrapper { width: calc(35% - 12px); flex-shrink: 0; gap: 24px; display: flex; flex-direction: column; }
+    .main-wrapper.layout-side-by-side .note-taker-tool { width: calc(65% - 12px); flex-grow: 1; display: flex; flex-direction: column; }
+
+    .main-wrapper.layout-stacked .top-bar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+    .main-wrapper.layout-stacked .top-bar .toolbar-right {
+        gap: 8px;
+    }
+     .main-wrapper.layout-stacked .top-bar #notesSearchContainer {
+        max-width: 180px; /* Adjusted for button */
+        min-width: 130px;
     }
 
-    /* --- macOS UI Components --- */
-    
-    /* Buttons */
     button.macos {
         font-family: var(--system-font); font-weight: 500; cursor: pointer;
-        border: none; transition: all 0.15s ease;
-        font-size: 13px; padding: 4px 14px; border-radius: 8px;
+        border: none; transition: all 0.15s ease; font-size: 13px;
+        padding: 4px 14px; border-radius: 8px;
         display: inline-flex; align-items: center; justify-content: center;
     }
-    button.macos.primary {
-        background-image: linear-gradient(to bottom, #0A84FF, #007AFF);
-        border: 0.5px solid transparent;
-        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12);
-        color: white;
-    }
-    button.macos.primary:hover { background-image: linear-gradient(to bottom, #1A94FF, #118AFF); }
-    button.macos.primary:active { background-image: linear-gradient(to bottom, #006ADC, #0070E8); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); }
-    button.macos.primary:disabled { background-image: linear-gradient(to bottom, #87C9FF, #80C5FF); color: rgba(255,255,255,0.9); box-shadow: none; cursor: not-allowed; }
-    
-    button.macos.secondary {
-        background-image: linear-gradient(to bottom, #FFFFFF, #F8F8F8);
-        border: 0.5px solid var(--border-color);
-        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
-        color: var(--text-primary);
-    }
-    button.macos.secondary:active { background-image: linear-gradient(to bottom, #F0F0F0, #F7F7F7); border-color: #AFAFAF; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
-    button.macos.secondary:disabled { background-image: linear-gradient(#FFFFFF, #F7F7F7); color: rgba(0,0,0,0.35); border-color: var(--border-subtle); cursor: not-allowed; }
-
-    button.macos.danger { background-color: var(--accent-red); color: white; border: none; box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.12); }
-    button.macos.danger:hover { background-color: var(--accent-red-hover); }
-    
     button.macos > i { margin-right: 6px; font-size: 0.9em; }
+    
+    button.macos.primary { background-image: linear-gradient(to bottom, var(--accent-blue), var(--accent-blue-dark)); color: white; box-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
+    button.macos.primary:hover { filter: brightness(1.1); }
+    button.macos.primary:active { filter: brightness(0.9); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.15); }
+    button.macos.primary:disabled { background-image: none; background-color: var(--border-color); color: var(--text-secondary); filter: none; cursor: not-allowed; box-shadow: none; }
+    
+    button.macos.secondary { background-color: var(--bg-input); border: 0.5px solid var(--border-color); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08); color: var(--text-primary); }
+    button.macos.secondary:active { background-color: var(--bg-hover); }
+    button.macos.secondary:disabled { background-color: var(--bg-input); color: var(--text-placeholder); border-color: var(--border-subtle); }
+
+    button.macos.danger { background-color: var(--accent-red); color: white; box-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
+    button.macos.danger:hover { background-color: var(--accent-red-hover); }
 
     .macos-icon-button {
-        background: rgba(255,255,255,0.5); border: 0.5px solid var(--border-color); cursor: pointer;
-        width: 32px; height: 32px; border-radius: 8px;
-        display: inline-flex; align-items: center; justify-content: center;
+        background: transparent; border: none; cursor: pointer; width: 32px; height: 32px;
+        border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
         color: var(--text-secondary); transition: all 0.15s ease;
-        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.08);
     }
-    .macos-icon-button:hover { background-color: rgba(255,255,255,0.9); }
-    .macos-icon-button:active { background-color: #e5e5e5; }
+    .macos-icon-button:hover { background-color: var(--bg-hover); color: var(--text-primary); }
+    .macos-icon-button.active { background-color: var(--accent-blue); color: white; }
 
-    /* Inputs & Textareas */
     textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
     .macos-textfield-container {
         width: 100%; border-radius: 10px; border: 0.5px solid var(--border-color);
-        background-color: white; box-shadow: 0 1px 1px rgba(0,0,0,0.02) inset;
+        background-color: var(--bg-input);
         transition: all 0.15s ease;
     }
-    .macos-textfield-container:focus-within { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3); }
+    .macos-textfield-container.fixed-width {
+        width: 70px;
+        margin-left: auto;
+    }
+    .macos-textfield-container:focus-within {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-blue) 30%, transparent);
+    }
     .macos-textfield-container input, .macos-textfield-container textarea {
         width: 100%; background-color: transparent; padding: 8px 10px;
         font-size: 14px; color: var(--text-primary);
     }
     textarea.macos-textfield { font-family: var(--mono-font); resize: none; min-height: 100px; }
     
-    /* Switches */
     .macos-switch { position: relative; display: inline-block; width: 44px; height: 26px; flex-shrink: 0; }
     .macos-switch input { opacity: 0; width: 0; height: 0; }
-    .macos-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: .2s; border-radius: 34px; }
-    .macos-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-    .macos-switch input:checked + .slider { background-color: var(--accent-blue); }
+    .macos-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #c7c7cc; transition: background-color .2s; border-radius: 34px; }
+    .macos-switch .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 2px; bottom: 2px; background-color: white; transition: transform .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .macos-switch input:checked + .slider { background-color: var(--accent-blue); } 
+    html[data-theme="dark"] .macos-switch input:not(:checked) + .slider { background-color: #555; } 
     .macos-switch input:checked + .slider:before { transform: translateX(18px); }
 
-    /* Modals */
     .modal-overlay {
         display: none; position: fixed; z-index: 1000; left: 0; top: 0;
         width: 100%; height: 100%; justify-content: center; align-items: center;
-        background-color: rgba(60,60,67,0.3);
+        background-color: rgba(0,0,0,0.4);
     }
     .modal-content {
-        background-color: var(--bg-glass);
-        backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-        padding: 20px; border: 0.5px solid rgba(0,0,0,0.2);
-        border-radius: 14px; width: 90%; max-width: 520px;
+        background-color: var(--bg-primary);
+        padding: 20px; border-radius: 14px; width: 90%;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         display: flex; flex-direction: column; gap: 15px;
     }
-     .modal-content h2 { margin-top: 0; margin-bottom: 8px; font-size: 1.15em; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 10px; display:flex; align-items:center; justify-content:space-between; }
+    #splitModal .modal-content, #settingsModal .modal-content {max-width: 520px;}
+    #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content { max-width: 400px; text-align: center;}
+
+     .modal-content h2 {
+        margin: 0 0 8px 0; font-size: 1.15em; font-weight: 600;
+        border-bottom: 1px solid var(--border-subtle);
+        padding-bottom: 10px; display:flex; align-items:center;
+     }
+    #clearAllConfirmModal .modal-content h2, #clearAllSuccessPopup .modal-content h2 { justify-content: center; }
+    #clearAllConfirmModal p, #clearAllSuccessPopup p { margin: 10px 0 20px; font-size: 1.05em;}
+
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+    #clearAllConfirmModal .modal-actions { justify-content: center; }
     
-    /* Specifics */
+    .notification-popup {
+        display: none; position: fixed; top: 20px; left: 50%;
+        transform: translateX(-50%) scale(0.9);
+        background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); 
+        color: white;
+        padding: 10px 20px; border-radius: 20px;
+        font-size: 1.1em; font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.3s ease, top 0.3s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .notification-popup.show {
+        display: block;
+        opacity: 1;
+        top: 30px;
+        transform: translateX(-50%) scale(1);
+    }
+
     .left-column-wrapper, #merchantList, #noteArea { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
     .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar { width: 9px; }
     .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
     
     #merchantList {
-        min-height: 100px; /* CHANGE: Set a smaller min-height */
+        min-height: 100px;
         max-height: 70vh;
         overflow-y: auto;
-        /* CHANGE: Removed resize: vertical */
+        overflow-x: hidden;
         margin-top: 16px;
-        padding: 8px;
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
+        padding: 0;
+        border: none;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 8px;
-        background-color: rgba(255,255,255,0.4);
-        flex-grow: 1; /* CHANGE: Allow the list to grow */
+        background-color: transparent;
+        flex-grow: 1;
+        align-content: start;
+        max-width: 100%;
     }
 
     .merchant-item {
-        padding: 8px 12px;
-        background-color: #fff;
-        border-radius: 8px;
-        border: 1px solid var(--border-subtle);
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        font-size: 13px;
-        transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.2s ease;
-        cursor: pointer;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        padding: 8px 12px; background-color: var(--bg-window); border-radius: 8px;
+        border: 1px solid var(--border-subtle); display: flex; align-items: center;
+        transition: all 0.2s ease; cursor: pointer;
+        min-width: 0; 
     }
-    .merchant-item:hover {
-        background-color: rgba(0,0,0,0.03);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    }
-    .merchant-item.selected {
-        background-color: #e8f3ff;
-        border-color: #b0d7ff;
-    }
+    .merchant-item:hover { background-color: var(--bg-hover); }
+    .merchant-item.selected { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); color: white; }
+    .merchant-item [contenteditable] { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 50px;}
     
-    /* CHANGE: New styling for the case counter pill */
     .merchant-item .case-count {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        background-color: #e9e9ed;
-        padding: 3px 8px;
-        border-radius: 10px;
-        margin-left: auto;
-        flex-shrink: 0;
+        font-size: 11px; font-weight: 600; color: var(--text-secondary);
+        background-color: var(--bg-primary); padding: 3px 8px;
+        border-radius: 10px; margin-left: auto; flex-shrink: 0; transition: all 0.2s ease;
     }
+    .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
     
     .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
     .macos-checkbox {
-        appearance: none; -webkit-appearance: none; margin: 0;
-        width: 15px; height: 15px; border-radius: 4px;
+        appearance: none; margin: 0; width: 15px; height: 15px; border-radius: 4px;
         display: flex; align-items: center; justify-content: center;
-        background-image: linear-gradient(#FFFFFF, #F7F7F7);
-        border: 0.5px solid #BDBDBD;
-        box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.07);
-        flex-shrink: 0;
+        background-color: var(--bg-input); border: 0.5px solid var(--border-color); flex-shrink: 0;
     }
-    .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1); }
-    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; line-height: 1; }
+    .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); }
+    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; }
+    .merchant-item.selected .macos-checkbox { background-color: #fff; border-color: transparent; }
+    .merchant-item.selected .macos-checkbox:checked::after { color: var(--accent-blue); }
 
-    .counter-pill { display: flex; align-items: center; gap: 15px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.5); }
+    .counter-pill {
+        display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-input);
+    }
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
 
-    /* CHANGE: New styles for the custom resize handle */
     .resize-handle {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 20px;
-        cursor: ns-resize;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: absolute; bottom: 0; left: 0; right: 0; height: 20px;
+        cursor: ns-resize; display: flex; align-items: center; justify-content: center;
+        z-index: 10;
     }
     .resize-pill {
-        width: 40px;
-        height: 5px;
-        background-color: #d1d1d6;
+        width: 40px; height: 5px; background-color: var(--border-color);
         border-radius: 2.5px;
     }
+
+    textarea::selection {
+        background-color: var(--highlight-bg);
+        color: var(--highlight-text);
+    }
+
+    .parser-tool .macos-textfield-container,
+    .note-taker-tool .macos-textfield-container#noteAreaContainer,
+    #merchantList {
+        flex-grow: 1;
+        min-height: 0;
+    }
+    #shipmentInput, #upsUspsOutputArea, #noteArea {
+        height: 100%;
+    }
+    .parser-controls label.parser-control-row { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
+    
+    .controls-and-stats { margin-top: 16px; } 
+    .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    
+    #merchantCounterTarget { margin-top: 16px; display: flex; justify-content: flex-end; } 
+    .counter-pill-container { 
+        display: flex;
+        justify-content: flex-end; 
+    }
+
+    .settings-group { margin-bottom: 15px; }
+    .settings-group label { display: block; margin-bottom: 5px; font-weight: 500;}
+    .settings-group .radio-group label { display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal; }
+    .settings-group .radio-group input[type="radio"] { margin-right: 5px; }
+
 </style>
 </head>
 <body>
-
-    <div class="top-bar">
-        <h1 class="top-bar-title">AMZL,UPS/USPS Outbound Tool</h1>
-        <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+    <div id="caseAddedPopup" class="notification-popup">+0</div>
+    <div id="clearAllConfirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 8px;"></i>Clear All Notes?</h2>
+            <p>Are you sure you want to clear ALL notes and merchant entries? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancelClearAllBtn" class="macos secondary">Cancel</button>
+                <button id="confirmClearAllBtn" class="macos danger">Clear All</button>
+            </div>
+        </div>
+    </div>
+    <div id="clearAllSuccessPopup" class="modal-overlay">
+         <div class="modal-content" style="max-width:300px; text-align:center;">
+            <h2 style="justify-content:center;"><i class="fa-solid fa-check-circle" style="color: var(--accent-blue); margin-right: 8px;"></i>Success</h2>
+            <p>All notes have been cleared.</p>
+            <button id="closeClearSuccessPopupBtn" class="macos primary" style="margin: 10px auto 0;">OK</button>
+        </div>
     </div>
 
-    <div class="main-wrapper">
+
+    <div class="top-bar">
+        <h1 class="top-bar-title">Lost Outbound</h1>
+        <div class="toolbar-right">
+            <div id="notesSearchContainer">
+                <i id="notesSearchIcon" class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="notesSearchInput" placeholder="Search in notes...">
+                 <button id="btnDoNotesSearch" class="macos-icon-button" title="Search Notes" style="margin-left: 5px; width:auto; padding: 0 8px; height: 30px; border-radius: 6px;">
+                    <i class="fa-solid fa-search" style="margin-right:0;"></i>
+                </button>
+                <div id="notesSearchNav">
+                    <span id="notesSearchMatchCount"></span>
+                    <button id="notesSearchPrev" title="Previous Match"><i class="fa-solid fa-chevron-up"></i></button>
+                    <button id="notesSearchNext" title="Next Match"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+            </div>
+            <div class="toolbar-icon-group">
+                <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
+                <button id="btnLayoutSide" class="macos-icon-button" title="Side-by-Side View"><i class="fa-solid fa-table-columns"></i></button>
+            </div>
+            <div class="toolbar-icon-group">
+                <button id="themeToggle" class="macos-icon-button" title="Toggle Theme">
+                    <i class="fa-solid fa-sun"></i> 
+                </button>
+            </div>
+            <div class="toolbar-icon-group">
+                <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainWrapper" class="main-wrapper">
         <div class="left-column-wrapper">
             <div class="tool-container parser-tool">
                 <h3 class="tool-card-title"><i class="fa-solid fa-filter" style="margin-right: 8px;"></i>Parser</h3>
                 <div class="macos-textfield-container" style="flex-grow:1; display:flex;">
-                    <textarea id="shipmentInput" class="macos-textfield"></textarea>
+                    <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
                 </div>
                 <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
-                    <div style="display: flex; align-items: center; gap: 8px;" id="groupOrdersControl">
+                    <label id="groupOrdersControl" for="groupToggle" class="parser-control-row">
                         <label class="macos-switch"><input type="checkbox" id="groupToggle"><span class="slider"></span></label>
-                        <label for="groupToggle">Group Orders</label>
-                        <div class="macos-textfield-container" style="width: 70px;">
+                        <span>Group Orders</span>
+                        <div class="macos-textfield-container fixed-width">
                             <input type="number" id="parserGroupSize" class="macos-textfield" style="text-align:center;" min="1" value="2" disabled>
                         </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    </label>
+                    <label for="upsUspsToggle" class="parser-control-row">
                         <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
-                        <label for="upsUspsToggle">Extract Other Carriers</label>
-                    </div>
+                        <span>UPS/USPS</span>
+                    </label>
                 </div>
                  <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
                     <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
                     <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
                 </div>
-                <!-- CHANGE: Added resize handle -->
-                <div class="resize-handle"><div class="resize-pill"></div></div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
                 <h3 class="tool-card-title"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>Merchants</h3>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                     <button id="btnDownloadSelected" class="macos primary"><i class="fa-solid fa-download"></i>Download Selected</button>
                     <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i>Select All</button>
                     <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
                     <button id="btnSplitSelected" class="macos primary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                 </div>
-                 <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative;">
+                 <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative; flex-shrink:0;">
                     <div class="macos-textfield-container">
                          <input type="text" id="merchantSearchInput" class="macos-textfield" style="padding-left:30px" placeholder="Search merchants...">
                     </div>
                      <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
+                <div id="merchantCounterTarget"></div>
                 <div id="merchantList"></div>
-                <!-- CHANGE: Added resize handle -->
                 <div class="resize-handle"><div class="resize-pill"></div></div>
             </div>
         </div>
 
         <div class="tool-container note-taker-tool">
             <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square" style="margin-right: 8px;"></i>Notes</h3>
-            <div class="macos-textfield-container" style="flex-grow: 1; display:flex;">
+            <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
                 <textarea id="noteArea" class="macos-textfield" placeholder="Notes area..."></textarea>
             </div>
-            <div class="controls-and-stats" style="margin-top:16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-                    <div style="display: flex; gap: 8px;">
+            <div class="controls-and-stats">
+                <div>
+                    <div style="display: flex; gap: 8px; flex-wrap:wrap">
                         <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-minus"></i>Separator</button>
                         <button id="btnAddSpacing" class="macos secondary"><i class="fa-solid fa-grip-lines"></i>Spacing</button>
                         <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
                     </div>
-                     <div class="counter-pill">
-                        <p><i class="fa-solid fa-users"></i>Merchants: <span id="merchantCount">0</span></p>
-                        <p><i class="fa-solid fa-file-lines"></i>Cases: <span id="totalTemplates">0</span></p>
+                     <div id="notesCounterTarget" class="counter-pill-container">
+                        <div id="theCounterPill" class="counter-pill">
+                            <p><i class="fa-solid fa-users"></i>Merchants: <span id="merchantCount">0</span></p>
+                            <p><i class="fa-solid fa-file-lines"></i>Cases: <span id="totalTemplates">0</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- CHANGE: Added resize handle -->
             <div class="resize-handle"><div class="resize-pill"></div></div>
         </div>
     </div>
@@ -353,7 +487,7 @@
     <div id="splitModal" class="modal-overlay">
         <div class="modal-content">
             <h2><i class="fa-solid fa-table-columns" style="margin-right:8px;"></i>Split Selected Merchant(s)</h2>
-            <div id="splitMerchantInfo" style="font-size: 0.9em; color: var(--text-secondary); background-color: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"></div>
+            <div id="splitMerchantInfo" style="font-size: 0.9em; color: var(--text-secondary); background-color: var(--bg-hover); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);"></div>
             <div>
                 <label for="splitOrdersPerTemplate">Removal Orders per Template:</label>
                 <div class="macos-textfield-container" style="width: 80px; margin-top: 4px;">
@@ -379,23 +513,36 @@
     
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
-             <h2><span><i class="fa-solid fa-sliders"></i>Settings</span></h2>
+             <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
             <div style="display:flex; flex-direction:column; gap: 15px;">
-                <div style="display:flex; flex-direction:column; gap: 5px;">
+                <div class="settings-group">
                     <label for="settingsFilenamePrefix">Filename Prefix:</label>
                     <div class="macos-textfield-container"><input type="text" id="settingsFilenamePrefix" class="macos-textfield" placeholder="e.g., 3COUTB"></div>
                 </div>
-                 <div style="display:flex; flex-direction:column; gap: 5px;">
+                 <div class="settings-group">
                      <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
                      <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
                 </div>
-                <div style="display:flex; flex-direction:column; gap: 5px;">
+                <div class="settings-group">
                      <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
                      <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
                 </div>
-                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label for="settingsShowMerchantSearchToggleInput">Show Merchant Search Bar</label>
+                 <div class="settings-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin-bottom:0;">Show Merchant Search Bar</label>
                     <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
+                </div>
+                <div class="settings-group">
+                    <label>Counter Position:</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="counterPosition" value="notes" id="counterPosNotes" checked>
+                            Notes Area
+                        </label>
+                        <label>
+                            <input type="radio" name="counterPosition" value="merchants" id="counterPosMerchants">
+                            Merchant List
+                        </label>
+                    </div>
                 </div>
             </div>
             <div class="modal-actions">
@@ -414,15 +561,22 @@
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
 
-    // Settings Keys
-    const settingsKey = 'outboundToolSettings_v1';
+    const scrollPosKeys = {
+        shipmentInput: 'scrollPos_shipmentInput_amzlTool',
+        upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
+        noteArea: 'scrollPos_noteArea_amzlTool'
+    };
+
+    const settingsKey = 'outboundToolSettings_v1_enhanced_v5'; 
     let appSettings = {
         filenamePrefix: '3COUTB',
-        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'],
+        amzlTypeCarriers: ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'],
         otherCarriers: ['UPS', 'USPS'],
-        showMerchantSearch: false
+        showMerchantSearch: false,
+        theme: 'light',
+        layout: 'auto',
+        counterPosition: 'notes' 
     };
-    // Regex patterns, will be initialized/updated by loadSettings
     let regexPatterns = {
         amzlSource: null,
         otherSource: null,
@@ -430,8 +584,9 @@
         coreTnExtract: null
     };
 
-
-    let tempUpsUspsData = {}; 
+    let tempUpsUspsData = {};
+    let notesSearchMatches = [];
+    let currentMatchIndex = -1;
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -454,17 +609,44 @@
         regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
         regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
     }
+    
+    function updateCounterPillLocation() {
+        const counterPillEl = document.getElementById('theCounterPill');
+        const notesTarget = document.getElementById('notesCounterTarget');
+        const merchantTarget = document.getElementById('merchantCounterTarget');
 
+        if (!counterPillEl || !notesTarget || !merchantTarget) {
+            console.error("Counter pill or target placeholders not found for location update.");
+            return;
+        }
+        
+        if (counterPillEl.parentNode) {
+            counterPillEl.parentNode.removeChild(counterPillEl);
+        }
+        
+        if (appSettings.counterPosition === 'merchants') {
+            merchantTarget.appendChild(counterPillEl);
+            merchantTarget.style.display = 'flex'; 
+            notesTarget.style.display = 'none';    
+        } else { 
+            notesTarget.appendChild(counterPillEl);
+            notesTarget.style.display = 'flex';
+            merchantTarget.style.display = 'none';
+        }
+    }
 
     function loadSettings() {
         const savedSettings = localStorage.getItem(settingsKey);
         if (savedSettings) {
             try {
                 const parsed = JSON.parse(savedSettings);
-                appSettings.filenamePrefix = parsed.filenamePrefix || '3COUTB';
-                appSettings.amzlTypeCarriers = Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0 ? parsed.amzlTypeCarriers : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-                appSettings.otherCarriers = Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0 ? parsed.otherCarriers : ['UPS', 'USPS'];
-                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : false;
+                appSettings.filenamePrefix = parsed.filenamePrefix || appSettings.filenamePrefix;
+                appSettings.amzlTypeCarriers = (Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0) ? parsed.amzlTypeCarriers : appSettings.amzlTypeCarriers;
+                appSettings.otherCarriers = (Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0) ? parsed.otherCarriers : appSettings.otherCarriers;
+                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : appSettings.showMerchantSearch;
+                appSettings.theme = parsed.theme || appSettings.theme;
+                appSettings.layout = parsed.layout || appSettings.layout;
+                appSettings.counterPosition = parsed.counterPosition || appSettings.counterPosition;
             } catch (e) {
                 console.error("Error parsing saved settings, using defaults.", e);
             }
@@ -474,26 +656,82 @@
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
         document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
+        
+        const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
+        if (counterPosRadio) counterPosRadio.checked = true;
+        
         applyMerchantSearchVisibility();
+        setTheme(appSettings.theme);
+        updateCounterPillLocation(); 
     }
 
     function saveSettings() {
         appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
         
         const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
-        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN', 'AMZL', 'AMZL_US_PREMIUM'];
+        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'];
+        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'];
 
         const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
         appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
         if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
 
         appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+        
+        const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
+        if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns(); 
         applyMerchantSearchVisibility();
-        alert("Settings saved!");
+        updateCounterPillLocation(); 
+    }
+    
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (themeIcon) {
+            themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
+        }
+        appSettings.theme = theme;
+        localStorage.setItem(settingsKey, JSON.stringify(appSettings)); 
+    }
+
+    function setLayout(layout, saveUserChoice = true) {
+        const mainWrapper = document.getElementById('mainWrapper');
+        mainWrapper.classList.remove('layout-stacked', 'layout-side-by-side'); 
+        mainWrapper.classList.add(`layout-${layout}`); 
+        
+        document.getElementById('btnLayoutStacked').classList.toggle('active', layout === 'stacked');
+        document.getElementById('btnLayoutSide').classList.toggle('active', layout === 'side-by-side');
+        
+        if (saveUserChoice) {
+            appSettings.layout = layout;
+            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        }
+    }
+
+    function handleAutoLayout() {
+        const isCurrentlyNarrow = window.innerWidth < 992;
+        const mainWrapper = document.getElementById('mainWrapper');
+        const currentLayoutIsSideBySide = mainWrapper.classList.contains('layout-side-by-side');
+
+        if (isCurrentlyNarrow) {
+            if (currentLayoutIsSideBySide) setLayout('stacked', false);
+            mainWrapper.classList.add('layout-stacked'); 
+            mainWrapper.classList.remove('layout-side-by-side');
+        } else { 
+            mainWrapper.classList.remove('layout-stacked'); 
+            if (!currentLayoutIsSideBySide) { 
+                 if (appSettings.layout === 'auto' || appSettings.layout === 'side-by-side') {
+                    setLayout('side-by-side', false);
+                } else if (appSettings.layout === 'stacked') {
+                     setLayout('stacked', false);
+                }
+            } else { 
+                 if(appSettings.layout === 'auto') setLayout('side-by-side', false);
+            }
+        }
     }
 
     function applyMerchantSearchVisibility() {
@@ -506,7 +744,7 @@
                 searchContainer.style.display = 'none';
                 if (searchInput) searchInput.value = ''; 
             }
-            filterMerchants(); // Always re-filter when visibility changes or input is cleared
+            filterMerchants();
         }
     }
 
@@ -524,12 +762,134 @@
             }
         });
     }
+    
+    function updateNotesSearchUI() {
+        const navUI = document.getElementById('notesSearchNav');
+        const matchCountUI = document.getElementById('notesSearchMatchCount');
+        const prevBtn = document.getElementById('notesSearchPrev');
+        const nextBtn = document.getElementById('notesSearchNext');
+
+        if (notesSearchMatches.length > 0) {
+            navUI.style.display = 'flex';
+            matchCountUI.textContent = `${currentMatchIndex + 1} of ${notesSearchMatches.length}`;
+            prevBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex <= 0;
+            nextBtn.disabled = notesSearchMatches.length <= 1 || currentMatchIndex >= notesSearchMatches.length - 1;
+        } else {
+            navUI.style.display = 'none';
+            matchCountUI.textContent = "";
+        }
+    }
+
+    function selectAndScrollToMatch(noteArea, match) {
+        if (typeof noteArea.setSelectionRange === 'function' && match) {
+            noteArea.focus(); // Focus the textarea to make selection visible
+            noteArea.setSelectionRange(match.index, match.index + match.term.length);
+            
+            const textBefore = noteArea.value.substring(0, match.index);
+            const linesToMatch = textBefore.split('\n').length;
+            const lineHeight = parseFloat(getComputedStyle(noteArea).lineHeight) || 16;
+            const visibleLines = Math.floor(noteArea.clientHeight / lineHeight);
+            let scrollTarget = (linesToMatch - Math.floor(visibleLines / 2) -1 ) * lineHeight;
+            scrollTarget = Math.max(0, scrollTarget);
+
+            const matchTopPosition = (linesToMatch - 1) * lineHeight;
+            const matchBottomPosition = linesToMatch * lineHeight;
+            const viewTop = noteArea.scrollTop;
+            const viewBottom = noteArea.scrollTop + noteArea.clientHeight;
+
+            if (matchTopPosition < viewTop || matchBottomPosition > viewBottom - lineHeight) {
+                 noteArea.scrollTop = scrollTarget;
+            }
+        }
+    }
+    
+    function findAndHighlightAllMatches() {
+        const noteArea = document.getElementById('noteArea');
+        const searchTerm = document.getElementById('notesSearchInput').value;
+        notesSearchMatches = [];
+        currentMatchIndex = -1;
+
+        if (!searchTerm.trim()) {
+            updateNotesSearchUI();
+             if (typeof noteArea.setSelectionRange === 'function') { 
+                const currentCaretPos = noteArea.selectionStart;
+                noteArea.setSelectionRange(currentCaretPos, currentCaretPos);
+            }
+            return;
+        }
+
+        const text = noteArea.value;
+        const regex = new RegExp(escapeRegExp(searchTerm), 'gi'); 
+        let matchInstance;
+        while((matchInstance = regex.exec(text)) !== null) { 
+            notesSearchMatches.push({ index: matchInstance.index, term: matchInstance[0] });
+        }
+
+        if (notesSearchMatches.length > 0) {
+            currentMatchIndex = 0;
+            selectAndScrollToMatch(noteArea, notesSearchMatches[currentMatchIndex]);
+        } else {
+             if (typeof noteArea.setSelectionRange === 'function') { 
+                const currentCaretPos = noteArea.selectionStart;
+                noteArea.setSelectionRange(currentCaretPos, currentCaretPos);
+            }
+        }
+        updateNotesSearchUI();
+    }
+
+    function navigateSearchMatches(direction) {
+        if (notesSearchMatches.length === 0) return;
+        currentMatchIndex += direction;
+        if (currentMatchIndex < 0) currentMatchIndex = notesSearchMatches.length - 1;
+        else if (currentMatchIndex >= notesSearchMatches.length) currentMatchIndex = 0;
+        
+        const noteArea = document.getElementById('noteArea');
+        selectAndScrollToMatch(noteArea, notesSearchMatches[currentMatchIndex]);
+        updateNotesSearchUI();
+    }
+
+    function showCaseAddedNotification(count) {
+        if (count <= 0) return;
+        const popup = document.getElementById('caseAddedPopup');
+        if (!popup) return;
+        popup.textContent = `+${count}`;
+        popup.classList.add('show');
+        popup.style.transform = 'translateX(-50%) scale(1.1)';
+        popup.style.opacity = '1';
+        
+        setTimeout(() => {
+            popup.style.transform = 'translateX(-50%) scale(0.9)';
+            popup.style.opacity = '0';
+            setTimeout(() => { 
+                 popup.classList.remove('show');
+                 popup.style.transform = 'translateX(-50%) scale(1)'; 
+            }, 300); 
+        }, 1500);
+    }
+
+    function showClearAllConfirmPrompt() {
+        const modal = document.getElementById('clearAllConfirmModal');
+        if (modal) modal.style.display = 'flex';
+    }
+    function hideClearAllConfirmPrompt() {
+        const modal = document.getElementById('clearAllConfirmModal');
+        if (modal) modal.style.display = 'none';
+    }
+    function showClearAllSuccessNotification() {
+        const modal = document.getElementById('clearAllSuccessPopup');
+        if (modal) modal.style.display = 'flex';
+        // Auto-hide can be added here if needed, or rely on OK button
+        // setTimeout(() => {
+        // if (modal) modal.style.display = 'none';
+        // }, 2500); 
+    }
 
 
     function saveNotesToLocalStorage() {
         const noteArea = document.getElementById('noteArea');
         if (noteArea) {
             localStorage.setItem(localStorageKey, noteArea.value);
+            localStorage.setItem(scrollPosKeys.noteArea, noteArea.scrollTop);
         }
     }
 
@@ -537,6 +897,14 @@
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         if (upsUspsOutputArea) {
             localStorage.setItem(upsUspsOutputKey, upsUspsOutputArea.value);
+            localStorage.setItem(scrollPosKeys.upsUspsOutputArea, upsUspsOutputArea.scrollTop);
+        }
+    }
+    
+    function saveShipmentInputScroll() {
+        const shipmentInput = document.getElementById('shipmentInput');
+        if (shipmentInput) {
+            localStorage.setItem(scrollPosKeys.shipmentInput, shipmentInput.scrollTop);
         }
     }
 
@@ -547,7 +915,7 @@
             console.error("Error saving Other Carrier context to localStorage:", error);
         }
     }
-
+    
     function getFormattedDate() {
         const date = new Date();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -699,13 +1067,13 @@
                 validShipmentsFound++;
             });
         });
-
+        
+        let casesAdded = 0;
         if (isUpsUspsMode) {
             if (extractedUpsUspsNumbers.length > 0) {
                 const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
                 upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
-                upsUspsOutputArea.scrollTop = upsUspsOutputArea.scrollHeight;
-                saveUpsUspsOutputToLocalStorage();
+                saveUpsUspsOutputToLocalStorage(); 
                 saveUpsUspsContextToLocalStorage();
                 let processedMessage = `Extracted ${uniqueNumbersToAdd.length} unique Other Carrier number(s) from batch. `;
                  if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
@@ -724,20 +1092,22 @@
                     for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
                         const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
                         groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
+                        casesAdded++; 
                     }
                     finalOutputString = groupedOutputs.join('\n\n');
                 } else {
                     finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock ).join('\n\n');
+                    casesAdded = parsedDataBlocksForAmzl.length; 
                 }
                 const currentNoteTrimmed = noteArea.value.trimEnd();
                 noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
-                noteArea.scrollTop = noteArea.scrollHeight;
                 countTemplatesNoteTaker(); 
                 const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s) from batch. `;
                  if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
                 processedMessage += `Grouping: ${groupingStatus}. Ready...`;
                  input.placeholder = processedMessage;
+                 if (casesAdded > 0) showCaseAddedNotification(casesAdded);
             } else {
                  let message = "No new valid AMZL-type shipments found in batch. ";
                  if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
@@ -752,16 +1122,17 @@
                     : "Paste Amazon removal shipment data here...";
             }
         }, 5000);
+        saveShipmentInputScroll(); 
     }
 
-   function processUpsUspsData() { 
+    function processUpsUspsData() { 
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const noteArea = document.getElementById('noteArea');
         const shipmentInput = document.getElementById('shipmentInput');
         if (!upsUspsOutputArea || !noteArea || !shipmentInput) return;
 
         const trackingNumbersToProcess = upsUspsOutputArea.value.split('\n').map(tn => tn.trim()).filter(tn => tn);
-        if (trackingNumbersToProcess.length === 0) { alert("No Other Carrier tracking numbers found in the staging area."); return; }
+        if (trackingNumbersToProcess.length === 0) { return; }
 
         let processedBlocks = []; let notFoundCount = 0; const processedTNs = new Set();
         trackingNumbersToProcess.forEach(tn => {
@@ -777,29 +1148,31 @@
         if (processedBlocks.length > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
             noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
-            noteArea.scrollTop = noteArea.scrollHeight;
             countTemplatesNoteTaker(); 
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
             upsUspsOutputArea.value = remainingOutputTNs.join('\n');
             processedTNs.forEach(coreTN => { delete tempUpsUspsData[coreTN]; });
             saveUpsUspsOutputToLocalStorage(); saveUpsUspsContextToLocalStorage();
             shipmentInput.placeholder = `Added ${processedBlocks.length} Other Carrier entries to notes. Ready...`;
-            setTimeout(() => { if (shipmentInput) shipmentInput.placeholder = "Paste shipment data for Other Carriers..."; }, 3000);
-        } else { alert("No data could be processed."); }
-        if (notFoundCount > 0) alert(`Warning: Could not find original data for ${notFoundCount} tracking number(s).`);
-   }
+            if (processedBlocks.length > 0) showCaseAddedNotification(processedBlocks.length);
 
-    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); ta.scrollTop = ta.scrollHeight; countTemplatesNoteTaker(); }
-    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); ta.scrollTop = ta.scrollHeight; saveNotesToLocalStorage(); }
+            setTimeout(() => { if (shipmentInput) shipmentInput.placeholder = "Paste shipment data for Other Carriers..."; }, 3000);
+        }
+        if (notFoundCount > 0) alert(`Warning: Could not find original data for ${notFoundCount} tracking number(s).`);
+    }
+
+    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); countTemplatesNoteTaker(); }
+    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); saveNotesToLocalStorage(); }
     function selectAllMerchants() { document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
     
-    function clearAllNotes() {
-        if (confirm("Are you sure you want to clear ALL notes? This action cannot be undone.")) {
-            const noteArea = document.getElementById('noteArea');
-            noteArea.value = '';
-            countTemplatesNoteTaker(); 
-        }
+    function confirmAndClearAllNotes() {
+        hideClearAllConfirmPrompt(); 
+        const noteArea = document.getElementById('noteArea');
+        noteArea.value = '';
+        countTemplatesNoteTaker(); 
+        showClearAllSuccessNotification();
     }
+
 
     function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
         const editableSpan = event.target; const newName = editableSpan.textContent.trim();
@@ -820,7 +1193,7 @@
         if (replaced) { noteArea.value = reconstructedNotes; countTemplatesNoteTaker(); }
         else { editableSpan.textContent = originalDisplayName; }
     }
-
+    
     function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
         const fullText = noteArea.value;
@@ -858,9 +1231,8 @@
         
         const merchantsInOrder = Object.entries(merchantsData); 
         merchantsInOrder.forEach(([key, data]) => {
-            // CHANGE: Build the new merchant item structure
             const merchantDiv = document.createElement('div');
-            merchantDiv.className = 'merchant-item'; // Use the styled class
+            merchantDiv.className = 'merchant-item';
             merchantDiv.dataset.key = key;
             merchantDiv.dataset.displayName = data.displayName;
             merchantDiv.dataset.count = data.count;
@@ -895,7 +1267,6 @@
                     updateSelectedCountNoteTaker();
                 }
             };
-
             merchantListDiv.appendChild(merchantDiv);
         });
         filterMerchants(); 
@@ -933,13 +1304,13 @@
             if (splitButton) splitButton.disabled = true;
         }
     }
-
+    
     function downloadSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { alert('Please select merchant(s) to download.'); return; }
+        if (selectedDivs.length === 0) { return; }
         const textsToDownload = []; let totalSelectedCases = 0;
         selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
-        if (textsToDownload.length === 0) { alert("Could not retrieve text."); return; }
+        if (textsToDownload.length === 0) { return; }
         const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
         const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
         downloadText(combinedText + '\n', filename); 
@@ -947,8 +1318,7 @@
 
     function clearSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { alert('Please select merchant(s) to clear.'); return; }
-        if (!confirm(`Are you sure you want to clear the ${selectedDivs.length} selected merchant(s)? This cannot be undone.`)) return;
+        if (selectedDivs.length === 0) { return; }
         const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
         selectedDivs.forEach(div => { if (div.dataset.key) keysToRemove.add(div.dataset.key); });
         const allSections = fullText.split(noteSeparatorRegex).filter(s => s.trim() !== "");
@@ -959,7 +1329,7 @@
 
     function downloadAllNotes() {
         const noteArea = document.getElementById('noteArea'); const textToDownload = noteArea.value.trim();
-        if (!textToDownload) { alert("Nothing to download."); return; }
+        if (!textToDownload) { return; }
         const totalTemplatesCount = document.getElementById('totalTemplates').textContent;
         const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalTemplatesCount}).txt`;
         downloadText(textToDownload + '\n', filename);
@@ -1006,9 +1376,9 @@
     function openSplitModal() {
         selectedMerchantDataForSplit = [];
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { alert("Please select merchant(s)."); return; }
+        if (selectedDivs.length === 0) { return; }
         const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
-        if (!modal || !merchantInfoDiv) { alert("Split modal error."); return; }
+        if (!modal || !merchantInfoDiv) { return; }
         let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
         selectedDivs.forEach((div) => {
             const key = div.dataset.key; const name = div.dataset.displayName || `Unknown`;
@@ -1030,7 +1400,6 @@
     function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
     function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
 
-
     function updateCalculatedTemplates() {
          const modal = document.getElementById('splitModal'); if (!modal) return;
          const combinedText = modal.dataset.combinedText || '';
@@ -1041,17 +1410,17 @@
              const ros = splitTextIntoRemovalOrders(combinedText);
              calcSpan.textContent = createTemplates(ros, ordersPer).length;
          } else calcSpan.textContent = '0';
-       }
-
-   function generateAndDownloadSplits() {
+    }
+    
+    function generateAndDownloadSplits() {
         const modal = document.getElementById('splitModal'); if (!modal) return;
         const combinedText = modal.dataset.combinedText || '';
         const ordersPerInput = document.getElementById('splitOrdersPerTemplate');
         const splitNumInput = document.getElementById('splitNumberInput');
         const containsAmzl = modal.dataset.containsAmzl === 'true'; const containsUpsUsps = modal.dataset.containsUpsUsps === 'true';
-        if (!ordersPerInput || !splitNumInput) { alert("Modal input error."); return; }
+        if (!ordersPerInput || !splitNumInput) { return; }
         const ordersPer = parseInt(ordersPerInput.value); const splitNum = parseInt(splitNumInput.value);
-        if (!combinedText) { alert("No text for selected merchants."); return; }
+        if (!combinedText) { return; }
         if (isNaN(ordersPer) || ordersPer < 1) { alert("Invalid 'Orders per Template'."); return; }
         if (isNaN(splitNum) || splitNum < 1) { alert("Invalid 'Templates per Split File'."); return; }
         let templateToUse = amzlTemplate;
@@ -1076,15 +1445,15 @@
         closeSplitModal();
    }
     
-    // CHANGE: New function to initialize custom resizers
     function initDraggableWindows() {
         const handles = document.querySelectorAll('.resize-handle');
         handles.forEach(handle => {
             const container = handle.closest('.tool-container');
             if (!container) return;
-
+            if (container.classList.contains('parser-tool')) {
+                return; 
+            }
             let initialHeight, initialY;
-
             const onMouseMove = (e) => {
                 const dy = e.clientY - initialY;
                 let newHeight = initialHeight + dy;
@@ -1092,13 +1461,11 @@
                 if (newHeight < minHeight) newHeight = minHeight;
                 container.style.height = `${newHeight}px`;
             };
-
             const onMouseUp = () => {
                 document.body.classList.remove('is-resizing');
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
-
             handle.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 initialHeight = container.offsetHeight;
@@ -1109,6 +1476,23 @@
             });
         });
     }
+
+    function restoreScrollPositions() {
+        const shipmentInputEl = document.getElementById('shipmentInput');
+        const upsUspsOutputAreaEl = document.getElementById('upsUspsOutputArea');
+        const noteAreaEl = document.getElementById('noteArea');
+
+        if (shipmentInputEl) shipmentInputEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.shipmentInput)) || 0;
+        if (upsUspsOutputAreaEl) upsUspsOutputAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.upsUspsOutputArea)) || 0;
+        if (noteAreaEl) noteAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.noteArea)) || 0;
+    }
+
+    function saveAllScrollPositions() {
+        saveShipmentInputScroll();
+        saveUpsUspsOutputToLocalStorage();
+        saveNotesToLocalStorage();
+    }
+
 
     document.addEventListener('DOMContentLoaded', () => {
         loadSettings(); 
@@ -1122,6 +1506,16 @@
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const groupOrdersControl = document.getElementById('groupOrdersControl');
         const merchantSearchInput = document.getElementById('merchantSearchInput');
+        const notesSearchInput = document.getElementById('notesSearchInput');
+        const btnDoNotesSearch = document.getElementById('btnDoNotesSearch');
+        const notesSearchPrevBtn = document.getElementById('notesSearchPrev');
+        const notesSearchNextBtn = document.getElementById('notesSearchNext');
+        
+        const clearAllConfirmModal = document.getElementById('clearAllConfirmModal');
+        const cancelClearAllBtn = document.getElementById('cancelClearAllBtn');
+        const confirmClearAllBtn = document.getElementById('confirmClearAllBtn');
+        const closeClearSuccessPopupBtn = document.getElementById('closeClearSuccessPopupBtn');
+
 
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
@@ -1129,8 +1523,19 @@
             let countTimer;
             noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(countTemplatesNoteTaker, 300); });
             noteArea.addEventListener('paste', () => { setTimeout(countTemplatesNoteTaker, 50); });
+            noteArea.addEventListener('scroll', saveNotesToLocalStorage);
         }
-        if (upsUspsOutputArea) { const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved; }
+        if (upsUspsOutputArea) { 
+            const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved;
+            upsUspsOutputArea.addEventListener('scroll', saveUpsUspsOutputToLocalStorage);
+        }
+        if (shipmentInput) {
+            shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
+        }
+
+        restoreScrollPositions();
+
+
         try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
         catch (e) { tempUpsUspsData = {}; }
 
@@ -1142,12 +1547,41 @@
         if(merchantSearchInput) {
             merchantSearchInput.addEventListener('input', filterMerchants);
         }
+        if(notesSearchInput) {
+             notesSearchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    findAndHighlightAllMatches();
+                }
+            });
+        }
+        if(btnDoNotesSearch) {
+            btnDoNotesSearch.addEventListener('click', findAndHighlightAllMatches);
+        }
+        if(notesSearchPrevBtn) notesSearchPrevBtn.addEventListener('click', () => navigateSearchMatches(-1));
+        if(notesSearchNextBtn) notesSearchNextBtn.addEventListener('click', () => navigateSearchMatches(1));
+        
+        if(cancelClearAllBtn) cancelClearAllBtn.addEventListener('click', hideClearAllConfirmPrompt);
+        if(confirmClearAllBtn) confirmClearAllBtn.addEventListener('click', confirmAndClearAllNotes);
+        if(closeClearSuccessPopupBtn) closeClearSuccessPopupBtn.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
+        
+        clearAllConfirmModal.addEventListener('click', (e) => {
+            if (e.target === clearAllConfirmModal) hideClearAllConfirmPrompt();
+        });
+        document.getElementById('clearAllSuccessPopup').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('clearAllSuccessPopup')) document.getElementById('clearAllSuccessPopup').style.display = 'none';
+        });
+
 
         try { countTemplatesNoteTaker(); } catch(e) { console.error("Initial count error:", e); }
 
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+        });
+
         document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
         document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
-        document.getElementById('btnClearAllNotes')?.addEventListener('click', clearAllNotes);
+        document.getElementById('btnClearAllNotes')?.addEventListener('click', showClearAllConfirmPrompt); 
         document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
         document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
         document.getElementById('btnSelectAll')?.addEventListener('click', selectAllMerchants);
@@ -1159,6 +1593,10 @@
         document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
         document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
         document.getElementById('settingsModal').addEventListener('click', (event) => { if (event.target === document.getElementById('settingsModal')) closeSettingsModal(); });
+
+        document.getElementById('btnLayoutStacked').addEventListener('click', () => setLayout('stacked'));
+        document.getElementById('btnLayoutSide').addEventListener('click', () => setLayout('side-by-side'));
+        window.addEventListener('resize', handleAutoLayout);
 
 
         if (groupToggle && groupSizeInput) {
@@ -1184,8 +1622,11 @@
         document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
         document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
 
-        // CHANGE: Initialize the custom draggable resizers
         initDraggableWindows();
+        window.addEventListener('beforeunload', saveAllScrollPositions);
+        handleAutoLayout();
+        updateCounterPillLocation();
+
     });
 </script>
 
