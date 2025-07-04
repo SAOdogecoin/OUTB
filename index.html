@@ -87,7 +87,7 @@
         white-space: nowrap;
     }
     .toolbar-right { display: flex; align-items: center; gap: 16px; }
-    .toolbar-icon-group {
+    .toolbar-icon-group, .url-generator-group {
         display: flex;
         align-items: center;
         border: none;
@@ -97,10 +97,31 @@
         box-shadow: 0 1px 4px rgba(0,0,0,0.07);
         gap: 4px;
     }
-    html[data-theme="dark"] .toolbar-icon-group {
+    html[data-theme="dark"] .toolbar-icon-group,
+    html[data-theme="dark"] .url-generator-group {
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     
+    #marketplaceSelectUrlGen {
+        all: unset;
+        font-family: var(--system-font);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+        padding: 0 12px 0 6px;
+        height: 30px;
+        cursor: pointer;
+        border-radius: 15px;
+        transition: background-color 0.15s ease;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    #marketplaceSelectUrlGen:hover {
+        background-color: var(--bg-hover);
+    }
+
     .main-wrapper {
         display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
         width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
@@ -334,39 +355,22 @@
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
 
-.resize-handle {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 25px;
-    cursor: ns-resize;
-    z-index: 10;
-}
-
-.resize-handle::before, .resize-handle::after {
-    content: "";
-    position: absolute;
-    display: block;
-    border-bottom: 3px solid var(--text-placeholder);
-    opacity: 0.7;
-    transition: border-color 0.2s ease;
-    transform: rotate(-45deg);
-    transform-origin: bottom right;
-}
-
-.resize-handle:hover::before, .resize-handle:hover::after {
-    border-color: var(--text-primary);
-}
-
-.resize-handle::before {
-    width: 20px;
-    right: 2px;
-    bottom: 8px;
-}
-
-.resize-handle::after {
-    width: 12px;
-    right: 5px;
-    bottom: 14px;
-}
+    .resize-handle {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 25px; cursor: ns-resize; z-index: 10;
+        overflow: hidden;
+    }
+    .resize-handle::before, .resize-handle::after {
+        content: ""; position: absolute;
+        border-bottom: 2px solid var(--text-placeholder);
+        opacity: 0.7;
+        transition: border-color 0.2s ease;
+        transform: rotate(-45deg);
+        transform-origin: bottom right;
+    }
+    .resize-handle:hover::before, .resize-handle:hover::after { border-color: var(--text-primary); }
+    .resize-handle::before { width: 14px; right: 4px; bottom: 8px; }
+    .resize-handle::after { width: 8px; right: 6px; bottom: 13px; }
 
     textarea::selection { background-color: var(--highlight-bg); color: var(--highlight-text); }
     .parser-tool .macos-textfield-container {
@@ -447,6 +451,14 @@
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
+            <div class="url-generator-group">
+                <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
+                <select id="marketplaceSelectUrlGen">
+                    <option value="com">US</option>
+                    <option value="co.uk">UK</option>
+                    <option value="ca">CA</option>
+                </select>
+            </div>
             <div class="toolbar-icon-group">
                 <button id="btnHistory" class="macos-icon-button" title="History"><i class="fa-solid fa-history"></i></button>
             </div>
@@ -668,8 +680,8 @@
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
-const noteSeparatorRegex = /\n\n-{41}\n\n/g;
+    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
+    const noteSeparatorRegex = /\n\n-{41}\n\n/g;
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
@@ -691,7 +703,8 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         counterPosition: 'notes',
         telegramBotToken: '',
         telegramChatId: '',
-        autoClearHistory: true
+        autoClearHistory: true,
+        marketplaceUrlGen: 'com'
     };
     let regexPatterns = {
         amzlSource: null,
@@ -764,6 +777,7 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
         document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
+        document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
         const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
         if (counterPosRadio) counterPosRadio.checked = true;
         initializeRegexPatterns();
@@ -782,6 +796,7 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
         appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
         appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+        appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
         const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
         if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
@@ -989,9 +1004,11 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         if (appSettings.counterPosition === 'merchants') {
             merchantTarget.appendChild(counterPillEl);
             notesTarget.style.display = 'none';
+            merchantTarget.style.display = 'flex';
         } else {
             notesTarget.appendChild(counterPillEl);
             notesTarget.style.display = 'flex';
+            merchantTarget.style.display = 'none';
         }
     }
 
@@ -1183,13 +1200,13 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
                         groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
                         casesAdded++;
                     }
-                    finalOutputString = groupedOutputs.join('\n\n');
+                    finalOutputString = groupedOutputs.join(noteSeparator);
                 } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join('\n\n');
+                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join(noteSeparator);
                     casesAdded = parsedDataBlocksForAmzl.length;
                 }
                 const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
+                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + finalOutputString;
                 countTemplatesNoteTaker();
                 recordNoteChange();
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
@@ -1229,7 +1246,7 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         });
         if (processedBlocks.length > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
+            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + processedBlocks.join(noteSeparator);
             countTemplatesNoteTaker();
             recordNoteChange();
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
@@ -1758,7 +1775,30 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         }
     }
 
-    // --- Modal Control Functions ---
+    function generateReportUrl() {
+        const marketplaceDomain = `sellercentral.amazon.${appSettings.marketplaceUrlGen}`;
+        const today = new Date();
+        const endDate = new Date();
+        endDate.setDate(today.getDate() - 15);
+        const startDate = new Date();
+        startDate.setDate(today.getDate() - 75);
+        const formatUrlDate = (date) => {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}/${m}/${d}`;
+        };
+        const urlStartDate = formatUrlDate(startDate);
+        const urlEndDate = formatUrlDate(endDate);
+        const reportJsonPayload = { filters: ["", "", "", "RETURN", "COMPLETE"], pageOffset: 1, searchDays: -1, startDate: urlStartDate, endDate: urlEndDate };
+        const jsonString = JSON.stringify(reportJsonPayload);
+        let encodedPayload = encodeURIComponent(jsonString)
+            .replace(/%3A/g, ':').replace(/%2C/g, ',')
+            .replace(/%5B/g, '[').replace(/%5D/g, ']')
+            .replace(/%2F/g, '/');
+        return `https://${marketplaceDomain}/reportcentral/REMOVAL_ORDER_DETAIL/0/${encodedPayload}`;
+    }
+
     function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
     function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
     function openSplitModal() {
@@ -1830,7 +1870,6 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         modal.style.display = 'flex';
     }
     function closeTelegramSendModal() { document.getElementById('telegramSendModal').style.display = 'none'; }
-    // --- End Modal Control Functions ---
 
     document.addEventListener('DOMContentLoaded', () => {
         loadSettings();
@@ -1916,6 +1955,21 @@ const noteSeparatorRegex = /\n\n-{41}\n\n/g;
         document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
         document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
         document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
+        
+        const marketplaceSelectUrlGen = document.getElementById('marketplaceSelectUrlGen');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        marketplaceSelectUrlGen.addEventListener('change', () => {
+            appSettings.marketplaceUrlGen = marketplaceSelectUrlGen.value;
+            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        });
+        copyUrlBtn.addEventListener('click', () => {
+            const urlToCopy = generateReportUrl();
+            navigator.clipboard.writeText(urlToCopy).then(() => {
+                showNotification('URL Copied!', 'success');
+            }, () => {
+                showNotification('Copy Failed!', 'error');
+            });
+        });
 
         document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
         document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
