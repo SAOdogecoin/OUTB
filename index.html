@@ -668,8 +668,8 @@
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n';
-    const noteSeparatorRegex = /\n\n-{41}\n/g;
+const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
+const noteSeparatorRegex = /\n\n-{41}\n\n/g;
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
