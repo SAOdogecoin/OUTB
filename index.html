@@ -26,6 +26,7 @@
         --accent-blue-dark: #006ADC;
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
+        --accent-green: #34c759;
         --highlight-bg: #B4D7FF; 
         --highlight-text: #000000; 
         --top-bar-height: 50px;
@@ -47,6 +48,7 @@
         --accent-blue-dark: #007AFF;
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
+        --accent-green: #30d158;
         --highlight-bg: #0052A3; 
         --highlight-text: #FFFFFF; 
         color-scheme: dark;
@@ -77,15 +79,26 @@
         gap: 16px;
         position: relative; 
     }
-    .top-bar-title { font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin-right: auto; white-space: nowrap; }
+    .top-bar-title {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-right: auto;
+        white-space: nowrap;
+    }
     .toolbar-right { display: flex; align-items: center; gap: 16px; }
     .toolbar-icon-group {
         display: flex;
         align-items: center;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 2px;
-        background-color: var(--bg-primary);
+        border: none;
+        border-radius: 50px;
+        padding: 4px;
+        background-color: var(--bg-window);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        gap: 4px;
+    }
+    html[data-theme="dark"] .toolbar-icon-group {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     
     .main-wrapper {
@@ -96,12 +109,12 @@
 
     .tool-container {
         background-color: var(--bg-window);
-        border-radius: 12px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        border-radius: 24px;
+        box-shadow: none;
         padding: 20px 20px 25px 20px;
         display: flex; flex-direction: column;
         position: relative;
-        border: 0.5px solid var(--border-color);
+        border: none;
         overflow: hidden;
         resize: none;
         min-height: 200px;
@@ -118,16 +131,41 @@
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
     .main-wrapper.layout-side-by-side { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
-    .main-wrapper.layout-side-by-side .left-column-wrapper { width: calc(35% - 12px); flex-shrink: 0; gap: 24px; display: flex; flex-direction: column; }
-    .main-wrapper.layout-side-by-side .note-taker-tool { width: calc(65% - 12px); flex-grow: 1; display: flex; flex-direction: column; }
+    .main-wrapper.layout-side-by-side .left-column-wrapper {
+        width: 480px;
+        flex-shrink: 0;
+        gap: 0;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--bg-window);
+        border-radius: 24px;
+        padding: 20px;
+        position: relative;
+        overflow-y: auto;
+    }
+    .main-wrapper.layout-side-by-side .note-taker-tool {
+        flex-grow: 1;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .main-wrapper.layout-side-by-side .left-column-wrapper .tool-container {
+        background-color: transparent; border-radius: 0; padding: 0;
+        min-height: unset; overflow: visible; flex-grow: 1;
+    }
+    .main-wrapper.layout-side-by-side .left-column-wrapper .parser-tool {
+        padding-bottom: 20px !important; margin-bottom: 20px;
+        border-bottom: 1px solid var(--border-subtle); flex-grow: 0;
+    }
+    .main-wrapper.layout-side-by-side .left-column-wrapper .merchant-actions-tool {
+        padding-bottom: 0 !important;
+    }
+    .main-wrapper.layout-side-by-side .merchant-actions-tool .resize-handle {
+        display: none;
+    }
 
-    .main-wrapper.layout-stacked .top-bar {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-    }
-    .main-wrapper.layout-stacked .top-bar .toolbar-right {
-        gap: 8px;
-    }
+    .main-wrapper.layout-stacked .top-bar { flex-wrap: nowrap; overflow-x: auto; }
+    .main-wrapper.layout-stacked .top-bar .toolbar-right { gap: 8px; }
 
     button.macos {
         font-family: var(--system-font); font-weight: 500; cursor: pointer;
@@ -148,10 +186,12 @@
 
     button.macos.danger { background-color: var(--accent-red); color: white; box-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
     button.macos.danger:hover { background-color: var(--accent-red-hover); }
+    button.macos.success { background-color: var(--accent-green); color: white; }
 
     .macos-icon-button {
-        background: transparent; border: none; cursor: pointer; width: 32px; height: 32px;
-        border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+        background: transparent; border: none; cursor: pointer;
+        width: 30px; height: 30px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
         color: var(--text-secondary); transition: all 0.15s ease;
     }
     .macos-icon-button:hover { background-color: var(--bg-hover); color: var(--text-primary); }
@@ -159,14 +199,13 @@
 
     textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
     .macos-textfield-container {
-        width: 100%; border-radius: 10px; border: 0.5px solid var(--border-color);
+        width: 100%;
+        border-radius: 12px;
+        border: 0.5px solid var(--border-color);
         background-color: var(--bg-input);
         transition: all 0.15s ease;
     }
-    .macos-textfield-container.fixed-width {
-        width: 70px;
-        margin-left: auto;
-    }
+    .macos-textfield-container.fixed-width { width: 70px; margin-left: auto; }
     .macos-textfield-container:focus-within {
         border-color: var(--accent-blue);
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-blue) 30%, transparent);
@@ -187,74 +226,59 @@
 
     .modal-overlay {
         display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-        width: 100%; height: 100%; justify-content: center; align-items: center;
+        width: 100%; height: 100%; justify-content: center; align-items: flex-start;
         background-color: rgba(0,0,0,0.4);
+        padding: 5vh 20px; overflow-y: auto;
     }
     .modal-content {
-        background-color: var(--bg-primary);
-        padding: 20px; border-radius: 14px; width: 90%;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        display: flex; flex-direction: column; gap: 15px;
+        background-color: var(--bg-primary); padding: 20px; border-radius: 14px; width: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
+        margin-bottom: auto;
     }
-    #splitModal .modal-content, #settingsModal .modal-content {max-width: 520px;}
-    #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content { max-width: 400px; text-align: center;}
-
-     .modal-content h2 {
+    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content {max-width: 520px;}
+    #historyModal .modal-content { max-width: 800px; }
+    #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
+    .modal-content h2 {
         margin: 0 0 8px 0; font-size: 1.15em; font-weight: 600;
-        border-bottom: 1px solid var(--border-subtle);
-        padding-bottom: 10px; display:flex; align-items:center;
-     }
-    #clearAllConfirmModal .modal-content h2, #clearAllSuccessPopup .modal-content h2 { justify-content: center; }
-    #clearAllConfirmModal p, #clearAllSuccessPopup p { margin: 10px 0 20px; font-size: 1.05em;}
-
+        border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; display:flex; align-items:center;
+    }
+    #clearAllConfirmModal .modal-content h2, #clearAllSuccessPopup .modal-content h2, #confirmDeleteSentModal .modal-content h2, #confirmClearHistoryModal .modal-content h2 { justify-content: center; }
+    #clearAllConfirmModal p, #clearAllSuccessPopup p, #confirmDeleteSentModal p, #confirmClearHistoryModal p { margin: 10px 0 20px; font-size: 1.05em;}
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
-    #clearAllConfirmModal .modal-actions { justify-content: center; }
+    #clearAllConfirmModal .modal-actions, #confirmDeleteSentModal .modal-actions, #confirmClearHistoryModal .modal-actions { justify-content: center; }
     
     .notification-popup {
         display: none; position: fixed; top: 20px; left: 50%;
         transform: translateX(-50%) scale(0.9);
-        background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); 
-        color: white;
-        padding: 10px 20px; border-radius: 20px;
-        font-size: 1.1em; font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 2000;
-        opacity: 0;
+        color: white; padding: 10px 20px; border-radius: 20px;
+        font-size: 1.1em; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 2000; opacity: 0;
         transition: opacity 0.3s ease, top 0.3s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     }
+    .notification-popup.success { background-color: color-mix(in srgb, var(--accent-green) 85%, #000000 15%); }
+    .notification-popup.error { background-color: color-mix(in srgb, var(--accent-red) 85%, #000000 15%); }
+    .notification-popup.info { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
+
     .notification-popup.show {
-        display: block;
-        opacity: 1;
-        top: 30px;
-        transform: translateX(-50%) scale(1);
+        display: block; opacity: 1; top: 30px; transform: translateX(-50%) scale(1);
     }
 
-    .left-column-wrapper, #merchantList, #noteArea { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar { width: 9px; }
-    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    .left-column-wrapper, #merchantList, #noteArea, #historyList { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar { width: 9px; }
+    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
     
     #merchantList {
-        min-height: 100px;
-        max-height: 70vh; 
-        overflow-y: auto;
-        overflow-x: hidden; 
-        margin-top: 16px;
-        padding: 0; 
-        border: none;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 8px;
-        background-color: transparent;
-        flex-grow: 1;
-        align-content: start;
-        max-width: 100%; 
+        min-height: 100px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; 
+        margin-top: 16px; padding: 0; border: none;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 8px; background-color: transparent; flex-grow: 1;
+        align-content: start; max-width: 100%; 
     }
-
     .merchant-item {
-        padding: 8px 12px; background-color: var(--bg-window); border-radius: 8px;
+        padding: 8px 12px; background-color: var(--bg-window);
+        border-radius: 12px;
         border: 1px solid var(--border-subtle); display: flex; align-items: center;
-        transition: all 0.2s ease; cursor: pointer;
-        min-width: 0; 
+        transition: all 0.2s ease; cursor: pointer; min-width: 0; 
     }
     .merchant-item:hover { background-color: var(--bg-hover); }
     .merchant-item.selected { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); color: white; }
@@ -280,58 +304,68 @@
 
     .counter-pill {
         display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;
-        padding: 5px 10px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background-color: var(--bg-input);
+        padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-input);
     }
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
 
     .resize-handle {
-        position: absolute; bottom: 0; left: 0; right: 0; height: 20px;
-        cursor: ns-resize; display: flex; align-items: center; justify-content: center;
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 25px;
+        cursor: ns-resize;
         z-index: 10;
     }
-    .resize-pill {
-        width: 40px; height: 5px; background-color: var(--border-color);
-        border-radius: 2.5px;
+    .resize-handle .resize-pill { display: none; }
+    .resize-handle::before, .resize-handle::after {
+        content: ""; position: absolute; display: block;
+        border-bottom: 3px solid var(--text-placeholder); 
+        opacity: 0.7; transition: border-color 0.2s ease; transform-origin: bottom right;
     }
+    .resize-handle:hover::before, .resize-handle:hover::after { border-color: var(--text-primary); }
+    .resize-handle::before { width: 20px; transform: rotate(-45deg); right: 2px; bottom: 8px; }
+    .resize-handle::after { width: 12px; transform: rotate(-45deg); right: 5px; bottom: 14px; }
 
-    textarea::selection {
-        background-color: var(--highlight-bg);
-        color: var(--highlight-text);
-    }
-
+    textarea::selection { background-color: var(--highlight-bg); color: var(--highlight-text); }
     .parser-tool .macos-textfield-container,
     .note-taker-tool .macos-textfield-container#noteAreaContainer,
-    #merchantList {
-        flex-grow: 1;
-        min-height: 0;
-    }
-    #shipmentInput, #upsUspsOutputArea, #noteArea {
-        height: 100%;
-    }
+    #merchantList { flex-grow: 1; min-height: 0; }
+    #shipmentInput, #upsUspsOutputArea, #noteArea { height: 100%; }
     .parser-controls label.parser-control-row { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
-    
     .controls-and-stats { margin-top: 16px; } 
     .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    
     #merchantCounterTarget { margin-top: 16px; display: flex; justify-content: flex-end; } 
-    .counter-pill-container { 
-        display: flex;
-        justify-content: flex-end; 
-    }
+    .counter-pill-container { display: flex; justify-content: flex-end; }
 
     .settings-group { margin-bottom: 15px; }
     .settings-group label { display: block; margin-bottom: 5px; font-weight: 500;}
     .settings-group .radio-group label { display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal; }
     .settings-group .radio-group input[type="radio"] { margin-right: 5px; }
+    
+    #telegram-merchant-list h4 { margin: 0 0 8px 0; }
+    #telegram-merchant-list p {
+        margin: 2px 0 2px 10px;
+        font-size: 0.9em;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
+    #historyList { max-height: 60vh; overflow-y: auto; margin-top: 10px; }
+    .history-item {
+        background-color: var(--bg-input); padding: 10px 15px;
+        border: 1px solid var(--border-subtle); border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .history-item-date { font-size: 0.9em; color: var(--text-secondary); }
+    .history-item-content p { margin: 4px 0; font-size: 0.95em; }
+    .history-item-files { margin-top: 8px; font-size: 0.9em; color: var(--text-secondary); font-family: var(--mono-font); }
+    
 </style>
 </head>
 <body>
-    <div id="caseAddedPopup" class="notification-popup">+0</div>
+    <div id="notificationPopup" class="notification-popup">Notification</div>
     <div id="clearAllConfirmModal" class="modal-overlay">
         <div class="modal-content">
             <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 8px;"></i>Clear All Notes?</h2>
@@ -349,20 +383,29 @@
             <button id="closeClearSuccessPopupBtn" class="macos primary" style="margin: 10px auto 0;">OK</button>
         </div>
     </div>
-
+    <div id="confirmClearHistoryModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 8px;"></i>Clear All History?</h2>
+            <p>Are you sure you want to permanently delete all history entries? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="btnCancelClearHistory" class="macos secondary">Cancel</button>
+                <button id="btnConfirmClearHistory" class="macos danger">Clear All History</button>
+            </div>
+        </div>
+    </div>
 
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
-            <!-- Notes Search elements removed -->
+            <div class="toolbar-icon-group">
+                <button id="btnHistory" class="macos-icon-button" title="History"><i class="fa-solid fa-history"></i></button>
+            </div>
             <div class="toolbar-icon-group">
                 <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
                 <button id="btnLayoutSide" class="macos-icon-button" title="Side-by-Side View"><i class="fa-solid fa-table-columns"></i></button>
             </div>
             <div class="toolbar-icon-group">
-                <button id="themeToggle" class="macos-icon-button" title="Toggle Theme">
-                    <i class="fa-solid fa-sun"></i> 
-                </button>
+                <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
@@ -399,7 +442,8 @@
             <div class="tool-container merchant-actions-tool">
                 <h3 class="tool-card-title"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>Merchants</h3>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button id="btnDownloadSelected" class="macos primary"><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
                     <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i>Select All</button>
                     <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
                     <button id="btnSplitSelected" class="macos primary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
@@ -413,7 +457,7 @@
                 </div>
                 <div id="merchantCounterTarget"></div>
                 <div id="merchantList"></div>
-                <div class="resize-handle"><div class="resize-pill"></div></div>
+                <div class="resize-handle"></div>
             </div>
         </div>
 
@@ -437,7 +481,7 @@
                     </div>
                 </div>
             </div>
-            <div class="resize-handle"><div class="resize-pill"></div></div>
+            <div class="resize-handle"></div>
         </div>
     </div>
     
@@ -464,6 +508,7 @@
             <div class="modal-actions">
                 <button id="btnCancelSplit" class="macos secondary"><i class="fa-solid fa-xmark"></i>Cancel</button>
                 <button id="btnGenerateSplits" class="macos primary"><i class="fa-solid fa-file-zipper"></i>Generate & Download</button>
+                <button id="btnSendSplitsToTelegram" class="macos primary"><i class="fa-solid fa-paper-plane"></i>Send Splits</button>
             </div>
         </div>
     </div>
@@ -484,9 +529,21 @@
                      <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
                      <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
                 </div>
+                <div class="settings-group">
+                    <label for="settingsTelegramToken">Telegram Bot Token:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsTelegramToken" class="macos-textfield" placeholder="Enter your bot token"></div>
+                </div>
+                <div class="settings-group">
+                    <label for="settingsTelegramChatId">Telegram Chat ID:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsTelegramChatId" class="macos-textfield" placeholder="Enter your group/chat ID"></div>
+                </div>
                  <div class="settings-group" style="display: flex; justify-content: space-between; align-items: center;">
                     <label style="margin-bottom:0;">Show Merchant Search Bar</label>
                     <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
+                </div>
+                 <div class="settings-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin-bottom:0;">Auto-clear history older than 24 hours</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
                 </div>
                 <div class="settings-group">
                     <label>Counter Position:</label>
@@ -509,6 +566,41 @@
         </div>
     </div>
     
+    <div id="telegramSendModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Send to Telegram</h2>
+            <div id="telegram-merchant-list"></div>
+            <div class="modal-actions">
+                <button id="btnCancelTelegramSend" class="macos secondary">Cancel</button>
+                <button id="btnConfirmTelegramSend" class="macos primary">Send File</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmDeleteSentModal" class="modal-overlay">
+        <div class="modal-content">
+             <h2><i class="fa-solid fa-check-circle" style="color:var(--accent-green); margin-right:8px;"></i>Send Complete</h2>
+            <p>All files sent to Telegram successfully. Do you want to remove the sent merchants from the list?</p>
+            <div class="modal-actions">
+                <button id="btnNoDeleteSent" class="macos secondary">Keep Them</button>
+                <button id="btnYesDeleteSent" class="macos danger">Yes, Remove Them</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-history" style="margin-right:8px;"></i>Deletion History</h2>
+            <div id="historyList">
+                <p>No history found.</p>
+            </div>
+            <div class="modal-actions">
+                <button id="btnClearAllHistory" class="macos danger"><i class="fa-solid fa-trash"></i> Clear History</button>
+                <button id="btnCloseHistoryModal" class="macos primary">Close</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
@@ -517,22 +609,24 @@
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
-
+    const historyKey = 'outboundToolHistory_v2';
+    const settingsKey = 'outboundToolSettings_v2_telegram';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
         noteArea: 'scrollPos_noteArea_amzlTool'
     };
-
-    const settingsKey = 'outboundToolSettings_v1_enhanced_v5'; 
     let appSettings = {
         filenamePrefix: '3COUTB',
-        amzlTypeCarriers: ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'],
+        amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM', 'AMZL_CA_PREMIUM', 'AMZN_UK_PRIME', 'AMZN_UK_STD'],
         otherCarriers: ['UPS', 'USPS'],
         showMerchantSearch: false,
         theme: 'light',
         layout: 'auto',
-        counterPosition: 'notes' 
+        counterPosition: 'notes',
+        telegramBotToken: '',
+        telegramChatId: '',
+        autoClearHistory: true
     };
     let regexPatterns = {
         amzlSource: null,
@@ -540,54 +634,47 @@
         allExisting: null,
         coreTnExtract: null
     };
-
     let tempUpsUspsData = {};
-    // Notes search variables removed
+    let merchantsToDeleteAfterSend = [];
+    let selectedMerchantDataForSplit = [];
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
+    function sanitizeFilename(name) {
+        return name.replace(/[\s\\/:"*?<>|]+/g, '_').substring(0, 50);
+    }
+
+    function getFormattedDate() {
+        const date = new Date();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${month}-${day}`;
+    }
+
     function buildCarrierRegexPart(carrierArray) {
-        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)'; 
+        if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)';
         return '(?:' + carrierArray.map(escapeRegExp).join('|') + ')';
     }
 
-    function initializeRegexPatterns() {
-        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
-        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
-        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
-        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(c => c.trim() !== '')));
-        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']); 
-
-        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
-        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
-        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
-        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
+    function showNotification(message, type = 'info', duration = 3000) {
+        const popup = document.getElementById('notificationPopup');
+        if (!popup) return;
+        popup.textContent = message;
+        popup.className = 'notification-popup';
+        popup.classList.add(type);
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+        }, duration);
     }
-    
-    function updateCounterPillLocation() {
-        const counterPillEl = document.getElementById('theCounterPill');
-        const notesTarget = document.getElementById('notesCounterTarget');
-        const merchantTarget = document.getElementById('merchantCounterTarget');
 
-        if (!counterPillEl || !notesTarget || !merchantTarget) {
-            console.error("Counter pill or target placeholders not found for location update.");
-            return;
-        }
-        
-        if (counterPillEl.parentNode) {
-            counterPillEl.parentNode.removeChild(counterPillEl);
-        }
-        
-        if (appSettings.counterPosition === 'merchants') {
-            merchantTarget.appendChild(counterPillEl);
-            merchantTarget.style.display = 'flex'; 
-            notesTarget.style.display = 'none';    
-        } else { 
-            notesTarget.appendChild(counterPillEl);
-            notesTarget.style.display = 'flex';
-            merchantTarget.style.display = 'none';
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (themeIcon) {
+            themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
         }
     }
 
@@ -596,71 +683,255 @@
         if (savedSettings) {
             try {
                 const parsed = JSON.parse(savedSettings);
-                appSettings.filenamePrefix = parsed.filenamePrefix || appSettings.filenamePrefix;
-                appSettings.amzlTypeCarriers = (Array.isArray(parsed.amzlTypeCarriers) && parsed.amzlTypeCarriers.length > 0) ? parsed.amzlTypeCarriers : appSettings.amzlTypeCarriers;
-                appSettings.otherCarriers = (Array.isArray(parsed.otherCarriers) && parsed.otherCarriers.length > 0) ? parsed.otherCarriers : appSettings.otherCarriers;
-                appSettings.showMerchantSearch = parsed.hasOwnProperty('showMerchantSearch') ? parsed.showMerchantSearch : appSettings.showMerchantSearch;
-                appSettings.theme = parsed.theme || appSettings.theme;
-                appSettings.layout = parsed.layout || appSettings.layout;
-                appSettings.counterPosition = parsed.counterPosition || appSettings.counterPosition;
+                appSettings = { ...appSettings, ...parsed};
             } catch (e) {
-                console.error("Error parsing saved settings, using defaults.", e);
+                console.error("Error parsing settings:", e);
             }
         }
-        initializeRegexPatterns(); 
         document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
+        document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
         document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        
+        document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
         const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
         if (counterPosRadio) counterPosRadio.checked = true;
-        
+        initializeRegexPatterns();
         applyMerchantSearchVisibility();
         setTheme(appSettings.theme);
-        updateCounterPillLocation(); 
+        updateCounterPillLocation();
     }
 
     function saveSettings() {
         appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
-        
         const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(s => s) : ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'];
-        if(appSettings.amzlTypeCarriers.length === 0) appSettings.amzlTypeCarriers = ['AMZN','AMZL','AMZL_US_PREMIUM','AMZL_CA_PREMIUM','AMZN_UK_PRIME','AMZN_UK_STD'];
-
+        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
         const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(s => s) : ['UPS', 'USPS'];
-        if(appSettings.otherCarriers.length === 0) appSettings.otherCarriers = ['UPS', 'USPS'];
-
+        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
+        appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
+        appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
         appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
-        
+        appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
         const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
         if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
-
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        initializeRegexPatterns(); 
+        initializeRegexPatterns();
         applyMerchantSearchVisibility();
-        updateCounterPillLocation(); 
+        updateCounterPillLocation();
+        showNotification("Settings saved successfully!", "success");
+    }
+
+    function getHistory() {
+        try {
+            const history = localStorage.getItem(historyKey);
+            return history ? JSON.parse(history) : [];
+        } catch (e) {
+            console.error("Failed to parse history:", e);
+            return [];
+        }
+    }
+
+    function saveHistory(history) {
+        localStorage.setItem(historyKey, JSON.stringify(history));
     }
     
-    function setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        const themeIcon = document.querySelector('#themeToggle i');
-        if (themeIcon) {
-            themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
+    function autoClearOldHistory() {
+        if (!appSettings.autoClearHistory) return;
+        const history = getHistory();
+        if (history.length === 0) return;
+        const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+        const recentHistory = history.filter(item => {
+            const itemDate = new Date(item.deletedAt).getTime();
+            return itemDate > twentyFourHoursAgo;
+        });
+        if (recentHistory.length < history.length) {
+            saveHistory(recentHistory);
         }
-        appSettings.theme = theme;
-        localStorage.setItem(settingsKey, JSON.stringify(appSettings)); 
+    }
+
+    function addToHistory(deletedMerchants, fileInfo = []) {
+        if (!deletedMerchants || deletedMerchants.length === 0) return;
+        const history = getHistory();
+        const newEntry = {
+            id: Date.now() + Math.random().toString(36).substr(2, 9),
+            deletedAt: new Date().toISOString(),
+            merchants: deletedMerchants,
+            telegramFiles: fileInfo
+        };
+        history.unshift(newEntry);
+        saveHistory(history);
+    }
+    
+    function renderHistoryModal() {
+        const history = getHistory();
+        const listEl = document.getElementById('historyList');
+        listEl.innerHTML = '';
+        if (history.length === 0) {
+            listEl.innerHTML = '<p>No history found.</p>';
+            return;
+        }
+        history.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'history-item';
+            const merchantNames = item.merchants.map(m => m.displayName).join(', ');
+            const totalCases = item.merchants.reduce((sum, m) => sum + m.count, 0);
+            let filesHtml = '';
+            if (item.telegramFiles && item.telegramFiles.length > 0) {
+                filesHtml = `<div class="history-item-files"><b>Sent Files:</b><br>${item.telegramFiles.map(f => f.filename).join('<br>')}</div>`;
+            }
+            itemEl.innerHTML = `
+                <div class="history-item-header">
+                    <span class="history-item-date">${new Date(item.deletedAt).toLocaleString()}</span>
+                    <button class="macos secondary restore-btn" data-history-id="${item.id}"><i class="fa-solid fa-undo"></i> Restore</button>
+                </div>
+                <div class="history-item-content">
+                    <p><b>Merchants:</b> ${merchantNames}</p>
+                    <p><b>Total Cases:</b> ${totalCases}</p>
+                    ${filesHtml}
+                </div>`;
+            listEl.appendChild(itemEl);
+        });
+    }
+
+    function restoreHistoryItem(historyId) {
+        let history = getHistory();
+        const itemIndex = history.findIndex(item => item.id === historyId);
+        if (itemIndex === -1) return;
+        const [itemToRestore] = history.splice(itemIndex, 1);
+        const noteArea = document.getElementById('noteArea');
+        const textToRestore = itemToRestore.merchants.map(m => m.key).join(noteSeparator);
+        const currentNoteTrimmed = noteArea.value.trimEnd();
+        noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + textToRestore;
+        saveHistory(history);
+        countTemplatesNoteTaker();
+        renderHistoryModal();
+        showNotification("Merchant(s) restored successfully!", "success");
+    }
+
+    async function sendFileToTelegram(fileContent, filename, caption = '') {
+        const { telegramBotToken, telegramChatId } = appSettings;
+        if (!telegramBotToken || !telegramChatId) {
+            showNotification("Telegram Bot Token or Chat ID is missing in settings.", "error");
+            return null;
+        }
+        
+        const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+        const formData = new FormData();
+        formData.append('chat_id', telegramChatId);
+        formData.append('document', blob, filename);
+        if (caption) {
+            formData.append('caption', caption);
+        }
+        
+        try {
+            const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendDocument`, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (result.ok) {
+                return { success: true, filename: filename };
+            } else {
+                console.error("Telegram API Error:", result.description);
+                showNotification(`Error sending ${filename}: ${result.description}`, "error", 5000);
+                return { success: false, filename: filename };
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            showNotification(`Network error while sending ${filename}.`, "error", 5000);
+            return { success: false, filename: filename };
+        }
+    }
+    
+    async function handleConfirmTelegramSend() {
+        const modal = document.getElementById('telegramSendModal');
+        const sendButton = document.getElementById('btnConfirmTelegramSend');
+        const userNumberInput = document.getElementById('telegram-file-number-single');
+
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+        
+        const merchantsData = JSON.parse(modal.dataset.merchantsToSend || '[]');
+        if (merchantsData.length === 0) {
+             showNotification("No merchants to send.", "error");
+             sendButton.disabled = false; sendButton.innerHTML = 'Send File';
+             return;
+        }
+        
+        const userNumber = userNumberInput.value;
+        if (!userNumber || isNaN(parseInt(userNumber))) {
+            showNotification("Please enter a valid file number.", "error");
+            sendButton.disabled = false; sendButton.innerHTML = 'Send File';
+            return;
+        }
+        
+        const fileContent = merchantsData.map(m => m.key).join(noteSeparator);
+        const totalCount = merchantsData.reduce((sum, m) => sum + m.count, 0);
+        
+        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCount})_${userNumber}.txt`;
+        
+        const result = await sendFileToTelegram(fileContent, filename, ''); 
+        
+        sendButton.disabled = false;
+        sendButton.innerHTML = 'Send File';
+        closeTelegramSendModal();
+
+        if (result && result.success) {
+            merchantsToDeleteAfterSend = merchantsData;
+            addToHistory(merchantsToDeleteAfterSend, [{ filename: result.filename }]);
+            document.getElementById('confirmDeleteSentModal').style.display = 'flex';
+        }
+    }
+
+    function confirmAndDeleteSentMerchants() {
+        const keysToRemove = new Set(merchantsToDeleteAfterSend.map(m => m.key));
+        if (keysToRemove.size === 0) return;
+        const noteArea = document.getElementById('noteArea');
+        const allSections = noteArea.value.split(noteSeparatorRegex);
+        const remainingSections = allSections.filter(section => !keysToRemove.has(section.trim()));
+        noteArea.value = remainingSections.join(noteSeparator);
+        countTemplatesNoteTaker();
+        document.getElementById('confirmDeleteSentModal').style.display = 'none';
+        showNotification("Sent merchants removed from the list.", "success");
+        merchantsToDeleteAfterSend = [];
+    }
+
+    function initializeRegexPatterns() {
+        const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
+        const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
+        const allCarriersCombined = [...appSettings.amzlTypeCarriers, ...appSettings.otherCarriers];
+        const uniqueAllCarriers = Array.from(new Set(allCarriersCombined.filter(Boolean)));
+        const allCarrierPart = buildCarrierRegexPart(uniqueAllCarriers.length > 0 ? uniqueAllCarriers : ['TEMP_PLACEHOLDER']);
+        regexPatterns.amzlSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${amzlCarrierPart})\\)`, 'gi');
+        regexPatterns.otherSource = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?)\\s*\\((${otherCarrierPart})\\)`, 'gi');
+        regexPatterns.allExisting = new RegExp(`\\b([A-Z0-9]+(?:-|\\s)*?\\s*\\(${allCarrierPart}\\))`, 'gi');
+        regexPatterns.coreTnExtract = new RegExp(`\\s*\\(${allCarrierPart}\\)$`, 'i');
+    }
+
+    function updateCounterPillLocation() {
+        const counterPillEl = document.getElementById('theCounterPill');
+        const notesTarget = document.getElementById('notesCounterTarget');
+        const merchantTarget = document.getElementById('merchantCounterTarget');
+        if (!counterPillEl || !notesTarget || !merchantTarget) return;
+        if (counterPillEl.parentNode) counterPillEl.parentNode.removeChild(counterPillEl);
+        if (appSettings.counterPosition === 'merchants') {
+            merchantTarget.appendChild(counterPillEl);
+            merchantTarget.style.display = 'flex';
+            notesTarget.style.display = 'none';
+        } else {
+            notesTarget.appendChild(counterPillEl);
+            notesTarget.style.display = 'flex';
+            merchantTarget.style.display = 'none';
+        }
     }
 
     function setLayout(layout, saveUserChoice = true) {
         const mainWrapper = document.getElementById('mainWrapper');
-        mainWrapper.classList.remove('layout-stacked', 'layout-side-by-side'); 
-        mainWrapper.classList.add(`layout-${layout}`); 
-        
+        mainWrapper.classList.remove('layout-stacked', 'layout-side-by-side');
+        mainWrapper.classList.add(`layout-${layout}`);
         document.getElementById('btnLayoutStacked').classList.toggle('active', layout === 'stacked');
         document.getElementById('btnLayoutSide').classList.toggle('active', layout === 'side-by-side');
-        
         if (saveUserChoice) {
             appSettings.layout = layout;
             localStorage.setItem(settingsKey, JSON.stringify(appSettings));
@@ -668,25 +939,12 @@
     }
 
     function handleAutoLayout() {
-        const isCurrentlyNarrow = window.innerWidth < 992;
-        const mainWrapper = document.getElementById('mainWrapper');
-        const currentLayoutIsSideBySide = mainWrapper.classList.contains('layout-side-by-side');
-
+        const isCurrentlyNarrow = window.innerWidth < 1100;
         if (isCurrentlyNarrow) {
-            if (currentLayoutIsSideBySide) setLayout('stacked', false);
-            mainWrapper.classList.add('layout-stacked'); 
-            mainWrapper.classList.remove('layout-side-by-side');
-        } else { 
-            mainWrapper.classList.remove('layout-stacked'); 
-            if (!currentLayoutIsSideBySide) { 
-                 if (appSettings.layout === 'auto' || appSettings.layout === 'side-by-side') {
-                    setLayout('side-by-side', false);
-                } else if (appSettings.layout === 'stacked') {
-                     setLayout('stacked', false);
-                }
-            } else { 
-                 if(appSettings.layout === 'auto') setLayout('side-by-side', false);
-            }
+            setLayout('stacked', false);
+        } else {
+            const userLayout = appSettings.layout === 'auto' ? 'side-by-side' : appSettings.layout;
+            setLayout(userLayout, false);
         }
     }
 
@@ -694,63 +952,621 @@
         const searchContainer = document.getElementById('merchantSearchContainer');
         const searchInput = document.getElementById('merchantSearchInput');
         if (searchContainer) {
-            if (appSettings.showMerchantSearch) {
-                searchContainer.style.display = 'block';
-            } else {
-                searchContainer.style.display = 'none';
-                if (searchInput) searchInput.value = ''; 
-            }
+            searchContainer.style.display = appSettings.showMerchantSearch ? 'block' : 'none';
+            if (!appSettings.showMerchantSearch && searchInput) searchInput.value = '';
             filterMerchants();
         }
     }
 
     function filterMerchants() {
-        const searchInput = document.getElementById('merchantSearchInput');
-        const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-        const merchantItems = document.querySelectorAll('#merchantList .merchant-item');
-
-        merchantItems.forEach(item => {
-            const displayName = item.dataset.displayName ? item.dataset.displayName.toLowerCase() : "";
-            if (displayName.includes(searchTerm)) {
-                item.style.display = 'flex'; 
-            } else {
-                item.style.display = 'none';
-            }
+        const searchTerm = document.getElementById('merchantSearchInput')?.value.toLowerCase().trim() || "";
+        document.querySelectorAll('#merchantList .merchant-item').forEach(item => {
+            const displayName = item.dataset.displayName?.toLowerCase() || "";
+            item.style.display = displayName.includes(searchTerm) ? 'flex' : 'none';
         });
     }
-    
-    function showCaseAddedNotification(count) {
-        if (count <= 0) return;
-        const popup = document.getElementById('caseAddedPopup');
-        if (!popup) return;
-        popup.textContent = `+${count}`;
-        popup.classList.add('show');
-        popup.style.transform = 'translateX(-50%) scale(1.1)';
-        popup.style.opacity = '1';
+
+    function parseShipmentData() {
+        const input = document.getElementById('shipmentInput');
+        const noteArea = document.getElementById('noteArea');
+        const groupToggle = document.getElementById('groupToggle');
+        const groupSizeInput = document.getElementById('parserGroupSize');
+        const upsUspsToggle = document.getElementById('upsUspsToggle');
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        const inputValue = input.value;
+        if (inputValue.trim()) {
+            input.value = '';
+        } else {
+            return;
+        }
+        const currentNoteValue = noteArea.value;
+        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
+        const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
+        const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
+        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
+        const existingTrackingNumbers = new Set();
+        let matchCheck;
+        while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
+            const coreTN = matchCheck[1].replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
+            if (coreTN) existingTrackingNumbers.add(coreTN);
+        }
+        if (upsUspsOutputArea && upsUspsOutputArea.value) {
+            upsUspsOutputArea.value.split('\n').forEach(tn => {
+                const trimmedTn = tn.trim();
+                if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
+            });
+        }
+        const seenTrackingNumbersInCurrentInput = new Set();
+        let groupSize = 1;
+        const isGroupingActive = !isUpsUspsMode && groupToggle ? groupToggle.checked : false;
+        if (isGroupingActive && groupSizeInput) {
+            const parsedValue = parseInt(groupSizeInput.value, 10);
+            groupSize = (!isNaN(parsedValue) && parsedValue >= 1) ? parsedValue : 2;
+        }
+        const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
+        const parsedDataBlocksForAmzl = [];
+        const extractedUpsUspsNumbers = [];
+        let validShipmentsFound = 0;
+        let skippedDuplicateCount = 0;
+        let currentBlockRemovalOrderId = '';
+        overallBlocks.forEach(block => {
+            if (!block.trim()) return;
+            const blockRoMatch = block.match(/Removal order ID:\s*([^\n]+)/);
+            if (blockRoMatch) {
+                currentBlockRemovalOrderId = blockRoMatch[1].trim();
+            }
+            const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
+            shipmentSections.forEach(section => {
+                if (section.trim().startsWith("Removal order ID:")) return;
+                const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
+                if (!trackingMatches || trackingMatches.length === 0) return;
+                const sectionCoreTNs = new Set();
+                const sectionFullTNs = [];
+                trackingMatches.forEach(match => {
+                    const rawTNPart = match[1].trim();
+                    const carrier = match[2];
+                    const coreTN = rawTNPart.replace(/\s|-/g, '');
+                    if (!coreTN) return;
+                    sectionCoreTNs.add(coreTN);
+                    const fullFormattedTN = `${rawTNPart}(${carrier})`;
+                    sectionFullTNs.push(fullFormattedTN);
+                });
+                let hasDuplicate = false;
+                const coreTNsToCheck = Array.from(sectionCoreTNs);
+                for (const coreTn of coreTNsToCheck) {
+                    if (existingTrackingNumbers.has(coreTn) || seenTrackingNumbersInCurrentInput.has(coreTn)) {
+                        hasDuplicate = true;
+                        break;
+                    }
+                }
+                if (hasDuplicate) {
+                    skippedDuplicateCount++;
+                    coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+                    return;
+                }
+                coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
+                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
+                const productLines = section.split('\n').map(line => line.trim());
+                const parsedProducts = [];
+                let currentProduct = null;
+                for (let i = 0; i < productLines.length; i++) {
+                    const line = productLines[i];
+                    if (line.startsWith('Merchant SKU:')) {
+                        if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined) {
+                            parsedProducts.push(currentProduct);
+                        }
+                        currentProduct = {
+                            merchantSku: line.substring('Merchant SKU:'.length).trim(),
+                            qty: undefined
+                        };
+                    } else if (currentProduct) {
+                        if (line.startsWith('FNSKU:')) {
+                            currentProduct.fnsku = line.substring('FNSKU:'.length).trim();
+                        } else if (/^\d{1,4}$/.test(line) && productLines[i - 1]?.match(/^(EAN|UPC|ISBN_10|Condition|Shipped Quantity|Cancelled Quantity):/i)) {
+                            currentProduct.qty = parseInt(line, 10);
+                            parsedProducts.push(currentProduct);
+                            currentProduct = null;
+                        }
+                    }
+                }
+                if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) {
+                    parsedProducts.push(currentProduct);
+                }
+                if (parsedProducts.length === 0) return;
+                const roIdToUse = currentBlockRemovalOrderId || "N/A";
+                const outputParts = [`Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`];
+                const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n'));
+                const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
+                if (isUpsUspsMode) {
+                    coreTNsToCheck.forEach(coreTN => {
+                        if (!tempUpsUspsData[coreTN]) tempUpsUspsData[coreTN] = completeDataBlock;
+                        extractedUpsUspsNumbers.push(coreTN);
+                    });
+                } else {
+                    parsedDataBlocksForAmzl.push(completeDataBlock);
+                }
+                validShipmentsFound++;
+            });
+        });
+        let casesAdded = 0;
+        if (isUpsUspsMode) {
+            if (extractedUpsUspsNumbers.length > 0) {
+                const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
+                upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
+                saveUpsUspsOutputToLocalStorage();
+                saveUpsUspsContextToLocalStorage();
+                let processedMessage = `Extracted ${uniqueNumbersToAdd.length} Other Carrier number(s). `;
+                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                showNotification(processedMessage, "info");
+            } else {
+                let message = "No new Other Carrier shipments found. ";
+                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                showNotification(message, "info");
+            }
+        } else {
+            let finalOutputString = '';
+            if (parsedDataBlocksForAmzl.length > 0) {
+                if (groupSize > 1) {
+                    const groupedOutputs = [];
+                    for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
+                        const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
+                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
+                        casesAdded++;
+                    }
+                    finalOutputString = groupedOutputs.join('\n\n');
+                } else {
+                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join('\n\n');
+                    casesAdded = parsedDataBlocksForAmzl.length;
+                }
+                const currentNoteTrimmed = noteArea.value.trimEnd();
+                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
+                countTemplatesNoteTaker();
+                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
+                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                showNotification(processedMessage, "success");
+                if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
+            } else {
+                let message = "No new AMZL-type shipments found. ";
+                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                showNotification(message, "info");
+            }
+        }
+        saveShipmentInputScroll();
+    }
+
+    function processUpsUspsData() {
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        const noteArea = document.getElementById('noteArea');
+        if (!upsUspsOutputArea || !noteArea) return;
+        const trackingNumbersToProcess = upsUspsOutputArea.value.split('\n').map(tn => tn.trim()).filter(Boolean);
+        if (trackingNumbersToProcess.length === 0) {
+            return;
+        }
+        let processedBlocks = [];
+        let notFoundCount = 0;
+        const processedTNs = new Set();
+        trackingNumbersToProcess.forEach(tn => {
+            const coreTN = tn.replace(/\s|-/g, '');
+            if (!processedTNs.has(coreTN)) {
+                if (tempUpsUspsData[coreTN]) {
+                    processedBlocks.push(upsUspsTemplate + "\n\n" + tempUpsUspsData[coreTN]);
+                    processedTNs.add(coreTN);
+                } else {
+                    notFoundCount++;
+                }
+            }
+        });
+        if (processedBlocks.length > 0) {
+            const currentNoteTrimmed = noteArea.value.trimEnd();
+            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
+            countTemplatesNoteTaker();
+            const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
+            upsUspsOutputArea.value = remainingOutputTNs.join('\n');
+            processedTNs.forEach(coreTN => {
+                delete tempUpsUspsData[coreTN];
+            });
+            saveUpsUspsOutputToLocalStorage();
+            saveUpsUspsContextToLocalStorage();
+            showNotification(`Added ${processedBlocks.length} Other Carrier entries to notes.`, "success");
+            if (processedBlocks.length > 0) showNotification(`+${processedBlocks.length} cases added`, "info");
+        }
+        if (notFoundCount > 0) showNotification(`Warning: Could not find data for ${notFoundCount} tracking number(s).`, "error");
+    }
+
+    function clearSelectedMerchants() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) return;
+
+        const deletedMerchants = Array.from(selectedDivs).map(div => ({
+            key: div.dataset.key,
+            displayName: div.dataset.displayName,
+            count: parseInt(div.dataset.count, 10)
+        }));
+        addToHistory(deletedMerchants);
+
+        const keysToRemove = new Set(deletedMerchants.map(m => m.key));
+        const noteArea = document.getElementById('noteArea');
         
-        setTimeout(() => {
-            popup.style.transform = 'translateX(-50%) scale(0.9)';
-            popup.style.opacity = '0';
-            setTimeout(() => { 
-                 popup.classList.remove('show');
-                 popup.style.transform = 'translateX(-50%) scale(1)'; 
-            }, 300); 
-        }, 1500);
+        const allSections = noteArea.value.split(noteSeparatorRegex);
+        const remainingSections = allSections.filter(section => {
+            return !keysToRemove.has(section);
+        });
+        
+        noteArea.value = remainingSections.join(noteSeparator);
+        countTemplatesNoteTaker();
+        showNotification(`${deletedMerchants.length} merchant(s) deleted and backed up.`, "success");
     }
 
-    function showClearAllConfirmPrompt() {
-        const modal = document.getElementById('clearAllConfirmModal');
-        if (modal) modal.style.display = 'flex';
-    }
-    function hideClearAllConfirmPrompt() {
-        const modal = document.getElementById('clearAllConfirmModal');
-        if (modal) modal.style.display = 'none';
-    }
-    function showClearAllSuccessNotification() {
-        const modal = document.getElementById('clearAllSuccessPopup');
-        if (modal) modal.style.display = 'flex';
+    function countTemplatesInText(text, templateString) {
+        if (!text || !templateString) return 0;
+        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
     }
 
+    function downloadText(text, filename) {
+        const blob = new Blob([text], {
+            type: 'text/plain;charset=utf-8'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+    }
+
+    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
+        const editableSpan = event.target;
+        const newName = editableSpan.textContent.trim();
+        if (!newName || newName === originalDisplayName) {
+            editableSpan.textContent = originalDisplayName;
+            return;
+        }
+        const noteArea = document.getElementById('noteArea');
+        const currentNotes = noteArea.value;
+        let newSectionText;
+        if (isNameOriginallyFromFirstLine) {
+            const lines = originalSectionKey.split('\n');
+            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
+        } else {
+            newSectionText = newName + '\n\n' + originalSectionKey;
+        }
+        
+        noteArea.value = currentNotes.replace(originalSectionKey, newSectionText);
+        countTemplatesNoteTaker();
+    }
+
+    function countTemplatesNoteTaker() {
+        const noteArea = document.getElementById('noteArea');
+        const fullText = noteArea.value;
+        const merchantListDiv = document.getElementById('merchantList');
+        merchantListDiv.innerHTML = '';
+        const merchantsData = {};
+        let totalTemplatesOverall = 0;
+        let merchantIndex = 0;
+        const sections = fullText.split(noteSeparatorRegex);
+        sections.forEach((sectionTextOriginal) => {
+            const sectionText = sectionTextOriginal.trim();
+            if (!sectionText) return;
+            const amzlTemplateCount = countTemplatesInText(sectionText, amzlTemplate);
+            const upsUspsTemplateCount = countTemplatesInText(sectionText, upsUspsTemplate);
+            const templateCount = amzlTemplateCount + upsUspsTemplateCount;
+            totalTemplatesOverall += templateCount;
+            let merchantName = `Entry ${++merchantIndex}`;
+            const firstLine = sectionText.split('\n')[0]?.trim();
+            let isNameFromFirstLine = false;
+            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
+                merchantName = firstLine;
+                isNameFromFirstLine = true;
+            } else if (sectionText.includes('Removal order ID:')) {
+                merchantName = `Data Entry ${merchantIndex}`;
+            }
+            merchantsData[sectionTextOriginal] = { // Use the original, untrimmed text as the key
+                displayName: merchantName,
+                isNameFromFirstLine: isNameFromFirstLine,
+                count: templateCount,
+                key: sectionTextOriginal
+            };
+        });
+        
+        Object.entries(merchantsData).forEach(([key, data]) => {
+            const merchantDiv = document.createElement('div');
+            merchantDiv.className = 'merchant-item';
+            merchantDiv.dataset.key = key; // The key is the full, untrimmed block
+            merchantDiv.dataset.displayName = data.displayName;
+            merchantDiv.dataset.count = data.count;
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'macos-checkbox';
+            checkbox.onchange = updateSelectedCountNoteTaker;
+            const nameSpan = document.createElement('span');
+            nameSpan.contentEditable = true;
+            nameSpan.textContent = data.displayName;
+            nameSpan.style.margin = '0 8px';
+            nameSpan.style.flexGrow = '1';
+            nameSpan.style.overflow = 'hidden';
+            nameSpan.style.textOverflow = 'ellipsis';
+            nameSpan.style.whiteSpace = 'nowrap';
+            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
+            nameSpan.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.target.blur();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    e.target.textContent = data.displayName;
+                    e.target.blur();
+                }
+            });
+            const countSpan = document.createElement('span');
+            countSpan.className = 'case-count';
+            countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
+            merchantDiv.appendChild(checkbox);
+            merchantDiv.appendChild(nameSpan);
+            merchantDiv.appendChild(countSpan);
+            merchantDiv.onclick = (e) => {
+                if (e.target !== checkbox && e.target !== nameSpan) {
+                    checkbox.checked = !checkbox.checked;
+                    updateSelectedCountNoteTaker();
+                }
+            };
+            merchantListDiv.appendChild(merchantDiv);
+        });
+        filterMerchants();
+        updateSelectedCountNoteTaker();
+        localStorage.setItem(localStorageKey, noteArea.value);
+    }
+
+    function updateSelectedCountNoteTaker() {
+        const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
+        const splitButton = document.getElementById('btnSplitSelected');
+        const sendButton = document.getElementById('btnSendToTelegram');
+        const downloadSelectedButton = document.getElementById('btnDownloadSelected');
+
+        let selectedCaseCount = 0;
+        document.querySelectorAll('.merchant-item').forEach(item => {
+            const cb = item.querySelector('.macos-checkbox');
+            if (cb?.checked) {
+                item.classList.add('selected');
+                selectedCaseCount += parseInt(item.dataset.count || '0', 10);
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+
+        const isAnythingSelected = selectedCheckboxes.length > 0;
+        if (splitButton) splitButton.disabled = !isAnythingSelected;
+        if (sendButton) sendButton.disabled = !isAnythingSelected;
+        if (downloadSelectedButton) downloadSelectedButton.disabled = !isAnythingSelected;
+
+        const totalTemplatesSpan = document.getElementById('totalTemplates');
+        const merchantCountSpan = document.getElementById('merchantCount');
+
+        if (isAnythingSelected) {
+            totalTemplatesSpan.textContent = selectedCaseCount;
+            merchantCountSpan.textContent = selectedCheckboxes.length;
+        } else {
+            const allItems = document.querySelectorAll('#merchantList .merchant-item');
+            const totalCaseCountOverall = Array.from(allItems).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
+            totalTemplatesSpan.textContent = totalCaseCountOverall;
+            merchantCountSpan.textContent = allItems.length;
+        }
+    }
+    
+    function downloadSelectedMerchants() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) { return; }
+        const textsToDownload = []; let totalSelectedCases = 0;
+        selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
+        if (textsToDownload.length === 0) { return; }
+        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
+        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
+        downloadText(combinedText + '\n', filename); 
+    }
+
+    function processSingleROBlock(roBlockText, removalOrdersArray) {
+        const roIdLineMatch = roBlockText.match(/^\s*Removal order ID:[^\n]+/);
+        if (!roIdLineMatch) return;
+        const currentRoIdLine = roIdLineMatch[0].trim();
+        const remainingText = roBlockText.substring(roIdLineMatch[0].length).trim();
+        if (!remainingText) return;
+        const shipmentBlocks = remainingText.split(/(?=^\s*Shipment ID:)/m);
+        shipmentBlocks.forEach((shipmentBlock) => {
+            const trimmed = shipmentBlock.trim();
+            if (trimmed.startsWith('Shipment ID:') && trimmed.includes('Merchant SKU:')) removalOrdersArray.push(currentRoIdLine + '\n' + trimmed);
+        });
+    }
+
+    function splitTextIntoRemovalOrders(inputText) {
+        const removalOrders = [];
+        if (!inputText) return removalOrders;
+        let textToProcess = inputText.trim();
+        const escapedAmzl = amzlTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedUps = upsUspsTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        textToProcess = textToProcess.replace(new RegExp('^\\s*' + escapedAmzl + '\\s*\\n*', 'gm'), '').replace(new RegExp('^\\s*' + escapedUps + '\\s*\\n*', 'gm'), '').trim();
+        const lines = textToProcess.split('\n');
+        if (lines.length > 2 && lines[1].trim() === "" && lines[2].startsWith("Removal order ID:")) textToProcess = lines.slice(2).join('\n');
+        else if (lines.length > 0 && lines[0].startsWith("Removal order ID:")) textToProcess = lines.join('\n');
+        const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
+        potentialROBlocks.forEach((roBlock) => {
+            const trimmed = roBlock.trim();
+            if (!trimmed) return;
+            if (trimmed.startsWith('Removal order ID:')) processSingleROBlock(trimmed, removalOrders);
+        });
+        return removalOrders;
+    }
+
+    function createTemplates(removalOrders, ordersPerTemplate) {
+        const templates = [];
+        if (!removalOrders || removalOrders.length === 0 || ordersPerTemplate <= 0) return templates;
+        for (let i = 0; i < removalOrders.length; i += ordersPerTemplate) {
+            const chunk = removalOrders.slice(i, i + ordersPerTemplate).filter(o => o && typeof o === 'string');
+            if (chunk.length > 0) templates.push(chunk.join('\n\n'));
+        }
+        return templates;
+    }
+    
+    function updateCalculatedTemplates() {
+        const modal = document.getElementById('splitModal');
+        if (!modal) return;
+        const combinedText = modal.dataset.combinedText || '';
+        const ordersInput = document.getElementById('splitOrdersPerTemplate');
+        const calcSpan = document.getElementById('splitCalculatedTemplates');
+        if (!ordersInput || !calcSpan) return;
+        const ordersPer = parseInt(ordersInput.value) || 0;
+        if (ordersPer > 0 && combinedText) {
+            const ros = splitTextIntoRemovalOrders(combinedText);
+            calcSpan.textContent = createTemplates(ros, ordersPer).length;
+        } else calcSpan.textContent = '0';
+    }
+
+    function generateAndDownloadSplits() {
+        const modal = document.getElementById('splitModal');
+        if (!modal) return;
+        const combinedText = modal.dataset.combinedText || '';
+        const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
+        const splitNum = parseInt(document.getElementById('splitNumberInput').value);
+        if (!combinedText || isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
+             showNotification("Please enter valid numbers for splitting.", "error");
+            return;
+        }
+        let templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        const ros = splitTextIntoRemovalOrders(combinedText);
+        if (ros.length === 0) {
+            showNotification("No valid removal orders found to split.", "info");
+            return;
+        }
+        const templateGroups = createTemplates(ros, ordersPer);
+        if (templateGroups.length === 0) {
+            showNotification("Failed to generate template groups.", "error");
+            return;
+        }
+        const splitOutputs = [];
+        for (let i = 0; i < templateGroups.length; i += splitNum) {
+            const chunk = templateGroups.slice(i, i + splitNum);
+            if (chunk.length > 0) splitOutputs.push({
+                text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'),
+                count: chunk.length
+            });
+        }
+        if (splitOutputs.length === 0) {
+            showNotification("No split files generated.", "info");
+            return;
+        }
+        let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
+        const dateStr = getFormattedDate();
+        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
+        splitOutputs.forEach((output, index) => {
+            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            downloadText(merchantDisplay + '\n\n' + output.text + '\n', filename);
+        });
+        closeSplitModal();
+    }
+    
+    async function generateAndSendSplitsToTelegram() {
+        const modal = document.getElementById('splitModal');
+        if (!modal) return;
+
+        const sendButton = document.getElementById('btnSendSplitsToTelegram');
+        const combinedText = modal.dataset.combinedText || '';
+        const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
+        const splitNum = parseInt(document.getElementById('splitNumberInput').value);
+
+        if (!combinedText || isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
+            showNotification("Please enter valid numbers for splitting.", "error");
+            return;
+        }
+
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+        let templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        const ros = splitTextIntoRemovalOrders(combinedText);
+        if (ros.length === 0) {
+            showNotification("No valid removal orders found to split.", "info");
+            sendButton.disabled = false; sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
+            return;
+        }
+        const templateGroups = createTemplates(ros, ordersPer);
+        const splitOutputs = [];
+        for (let i = 0; i < templateGroups.length; i += splitNum) {
+            const chunk = templateGroups.slice(i, i + splitNum);
+            if (chunk.length > 0) splitOutputs.push({ text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'), count: chunk.length });
+        }
+        if (splitOutputs.length === 0) {
+            showNotification("No split files to send.", "info");
+            sendButton.disabled = false; sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
+            return;
+        }
+
+        let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
+        const dateStr = getFormattedDate();
+        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
+        
+        const sendPromises = splitOutputs.map((output, index) => {
+            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
+            return sendFileToTelegram(fileContent, filename, '');
+        });
+
+        const results = await Promise.all(sendPromises);
+        const successfulSends = results.filter(r => r && r.success);
+        
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
+        closeSplitModal();
+
+        if (successfulSends.length > 0) {
+             merchantsToDeleteAfterSend = selectedMerchantDataForSplit.map(m => ({
+                 key: m.key,
+                 displayName: m.name,
+                 count: parseInt(m.count)
+             }));
+             const fileInfo = successfulSends.map(r => ({ filename: r.filename }));
+             addToHistory(merchantsToDeleteAfterSend, fileInfo);
+             document.getElementById('confirmDeleteSentModal').style.display = 'flex';
+        }
+    }
+
+    function addSeparator() {
+        const ta = document.getElementById('noteArea');
+        const trimmed = ta.value.trimEnd();
+        ta.value = trimmed + (trimmed ? noteSeparator : '');
+        ta.focus();
+        countTemplatesNoteTaker();
+    }
+
+    function addSpacing() {
+        const ta = document.getElementById('noteArea');
+        ta.value = ta.value.trimEnd() + '\n\n';
+        ta.focus();
+        saveNotesToLocalStorage();
+    }
+
+    function confirmAndClearAllNotes() {
+        document.getElementById('clearAllConfirmModal').style.display = 'none';
+        const noteArea = document.getElementById('noteArea');
+        const deletedMerchants = [];
+        const sections = noteArea.value.split(noteSeparatorRegex);
+        sections.forEach(sectionText => {
+            const trimmedSection = sectionText.trim();
+            if (trimmedSection) {
+                const count = countTemplatesInText(trimmedSection, amzlTemplate) + countTemplatesInText(trimmedSection, upsUspsTemplate);
+                const displayName = trimmedSection.split('\n')[0].trim();
+                deletedMerchants.push({ key: sectionText, displayName, count });
+            }
+        });
+        if (deletedMerchants.length > 0) {
+            addToHistory(deletedMerchants);
+        }
+        noteArea.value = '';
+        countTemplatesNoteTaker();
+        document.getElementById('clearAllSuccessPopup').style.display = 'flex';
+    }
 
     function saveNotesToLocalStorage() {
         const noteArea = document.getElementById('noteArea');
@@ -759,7 +1575,7 @@
             localStorage.setItem(scrollPosKeys.noteArea, noteArea.scrollTop);
         }
     }
-
+    
     function saveUpsUspsOutputToLocalStorage() {
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         if (upsUspsOutputArea) {
@@ -782,544 +1598,27 @@
             console.error("Error saving Other Carrier context to localStorage:", error);
         }
     }
-    
-    function getFormattedDate() {
-        const date = new Date();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${month}-${day}`;
-    }
 
-    function countTemplatesInText(text, templateString) {
-        if (!text || !templateString) return 0;
-        const escapedTemplate = templateString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
-    }
-
-    function downloadText(text, filename) {
-        try {
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (error) {
-            console.error("Error during download:", error);
-            alert("An error occurred while trying to download the file.");
-        }
-    }
-
-    function sanitizeFilename(name) {
-        return name.replace(/[\s\\/:"*?<>|]+/g, '_').substring(0, 50);
-    }
-
-    function parseShipmentData() {
-        const input = document.getElementById('shipmentInput');
-        const noteArea = document.getElementById('noteArea');
-        const groupToggle = document.getElementById('groupToggle');
-        const groupSizeInput = document.getElementById('parserGroupSize');
-        const upsUspsToggle = document.getElementById('upsUspsToggle'); 
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        
-        const inputValue = input.value; 
-        if (inputValue.trim()) {
-            input.value = ''; 
-        } else {
-            return; 
-        }
-
-        const currentNoteValue = noteArea.value;
-        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
-
-        const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
-        const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
-        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
-
-        const existingTrackingNumbers = new Set();
-        let matchCheck;
-        while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
-            const coreTN = matchCheck[1].replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-            if (coreTN) existingTrackingNumbers.add(coreTN);
-        }
-        if (upsUspsOutputArea && upsUspsOutputArea.value) {
-            upsUspsOutputArea.value.split('\n').forEach(tn => {
-                const trimmedTn = tn.trim();
-                if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
-            });
-        }
-        const seenTrackingNumbersInCurrentInput = new Set();
-
-        let groupSize = 1;
-        const isGroupingActive = !isUpsUspsMode && groupToggle ? groupToggle.checked : false;
-        if (isGroupingActive && groupSizeInput) {
-            const parsedValue = parseInt(groupSizeInput.value, 10);
-            groupSize = (!isNaN(parsedValue) && parsedValue >= 1) ? parsedValue : 2;
-        }
-        
-        const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
-        const parsedDataBlocksForAmzl = [];
-        const extractedUpsUspsNumbers = [];
-        let validShipmentsFound = 0;
-        let skippedDuplicateCount = 0;
-        let currentBlockRemovalOrderId = '';
-
-        overallBlocks.forEach(block => {
-            if (!block.trim()) return;
-            const blockRoMatch = block.match(/Removal order ID:\s*([^\n]+)/);
-            if (blockRoMatch) {
-                currentBlockRemovalOrderId = blockRoMatch[1].trim();
-            }
-            const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
-
-            shipmentSections.forEach(section => {
-                if (section.trim().startsWith("Removal order ID:")) return;
-
-                const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
-                if (!trackingMatches || trackingMatches.length === 0) return;
-
-                const sectionCoreTNs = new Set();
-                const sectionFullTNs = []; 
-
-                trackingMatches.forEach(match => {
-                    const rawTNPart = match[1].trim(); 
-                    const carrier = match[2]; 
-                    const coreTN = rawTNPart.replace(/\s|-/g, ''); 
-                    if (!coreTN) return;
-                    sectionCoreTNs.add(coreTN);
-                    const fullFormattedTN = `${rawTNPart}(${carrier})`; 
-                    sectionFullTNs.push(fullFormattedTN);
-                });
-
-                let hasDuplicate = false;
-                const coreTNsToCheck = Array.from(sectionCoreTNs);
-                for (const coreTn of coreTNsToCheck) {
-                    if (existingTrackingNumbers.has(coreTn) || seenTrackingNumbersInCurrentInput.has(coreTn)) {
-                        hasDuplicate = true;
-                        break;
-                    }
-                }
-
-                if (hasDuplicate) {
-                    skippedDuplicateCount++;
-                    coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
-                    return;
-                }
-                coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
-
-                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
-                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
-                const productLines = section.split('\n').map(line => line.trim());
-                const parsedProducts = []; let currentProduct = null;
-                for (let i = 0; i < productLines.length; i++) { const line = productLines[i]; if (line.startsWith('Merchant SKU:')) { if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined) { parsedProducts.push(currentProduct); } currentProduct = { merchantSku: line.substring('Merchant SKU:'.length).trim(), qty: undefined }; } else if (currentProduct) { if (line.startsWith('FNSKU:')) { currentProduct.fnsku = line.substring('FNSKU:'.length).trim(); } else if (/^\d{1,4}$/.test(line) && productLines[i - 1]?.match(/^(EAN|UPC|ISBN_10|Condition|Shipped Quantity|Cancelled Quantity):/i)) { currentProduct.qty = parseInt(line, 10); parsedProducts.push(currentProduct); currentProduct = null; } } } if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) { parsedProducts.push(currentProduct); }
-
-                if (parsedProducts.length === 0) return;
-                const roIdToUse = currentBlockRemovalOrderId || "N/A";
-                const outputParts = [ `Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}` ];
-                const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n') );
-                const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
-
-                if (isUpsUspsMode) {
-                    coreTNsToCheck.forEach(coreTN => { 
-                        if (!tempUpsUspsData[coreTN]) tempUpsUspsData[coreTN] = completeDataBlock;
-                        extractedUpsUspsNumbers.push(coreTN);
-                    });
-                } else { 
-                    parsedDataBlocksForAmzl.push(completeDataBlock);
-                }
-                validShipmentsFound++;
-            });
-        });
-        
-        let casesAdded = 0;
-        if (isUpsUspsMode) {
-            if (extractedUpsUspsNumbers.length > 0) {
-                const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
-                upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
-                saveUpsUspsOutputToLocalStorage(); 
-                saveUpsUspsContextToLocalStorage();
-                let processedMessage = `Extracted ${uniqueNumbersToAdd.length} unique Other Carrier number(s) from batch. `;
-                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                processedMessage += `Click 'Process' to add to notes.`;
-                 input.placeholder = processedMessage;
-            } else {
-                 let message = "No new valid Other Carrier shipments found in batch. ";
-                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                 input.placeholder = message;
-            }
-        } else { 
-            let finalOutputString = '';
-            if (parsedDataBlocksForAmzl.length > 0) {
-                if (groupSize > 1) {
-                    const groupedOutputs = [];
-                    for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
-                        const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
-                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
-                        casesAdded++; 
-                    }
-                    finalOutputString = groupedOutputs.join('\n\n');
-                } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock ).join('\n\n');
-                    casesAdded = parsedDataBlocksForAmzl.length; 
-                }
-                const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
-                countTemplatesNoteTaker(); 
-                const groupingStatus = groupSize > 1 ? `ON (${groupSize} per template)` : 'OFF';
-                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s) from batch. `;
-                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                processedMessage += `Grouping: ${groupingStatus}. Ready...`;
-                 input.placeholder = processedMessage;
-                 if (casesAdded > 0) showCaseAddedNotification(casesAdded);
-            } else {
-                 let message = "No new valid AMZL-type shipments found in batch. ";
-                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                 input.placeholder = message;
-            }
-        }
-        setTimeout(() => {
-            if (input && !input.value.trim()) {
-                const currentModeIsUps = document.getElementById('upsUspsToggle')?.checked;
-                input.placeholder = currentModeIsUps
-                    ? "Paste shipment data for Other Carriers..."
-                    : "Paste Amazon removal shipment data here...";
-            }
-        }, 5000);
-        saveShipmentInputScroll(); 
-    }
-
-    function processUpsUspsData() { 
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        const noteArea = document.getElementById('noteArea');
-        const shipmentInput = document.getElementById('shipmentInput');
-        if (!upsUspsOutputArea || !noteArea || !shipmentInput) return;
-
-        const trackingNumbersToProcess = upsUspsOutputArea.value.split('\n').map(tn => tn.trim()).filter(tn => tn);
-        if (trackingNumbersToProcess.length === 0) { return; }
-
-        let processedBlocks = []; let notFoundCount = 0; const processedTNs = new Set();
-        trackingNumbersToProcess.forEach(tn => {
-            const coreTN = tn.replace(/\s|-/g, '');
-            if (!processedTNs.has(coreTN)) {
-                if (tempUpsUspsData[coreTN]) {
-                    processedBlocks.push(upsUspsTemplate + "\n\n" + tempUpsUspsData[coreTN]);
-                    processedTNs.add(coreTN);
-                } else { notFoundCount++; }
-            }
-        });
-
-        if (processedBlocks.length > 0) {
-            const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
-            countTemplatesNoteTaker(); 
-            const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
-            upsUspsOutputArea.value = remainingOutputTNs.join('\n');
-            processedTNs.forEach(coreTN => { delete tempUpsUspsData[coreTN]; });
-            saveUpsUspsOutputToLocalStorage(); saveUpsUspsContextToLocalStorage();
-            shipmentInput.placeholder = `Added ${processedBlocks.length} Other Carrier entries to notes. Ready...`;
-            if (processedBlocks.length > 0) showCaseAddedNotification(processedBlocks.length);
-
-            setTimeout(() => { if (shipmentInput) shipmentInput.placeholder = "Paste shipment data for Other Carriers..."; }, 3000);
-        }
-        if (notFoundCount > 0) alert(`Warning: Could not find original data for ${notFoundCount} tracking number(s).`);
-    }
-
-    function addSeparator() { const ta = document.getElementById('noteArea'); const trimmed = ta.value.trimEnd(); ta.value = trimmed + (trimmed ? noteSeparator : ''); ta.focus(); countTemplatesNoteTaker(); }
-    function addSpacing() { const ta = document.getElementById('noteArea'); ta.value = ta.value.trimEnd() + '\n\n'; ta.focus(); saveNotesToLocalStorage(); }
-    function selectAllMerchants() { document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => { cb.checked = true; }); updateSelectedCountNoteTaker(); }
-    
-    function confirmAndClearAllNotes() {
-        hideClearAllConfirmPrompt(); 
-        const noteArea = document.getElementById('noteArea');
-        noteArea.value = '';
-        countTemplatesNoteTaker(); 
-        showClearAllSuccessNotification();
-    }
-
-
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
-        const editableSpan = event.target; const newName = editableSpan.textContent.trim();
-        if (!newName || newName === originalDisplayName) { editableSpan.textContent = originalDisplayName; return; }
-        const noteArea = document.getElementById('noteArea'); const currentNotes = noteArea.value; let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
-            const lines = originalSectionKey.split('\n');
-            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
-        } else { newSectionText = newName + '\n\n' + originalSectionKey; }
-        const noteSeparatorCaptureRegex = new RegExp('(' + noteSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
-        const parts = currentNotes.split(noteSeparatorCaptureRegex); let reconstructedNotes = ""; let replaced = false;
-        for (let i = 0; i < parts.length; i++) {
-            if (i % 2 === 0) { 
-                if (parts[i].trim() === originalSectionKey.trim()) { reconstructedNotes += newSectionText; replaced = true; }
-                else { reconstructedNotes += parts[i]; }
-            } else { reconstructedNotes += parts[i]; }
-        }
-        if (replaced) { noteArea.value = reconstructedNotes; countTemplatesNoteTaker(); }
-        else { editableSpan.textContent = originalDisplayName; }
+    function restoreScrollPositions() {
+        const shipmentInputEl = document.getElementById('shipmentInput');
+        const upsUspsOutputAreaEl = document.getElementById('upsUspsOutputArea');
+        const noteAreaEl = document.getElementById('noteArea');
+        if (shipmentInputEl) shipmentInputEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.shipmentInput)) || 0;
+        if (upsUspsOutputAreaEl) upsUspsOutputAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.upsUspsOutputArea)) || 0;
+        if (noteAreaEl) noteAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.noteArea)) || 0;
     }
     
-    function countTemplatesNoteTaker() {
-        const noteArea = document.getElementById('noteArea');
-        const fullText = noteArea.value;
-        const merchantListDiv = document.getElementById('merchantList');
-        merchantListDiv.innerHTML = ''; 
-
-        const trackingNumberRegex = regexPatterns.allExisting; 
-        const coreTNReplaceRegex = regexPatterns.coreTnExtract;
-
-        const allTrackingNumbers = (fullText.match(trackingNumberRegex) || []);
-        const seenTrackingNumbers = new Set(); 
-        const duplicatedTrackingNumbers = new Set(); 
-        allTrackingNumbers.forEach(tnString => {
-            const coreTN = tnString.replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
-            if (seenTrackingNumbers.has(coreTN)) { duplicatedTrackingNumbers.add(coreTN); }
-            seenTrackingNumbers.add(coreTN);
-        });
-
-        const merchantsData = {}; let totalTemplatesOverall = 0; let merchantIndex = 0;
-        const sections = fullText.split(noteSeparatorRegex);
-        sections.forEach((sectionTextOriginal) => {
-            const sectionText = sectionTextOriginal.trim(); if (!sectionText) return;
-            const amzlTemplateCount = countTemplatesInText(sectionText, amzlTemplate);
-            const upsUspsTemplateCount = countTemplatesInText(sectionText, upsUspsTemplate);
-            const templateCount = amzlTemplateCount + upsUspsTemplateCount;
-            totalTemplatesOverall += templateCount;
-            let merchantName = `Entry ${++merchantIndex}`; const firstLine = sectionText.split('\n')[0]?.trim(); let isNameFromFirstLine = false;
-            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0,10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
-                merchantName = firstLine; isNameFromFirstLine = true;
-            } else if (sectionText.includes('Removal order ID:')) { merchantName = `Data Entry ${merchantIndex}`; }
-            merchantsData[sectionTextOriginal] = { displayName: merchantName, isNameFromFirstLine: isNameFromFirstLine, count: templateCount, text: sectionTextOriginal };
-        });
-        document.getElementById('merchantCount').textContent = Object.keys(merchantsData).length;
-        document.getElementById('totalTemplates').textContent = totalTemplatesOverall;
-        
-        const merchantsInOrder = Object.entries(merchantsData); 
-        merchantsInOrder.forEach(([key, data]) => {
-            const merchantDiv = document.createElement('div');
-            merchantDiv.className = 'merchant-item';
-            merchantDiv.dataset.key = key;
-            merchantDiv.dataset.displayName = data.displayName;
-            merchantDiv.dataset.count = data.count;
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'macos-checkbox';
-            checkbox.onchange = updateSelectedCountNoteTaker;
-            
-            const nameSpan = document.createElement('span');
-            nameSpan.contentEditable = true;
-            nameSpan.textContent = data.displayName;
-            nameSpan.style.margin = '0 8px';
-            nameSpan.style.flexGrow = '1';
-            nameSpan.style.overflow = 'hidden';
-            nameSpan.style.textOverflow = 'ellipsis';
-            nameSpan.style.whiteSpace = 'nowrap';
-            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
-            nameSpan.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); } else if (e.key === 'Escape') { e.preventDefault(); e.target.textContent = data.displayName; e.target.blur(); } });
-
-            const countSpan = document.createElement('span');
-            countSpan.className = 'case-count';
-            countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
-
-            merchantDiv.appendChild(checkbox);
-            merchantDiv.appendChild(nameSpan);
-            merchantDiv.appendChild(countSpan);
-            
-            merchantDiv.onclick = (e) => {
-                if (e.target !== checkbox && e.target !== nameSpan) {
-                    checkbox.checked = !checkbox.checked;
-                    updateSelectedCountNoteTaker();
-                }
-            };
-            merchantListDiv.appendChild(merchantDiv);
-        });
-        filterMerchants(); 
-        updateSelectedCountNoteTaker();
+    function saveAllScrollPositions() {
+        saveShipmentInputScroll();
+        saveUpsUspsOutputToLocalStorage();
         saveNotesToLocalStorage();
     }
-
-    function updateSelectedCountNoteTaker() {
-        const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
-        const splitButton = document.getElementById('btnSplitSelected');
-        let selectedCaseCount = 0;
-        
-        document.querySelectorAll('.merchant-item').forEach(item => {
-            const cb = item.querySelector('.macos-checkbox');
-            if (cb && cb.checked) {
-                item.classList.add('selected');
-                selectedCaseCount += parseInt(item.dataset.count || '0', 10);
-            } else {
-                item.classList.remove('selected');
-            }
-        });
-
-        const totalTemplatesSpan = document.getElementById('totalTemplates');
-        const merchantCountSpan = document.getElementById('merchantCount');
-        const totalMerchantCount = document.querySelectorAll('#merchantList .merchant-item').length;
-        const totalCaseCountOverall = Array.from(document.querySelectorAll('#merchantList .merchant-item')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
-        
-        if (selectedCheckboxes.length > 0) {
-            totalTemplatesSpan.textContent = selectedCaseCount;
-            merchantCountSpan.textContent = selectedCheckboxes.length;
-            if (splitButton) splitButton.disabled = false;
-        } else {
-            totalTemplatesSpan.textContent = totalCaseCountOverall;
-            merchantCountSpan.textContent = totalMerchantCount;
-            if (splitButton) splitButton.disabled = true;
-        }
-    }
-    
-    function downloadSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { return; }
-        const textsToDownload = []; let totalSelectedCases = 0;
-        selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
-        if (textsToDownload.length === 0) { return; }
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename); 
-    }
-
-    function clearSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { return; }
-        const noteArea = document.getElementById('noteArea'); const fullText = noteArea.value; const keysToRemove = new Set();
-        selectedDivs.forEach(div => { if (div.dataset.key) keysToRemove.add(div.dataset.key); });
-        const allSections = fullText.split(noteSeparatorRegex).filter(s => s.trim() !== "");
-        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
-        noteArea.value = remainingSections.length > 0 ? remainingSections.join(noteSeparator) : "";
-        countTemplatesNoteTaker(); 
-    }
-
-    function downloadAllNotes() {
-        const noteArea = document.getElementById('noteArea'); const textToDownload = noteArea.value.trim();
-        if (!textToDownload) { return; }
-        const totalTemplatesCount = document.getElementById('totalTemplates').textContent;
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalTemplatesCount}).txt`;
-        downloadText(textToDownload + '\n', filename);
-    }
-
-    function processSingleROBlock(roBlockText, removalOrdersArray) {
-        const roIdLineMatch = roBlockText.match(/^\s*Removal order ID:[^\n]+/); if (!roIdLineMatch) return;
-        const currentRoIdLine = roIdLineMatch[0].trim(); const remainingText = roBlockText.substring(roIdLineMatch[0].length).trim(); if (!remainingText) return;
-        const shipmentBlocks = remainingText.split(/(?=^\s*Shipment ID:)/m);
-        shipmentBlocks.forEach((shipmentBlock) => {
-             const trimmed = shipmentBlock.trim();
-             if (trimmed.startsWith('Shipment ID:') && trimmed.includes('Merchant SKU:')) removalOrdersArray.push(currentRoIdLine + '\n' + trimmed);
-        });
-    }
-
-   function splitTextIntoRemovalOrders(inputText) {
-        const removalOrders = []; if (!inputText) return removalOrders;
-        let textToProcess = inputText.trim();
-        const escapedAmzl = amzlTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const escapedUps = upsUspsTemplate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        textToProcess = textToProcess.replace(new RegExp('^\\s*' + escapedAmzl + '\\s*\\n*', 'gm'), '').replace(new RegExp('^\\s*' + escapedUps + '\\s*\\n*', 'gm'), '').trim();
-        const lines = textToProcess.split('\n');
-        if (lines.length > 2 && lines[1].trim() === "" && lines[2].startsWith("Removal order ID:")) textToProcess = lines.slice(2).join('\n');
-        else if (lines.length > 0 && lines[0].startsWith("Removal order ID:")) textToProcess = lines.join('\n');
-        const potentialROBlocks = textToProcess.split(/(?=^\s*Removal order ID:)/m);
-        potentialROBlocks.forEach((roBlock) => {
-            const trimmed = roBlock.trim(); if (!trimmed) return;
-            if (trimmed.startsWith('Removal order ID:')) processSingleROBlock(trimmed, removalOrders);
-        });
-        return removalOrders;
-   }
-
-   function createTemplates(removalOrders, ordersPerTemplate) {
-        const templates = []; if (!removalOrders || removalOrders.length === 0 || ordersPerTemplate <= 0) return templates;
-        for (let i = 0; i < removalOrders.length; i += ordersPerTemplate) {
-            const chunk = removalOrders.slice(i, i + ordersPerTemplate).filter(o => o && typeof o === 'string');
-            if (chunk.length > 0) templates.push(chunk.join('\n\n'));
-        }
-        return templates;
-   }
-
-    let selectedMerchantDataForSplit = [];
-
-    function openSplitModal() {
-        selectedMerchantDataForSplit = [];
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { return; }
-        const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
-        if (!modal || !merchantInfoDiv) { return; }
-        let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
-        selectedDivs.forEach((div) => {
-            const key = div.dataset.key; const name = div.dataset.displayName || `Unknown`;
-            if (key) { selectedMerchantDataForSplit.push({ key, name }); combinedTextParts.push(key);
-                if (key.includes(upsUspsTemplate)) containsUpsUsps = true; if (key.includes(amzlTemplate)) containsAmzl = true;
-            }
-        });
-        const names = selectedMerchantDataForSplit.map(item => item.name);
-        modal.dataset.combinedText = combinedTextParts.join(noteSeparator.trimEnd());
-        modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
-        if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
-        else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
-        else merchantInfoDiv.textContent = 'No valid merchants.';
-        document.getElementById('splitOrdersPerTemplate').value = '2'; document.getElementById('splitNumberInput').value = '';
-        updateCalculatedTemplates(); modal.style.display = 'flex';
-    }
-
-    function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
-    function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
-
-    function updateCalculatedTemplates() {
-         const modal = document.getElementById('splitModal'); if (!modal) return;
-         const combinedText = modal.dataset.combinedText || '';
-         const ordersInput = document.getElementById('splitOrdersPerTemplate');
-         const calcSpan = document.getElementById('splitCalculatedTemplates'); if (!ordersInput || !calcSpan) return;
-         const ordersPer = parseInt(ordersInput.value) || 0;
-         if (ordersPer > 0 && combinedText) {
-             const ros = splitTextIntoRemovalOrders(combinedText);
-             calcSpan.textContent = createTemplates(ros, ordersPer).length;
-         } else calcSpan.textContent = '0';
-    }
-    
-    function generateAndDownloadSplits() {
-        const modal = document.getElementById('splitModal'); if (!modal) return;
-        const combinedText = modal.dataset.combinedText || '';
-        const ordersPerInput = document.getElementById('splitOrdersPerTemplate');
-        const splitNumInput = document.getElementById('splitNumberInput');
-        const containsAmzl = modal.dataset.containsAmzl === 'true'; const containsUpsUsps = modal.dataset.containsUpsUsps === 'true';
-        if (!ordersPerInput || !splitNumInput) { return; }
-        const ordersPer = parseInt(ordersPerInput.value); const splitNum = parseInt(splitNumInput.value);
-        if (!combinedText) { return; }
-        if (isNaN(ordersPer) || ordersPer < 1) { alert("Invalid 'Orders per Template'."); return; }
-        if (isNaN(splitNum) || splitNum < 1) { alert("Invalid 'Templates per Split File'."); return; }
-        let templateToUse = amzlTemplate;
-        if (containsUpsUsps && !containsAmzl) templateToUse = upsUspsTemplate;
-        else if (containsUpsUsps && containsAmzl) console.warn("Mixed entries, using AMZL template.");
-        const ros = splitTextIntoRemovalOrders(combinedText); if (ros.length === 0) { alert("No valid removal orders found."); return; }
-        const templateGroups = createTemplates(ros, ordersPer); if (templateGroups.length === 0) { alert("Failed to generate template groups."); return; }
-        const splitOutputs = [];
-        for (let i = 0; i < templateGroups.length; i += splitNum) {
-            const chunk = templateGroups.slice(i, i + splitNum);
-            if (chunk.length > 0) splitOutputs.push({ text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'), count: chunk.length });
-        }
-        if (splitOutputs.length === 0) { alert("No split files generated."); return; }
-        let filenamePart = "SplitSelection"; let merchantDisplay = selectedMerchantDataForSplit.map(m=>m.name).join(' & ');
-        if (selectedMerchantDataForSplit.length === 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name);
-        else if (selectedMerchantDataForSplit.length > 1) filenamePart = sanitizeFilename(selectedMerchantDataForSplit[0].name) + "_Multi";
-        const dateStr = getFormattedDate();
-        splitOutputs.forEach((output, index) => {
-            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
-            downloadText(merchantDisplay + '\n\n' + output.text + '\n', filename);
-        });
-        closeSplitModal();
-   }
     
     function initDraggableWindows() {
         const handles = document.querySelectorAll('.resize-handle');
         handles.forEach(handle => {
             const container = handle.closest('.tool-container');
-            if (!container) return;
-            if (container.classList.contains('parser-tool')) {
-                return; 
-            }
+            if (!container || container.classList.contains('parser-tool')) return;
             let initialHeight, initialY;
             const onMouseMove = (e) => {
                 const dy = e.clientY - initialY;
@@ -1344,42 +1643,84 @@
         });
     }
 
-    function restoreScrollPositions() {
-        const shipmentInputEl = document.getElementById('shipmentInput');
-        const upsUspsOutputAreaEl = document.getElementById('upsUspsOutputArea');
-        const noteAreaEl = document.getElementById('noteArea');
-
-        if (shipmentInputEl) shipmentInputEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.shipmentInput)) || 0;
-        if (upsUspsOutputAreaEl) upsUspsOutputAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.upsUspsOutputArea)) || 0;
-        if (noteAreaEl) noteAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.noteArea)) || 0;
+    // --- Modal Control Functions ---
+    function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
+    function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+    function openSplitModal() {
+        selectedMerchantDataForSplit = [];
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) { return; }
+        const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
+        if (!modal || !merchantInfoDiv) { return; }
+        let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
+        selectedDivs.forEach((div) => {
+            const key = div.dataset.key;
+            const name = div.dataset.displayName || `Unknown`;
+            const count = div.dataset.count;
+            if (key) {
+                selectedMerchantDataForSplit.push({ key, name, count });
+                combinedTextParts.push(key);
+                if (key.includes(upsUspsTemplate)) containsUpsUsps = true; if (key.includes(amzlTemplate)) containsAmzl = true;
+            }
+        });
+        const names = selectedMerchantDataForSplit.map(item => item.name);
+        modal.dataset.combinedText = combinedTextParts.join(noteSeparator.trimEnd());
+        modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
+        if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
+        else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
+        else merchantInfoDiv.textContent = 'No valid merchants.';
+        document.getElementById('splitOrdersPerTemplate').value = '2'; document.getElementById('splitNumberInput').value = '';
+        updateCalculatedTemplates(); modal.style.display = 'flex';
     }
-
-    function saveAllScrollPositions() {
-        saveShipmentInputScroll();
-        saveUpsUspsOutputToLocalStorage();
-        saveNotesToLocalStorage();
+    function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
+    function openHistoryModal() { renderHistoryModal(); document.getElementById('historyModal').style.display = 'flex'; }
+    function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
+    function openClearHistoryConfirmModal() { document.getElementById('confirmClearHistoryModal').style.display = 'flex'; }
+    function closeClearHistoryConfirmModal() { document.getElementById('confirmClearHistoryModal').style.display = 'none'; }
+    function handleClearAllHistory() {
+        localStorage.removeItem(historyKey);
+        closeClearHistoryConfirmModal();
+        renderHistoryModal();
+        showNotification("All history has been cleared.", "success");
     }
-
+    function openTelegramSendModal() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) { showNotification("No merchants selected.", "info"); return; }
+        if (!appSettings.telegramBotToken || !appSettings.telegramChatId) { showNotification("Please configure Telegram settings first.", "error"); openSettingsModal(); return; }
+        const modal = document.getElementById('telegramSendModal');
+        const listEl = document.getElementById('telegram-merchant-list');
+        listEl.innerHTML = '';
+        let totalCases = 0;
+        let merchantInfoHtml = '<h4>Selected Merchants:</h4>';
+        const merchantsToSend = [];
+        selectedDivs.forEach((div) => {
+            const displayName = div.dataset.displayName;
+            const count = parseInt(div.dataset.count);
+            const key = div.dataset.key;
+            totalCases += count;
+            merchantInfoHtml += `<p>${displayName} (${count} cases)</p>`;
+            merchantsToSend.push({ key, displayName, count });
+        });
+        modal.dataset.merchantsToSend = JSON.stringify(merchantsToSend);
+        listEl.innerHTML = merchantInfoHtml;
+        const inputContainer = document.createElement('div');
+        inputContainer.style.marginTop = '15px';
+        inputContainer.innerHTML = `
+            <label for="telegram-file-number-single">File Number:</label>
+            <div class="macos-textfield-container" style="width: 80px; margin-top: 4px;">
+                <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" placeholder="#">
+            </div>
+        `;
+        listEl.appendChild(inputContainer);
+        modal.style.display = 'flex';
+    }
+    function closeTelegramSendModal() { document.getElementById('telegramSendModal').style.display = 'none'; }
+    // --- End Modal Control Functions ---
 
     document.addEventListener('DOMContentLoaded', () => {
-        loadSettings(); 
-
-        const shipmentInput = document.getElementById('shipmentInput');
+        loadSettings();
+        autoClearOldHistory();
         const noteArea = document.getElementById('noteArea');
-        const groupToggle = document.getElementById('groupToggle');
-        const groupSizeInput = document.getElementById('parserGroupSize');
-        const upsUspsToggle = document.getElementById('upsUspsToggle');
-        const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        const groupOrdersControl = document.getElementById('groupOrdersControl');
-        const merchantSearchInput = document.getElementById('merchantSearchInput');
-        
-        const clearAllConfirmModal = document.getElementById('clearAllConfirmModal');
-        const cancelClearAllBtn = document.getElementById('cancelClearAllBtn');
-        const confirmClearAllBtn = document.getElementById('confirmClearAllBtn');
-        const closeClearSuccessPopupBtn = document.getElementById('closeClearSuccessPopupBtn');
-
-
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
             if (savedNotes) noteArea.value = savedNotes;
@@ -1388,71 +1729,91 @@
             noteArea.addEventListener('paste', () => { setTimeout(countTemplatesNoteTaker, 50); });
             noteArea.addEventListener('scroll', saveNotesToLocalStorage);
         }
-        if (upsUspsOutputArea) { 
+        const shipmentInput = document.getElementById('shipmentInput');
+        if (shipmentInput) {
+             let parseTimer;
+             shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
+             shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
+        }
+        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+        if(upsUspsOutputArea) {
             const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved;
             upsUspsOutputArea.addEventListener('scroll', saveUpsUspsOutputToLocalStorage);
         }
-        if (shipmentInput) {
-            shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
-        }
-
-        restoreScrollPositions();
-
-
         try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
         catch (e) { tempUpsUspsData = {}; }
-
-        if (shipmentInput) {
-            let parseTimer;
-            shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
-        }
+        restoreScrollPositions();
+        countTemplatesNoteTaker();
         
-        if(merchantSearchInput) {
-            merchantSearchInput.addEventListener('input', filterMerchants);
-        }
-        
-        if(cancelClearAllBtn) cancelClearAllBtn.addEventListener('click', hideClearAllConfirmPrompt);
-        if(confirmClearAllBtn) confirmClearAllBtn.addEventListener('click', confirmAndClearAllNotes);
-        if(closeClearSuccessPopupBtn) closeClearSuccessPopupBtn.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
-        
-        clearAllConfirmModal.addEventListener('click', (e) => {
-            if (e.target === clearAllConfirmModal) hideClearAllConfirmPrompt();
+        // --- Event Listeners ---
+        document.getElementById('btnHistory')?.addEventListener('click', openHistoryModal);
+        document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            appSettings.theme = newTheme;
+            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+            setTheme(newTheme);
         });
-        document.getElementById('clearAllSuccessPopup').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('clearAllSuccessPopup')) document.getElementById('clearAllSuccessPopup').style.display = 'none';
-        });
-
-
-        try { countTemplatesNoteTaker(); } catch(e) { console.error("Initial count error:", e); }
-
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-        });
-
-        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
-        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
-        document.getElementById('btnClearAllNotes')?.addEventListener('click', showClearAllConfirmPrompt); 
-        document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
+        document.getElementById('btnLayoutStacked')?.addEventListener('click', () => setLayout('stacked'));
+        document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
+        document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
         document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
-        document.getElementById('btnSelectAll')?.addEventListener('click', selectAllMerchants);
-        document.getElementById('btnDownloadAll')?.addEventListener('click', downloadAllNotes);
+        document.getElementById('btnSelectAll')?.addEventListener('click', () => {
+            document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => { cb.checked = true; });
+            updateSelectedCountNoteTaker();
+        });
+        document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
+            const text = document.getElementById('noteArea').value.trim();
+            if (!text) return;
+            const count = Array.from(document.querySelectorAll('#merchantList .merchant-item')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
+            downloadText(text + '\n', `${appSettings.filenamePrefix}_${getFormattedDate()}_(${count}).txt`);
+        });
+        document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
         document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
         document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
-        
-        document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
+        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
+        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
+        document.getElementById('btnClearAllNotes')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'flex');
+        document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
+        document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
+        document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
+
+        // Modal Close Listeners
+        document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
+        document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
+        document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
+        document.getElementById('btnClearAllHistory')?.addEventListener('click', openClearHistoryConfirmModal);
+        document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
+        document.getElementById('btnConfirmClearHistory')?.addEventListener('click', handleClearAllHistory);
+        document.getElementById('confirmClearHistoryModal')?.addEventListener('click', e => { if (e.target.id === 'confirmClearHistoryModal') closeClearHistoryConfirmModal(); });
+
+        document.getElementById('btnCancelTelegramSend')?.addEventListener('click', closeTelegramSendModal);
+        document.getElementById('telegramSendModal')?.addEventListener('click', e => { if (e.target.id === 'telegramSendModal') closeTelegramSendModal(); });
+        document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
+        document.getElementById('btnYesDeleteSent')?.addEventListener('click', confirmAndDeleteSentMerchants);
+        document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
         document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
+        document.getElementById('settingsModal')?.addEventListener('click', e => { if (e.target.id === 'settingsModal') closeSettingsModal(); });
         document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
-        document.getElementById('settingsModal').addEventListener('click', (event) => { if (event.target === document.getElementById('settingsModal')) closeSettingsModal(); });
+        document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
+        document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
+        document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
+        document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
+        document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
+        document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
 
-        document.getElementById('btnLayoutStacked').addEventListener('click', () => setLayout('stacked'));
-        document.getElementById('btnLayoutSide').addEventListener('click', () => setLayout('side-by-side'));
-        window.addEventListener('resize', handleAutoLayout);
+        document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
 
-
+        const groupToggle = document.getElementById('groupToggle');
+        const groupSizeInput = document.getElementById('parserGroupSize');
         if (groupToggle && groupSizeInput) {
             groupToggle.addEventListener('change', function() { groupSizeInput.disabled = !this.checked; });
             groupSizeInput.disabled = !groupToggle.checked;
         }
+
+        const upsUspsToggle = document.getElementById('upsUspsToggle');
+        const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
+        const groupOrdersControl = document.getElementById('groupOrdersControl');
         if (upsUspsToggle && upsUspsOutputContainer && groupOrdersControl && shipmentInput && upsUspsOutputArea) {
             function toggleUpsUspsMode(isUpsMode) {
                 upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
@@ -1465,20 +1826,12 @@
             upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
             toggleUpsUspsMode(upsUspsToggle.checked);
         }
-
-        const splitModalEl = document.getElementById('splitModal');
-        document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
-        splitModalEl?.addEventListener('click', (event) => { if (event.target === splitModalEl) closeSplitModal(); });
-        document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
-        document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
-
-        initDraggableWindows();
+        
+        window.addEventListener('resize', handleAutoLayout);
         window.addEventListener('beforeunload', saveAllScrollPositions);
+        initDraggableWindows();
         handleAutoLayout();
-        updateCounterPillLocation();
-
     });
 </script>
-
 </body>
 </html>
