@@ -118,15 +118,38 @@
         overflow: hidden;
         resize: none;
         min-height: 200px;
+        transition: min-height 0.3s ease;
     }
-    .parser-tool { padding-bottom: 20px; }
+    .parser-tool.is-hidden { min-height: 50px; padding-bottom: 20px;}
+    .parser-tool .parser-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+        transition: opacity 0.3s ease, max-height 0.3s ease;
+        opacity: 1;
+        max-height: 1000px;
+    }
+    .parser-tool.is-hidden .parser-content {
+        opacity: 0;
+        max-height: 0;
+        pointer-events: none;
+    }
+
     .merchant-actions-tool, .note-taker-tool { padding-bottom: 25px; }
 
+    .tool-card-title-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: -5px 0 10px 0;
+        flex-shrink: 0;
+    }
     .tool-card-title {
         display: flex;
         align-items: center;
-        font-size: 1.1em; font-weight: 600; color: var(--text-primary); margin: -5px 0 10px 0;
-        flex-shrink: 0;
+        font-size: 1.1em; font-weight: 600; color: var(--text-primary);
+        margin: 0;
     }
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
@@ -196,6 +219,8 @@
     }
     .macos-icon-button:hover { background-color: var(--bg-hover); color: var(--text-primary); }
     .macos-icon-button.active { background-color: var(--accent-blue); color: white; }
+    .macos-icon-button:disabled { color: var(--text-placeholder); background: transparent; cursor: not-allowed; }
+    .macos-icon-button:disabled:hover { background: transparent; }
 
     textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
     .macos-textfield-container {
@@ -205,7 +230,7 @@
         background-color: var(--bg-input);
         transition: all 0.15s ease;
     }
-    .macos-textfield-container.fixed-width { width: 70px; margin-left: auto; }
+    .macos-textfield-container.fixed-width { width: 50px; margin-left: auto; }
     .macos-textfield-container:focus-within {
         border-color: var(--accent-blue);
         box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-blue) 30%, transparent);
@@ -311,30 +336,37 @@
 
     .resize-handle {
         position: absolute; bottom: 0; left: 0; right: 0;
-        height: 25px;
-        cursor: ns-resize;
-        z-index: 10;
+        height: 25px; cursor: ns-resize; z-index: 10;
+        overflow: hidden;
     }
-    .resize-handle .resize-pill { display: none; }
-    .resize-handle::before, .resize-handle::after {
-        content: ""; position: absolute; display: block;
-        border-bottom: 3px solid var(--text-placeholder); 
-        opacity: 0.7; transition: border-color 0.2s ease; transform-origin: bottom right;
+    .resize-handle::before {
+        content: ""; position: absolute;
+        width: 14px; height: 14px;
+        right: 4px; bottom: 4px;
+        border-right: 2px solid var(--text-placeholder);
+        border-bottom: 2px solid var(--text-placeholder);
+        border-bottom-right-radius: 4px;
+        transition: border-color 0.2s ease;
     }
-    .resize-handle:hover::before, .resize-handle:hover::after { border-color: var(--text-primary); }
-    .resize-handle::before { width: 20px; transform: rotate(-45deg); right: 2px; bottom: 8px; }
-    .resize-handle::after { width: 12px; transform: rotate(-45deg); right: 5px; bottom: 14px; }
+     .resize-handle:hover::before { border-color: var(--text-primary); }
 
     textarea::selection { background-color: var(--highlight-bg); color: var(--highlight-text); }
-    .parser-tool .macos-textfield-container,
-    .note-taker-tool .macos-textfield-container#noteAreaContainer,
-    #merchantList { flex-grow: 1; min-height: 0; }
+    .parser-tool .macos-textfield-container {
+        flex-grow: 1;
+        min-height: 0;
+    }
+    .note-taker-tool .macos-textfield-container, #merchantList {
+        flex-grow: 1;
+        min-height: 0;
+    }
     #shipmentInput, #upsUspsOutputArea, #noteArea { height: 100%; }
     .parser-controls label.parser-control-row { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
     .controls-and-stats { margin-top: 16px; } 
     .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    #merchantCounterTarget { margin-top: 16px; display: flex; justify-content: flex-end; } 
+    #merchantCounterTarget { display: none; } 
     .counter-pill-container { display: flex; justify-content: flex-end; }
+    
+    .tool-card-title-bar #merchantCounterTarget { margin-top: 0; display: flex; }
 
     .settings-group { margin-bottom: 15px; }
     .settings-group label { display: block; margin-bottom: 5px; font-weight: 500;}
@@ -415,32 +447,40 @@
 
     <div id="mainWrapper" class="main-wrapper">
         <div class="left-column-wrapper">
-            <div class="tool-container parser-tool">
-                <h3 class="tool-card-title"><i class="fa-solid fa-filter" style="margin-right: 8px;"></i>Parser</h3>
-                <div class="macos-textfield-container" style="flex-grow:1; display:flex;">
-                    <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
+            <div id="parserTool" class="tool-container parser-tool">
+                 <div class="tool-card-title-bar">
+                    <h3 class="tool-card-title"><i class="fa-solid fa-filter"></i>Parser</h3>
+                    <button id="parserToggle" class="macos-icon-button" title="Toggle Parser View"><i class="fa-solid fa-eye-slash"></i></button>
                 </div>
-                <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
-                    <label id="groupOrdersControl" for="groupToggle" class="parser-control-row">
-                        <label class="macos-switch"><input type="checkbox" id="groupToggle"><span class="slider"></span></label>
-                        <span>Group Orders</span>
-                        <div class="macos-textfield-container fixed-width">
-                            <input type="number" id="parserGroupSize" class="macos-textfield" style="text-align:center;" min="1" value="2" disabled>
-                        </div>
-                    </label>
-                    <label for="upsUspsToggle" class="parser-control-row">
-                        <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
-                        <span>UPS/USPS</span>
-                    </label>
-                </div>
-                 <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
-                    <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
-                    <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
+                <div class="parser-content">
+                    <div class="macos-textfield-container">
+                        <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
+                    </div>
+                    <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
+                        <label id="groupOrdersControl" for="groupToggle" class="parser-control-row">
+                            <label class="macos-switch"><input type="checkbox" id="groupToggle"><span class="slider"></span></label>
+                            <span>Group Orders</span>
+                            <div class="macos-textfield-container fixed-width">
+                                <input type="number" id="parserGroupSize" class="macos-textfield" style="text-align:center;" min="1" value="2" disabled>
+                            </div>
+                        </label>
+                        <label for="upsUspsToggle" class="parser-control-row">
+                            <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
+                            <span>UPS/USPS</span>
+                        </label>
+                    </div>
+                     <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
+                        <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
+                        <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
+                    </div>
                 </div>
             </div>
 
             <div class="tool-container merchant-actions-tool">
-                <h3 class="tool-card-title"><i class="fa-solid fa-users" style="margin-right: 8px;"></i>Merchants</h3>
+                <div class="tool-card-title-bar">
+                    <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
+                    <div id="merchantCounterTarget"></div>
+                </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                     <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                     <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
@@ -455,14 +495,20 @@
                     </div>
                      <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
-                <div id="merchantCounterTarget"></div>
+                
                 <div id="merchantList"></div>
                 <div class="resize-handle"></div>
             </div>
         </div>
 
         <div class="tool-container note-taker-tool">
-            <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square" style="margin-right: 8px;"></i>Notes</h3>
+             <div class="tool-card-title-bar">
+                <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
+                <div class="toolbar-icon-group" style="border:none; padding: 0;">
+                     <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
+                     <button id="btnRedoNote" class="macos-icon-button" title="Redo"><i class="fa-solid fa-redo"></i></button>
+                </div>
+            </div>
             <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
                 <textarea id="noteArea" class="macos-textfield" placeholder="Notes area..."></textarea>
             </div>
@@ -611,6 +657,7 @@
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
     const historyKey = 'outboundToolHistory_v2';
     const settingsKey = 'outboundToolSettings_v2_telegram';
+    const parserStateKey = 'outboundToolParserState';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -637,6 +684,10 @@
     let tempUpsUspsData = {};
     let merchantsToDeleteAfterSend = [];
     let selectedMerchantDataForSplit = [];
+    let noteHistory = [];
+    let noteHistoryIndex = -1;
+    let isUndoRedoAction = false;
+    let noteChangeTimeout;
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -805,6 +856,7 @@
         noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + textToRestore;
         saveHistory(history);
         countTemplatesNoteTaker();
+        recordNoteChange();
         renderHistoryModal();
         showNotification("Merchant(s) restored successfully!", "success");
     }
@@ -889,9 +941,10 @@
         if (keysToRemove.size === 0) return;
         const noteArea = document.getElementById('noteArea');
         const allSections = noteArea.value.split(noteSeparatorRegex);
-        const remainingSections = allSections.filter(section => !keysToRemove.has(section.trim()));
+        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
         noteArea.value = remainingSections.join(noteSeparator);
         countTemplatesNoteTaker();
+        recordNoteChange();
         document.getElementById('confirmDeleteSentModal').style.display = 'none';
         showNotification("Sent merchants removed from the list.", "success");
         merchantsToDeleteAfterSend = [];
@@ -917,12 +970,10 @@
         if (counterPillEl.parentNode) counterPillEl.parentNode.removeChild(counterPillEl);
         if (appSettings.counterPosition === 'merchants') {
             merchantTarget.appendChild(counterPillEl);
-            merchantTarget.style.display = 'flex';
             notesTarget.style.display = 'none';
         } else {
             notesTarget.appendChild(counterPillEl);
             notesTarget.style.display = 'flex';
-            merchantTarget.style.display = 'none';
         }
     }
 
@@ -1122,6 +1173,7 @@
                 const currentNoteTrimmed = noteArea.value.trimEnd();
                 noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
                 countTemplatesNoteTaker();
+                recordNoteChange();
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
                 showNotification(processedMessage, "success");
@@ -1161,6 +1213,7 @@
             const currentNoteTrimmed = noteArea.value.trimEnd();
             noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
             countTemplatesNoteTaker();
+            recordNoteChange();
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
             upsUspsOutputArea.value = remainingOutputTNs.join('\n');
             processedTNs.forEach(coreTN => {
@@ -1189,12 +1242,11 @@
         const noteArea = document.getElementById('noteArea');
         
         const allSections = noteArea.value.split(noteSeparatorRegex);
-        const remainingSections = allSections.filter(section => {
-            return !keysToRemove.has(section);
-        });
+        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
         
         noteArea.value = remainingSections.join(noteSeparator);
         countTemplatesNoteTaker();
+        recordNoteChange();
         showNotification(`${deletedMerchants.length} merchant(s) deleted and backed up.`, "success");
     }
 
@@ -1238,6 +1290,7 @@
         
         noteArea.value = currentNotes.replace(originalSectionKey, newSectionText);
         countTemplatesNoteTaker();
+        recordNoteChange();
     }
 
     function countTemplatesNoteTaker() {
@@ -1265,7 +1318,7 @@
             } else if (sectionText.includes('Removal order ID:')) {
                 merchantName = `Data Entry ${merchantIndex}`;
             }
-            merchantsData[sectionTextOriginal] = { // Use the original, untrimmed text as the key
+            merchantsData[sectionTextOriginal] = {
                 displayName: merchantName,
                 isNameFromFirstLine: isNameFromFirstLine,
                 count: templateCount,
@@ -1276,7 +1329,7 @@
         Object.entries(merchantsData).forEach(([key, data]) => {
             const merchantDiv = document.createElement('div');
             merchantDiv.className = 'merchant-item';
-            merchantDiv.dataset.key = key; // The key is the full, untrimmed block
+            merchantDiv.dataset.key = key;
             merchantDiv.dataset.displayName = data.displayName;
             merchantDiv.dataset.count = data.count;
             const checkbox = document.createElement('input');
@@ -1538,6 +1591,7 @@
         ta.value = trimmed + (trimmed ? noteSeparator : '');
         ta.focus();
         countTemplatesNoteTaker();
+        recordNoteChange();
     }
 
     function addSpacing() {
@@ -1545,6 +1599,7 @@
         ta.value = ta.value.trimEnd() + '\n\n';
         ta.focus();
         saveNotesToLocalStorage();
+        recordNoteChange();
     }
 
     function confirmAndClearAllNotes() {
@@ -1553,10 +1608,9 @@
         const deletedMerchants = [];
         const sections = noteArea.value.split(noteSeparatorRegex);
         sections.forEach(sectionText => {
-            const trimmedSection = sectionText.trim();
-            if (trimmedSection) {
-                const count = countTemplatesInText(trimmedSection, amzlTemplate) + countTemplatesInText(trimmedSection, upsUspsTemplate);
-                const displayName = trimmedSection.split('\n')[0].trim();
+            if (sectionText.trim()) {
+                const count = countTemplatesInText(sectionText, amzlTemplate) + countTemplatesInText(sectionText, upsUspsTemplate);
+                const displayName = sectionText.split('\n')[0].trim();
                 deletedMerchants.push({ key: sectionText, displayName, count });
             }
         });
@@ -1565,6 +1619,7 @@
         }
         noteArea.value = '';
         countTemplatesNoteTaker();
+        recordNoteChange();
         document.getElementById('clearAllSuccessPopup').style.display = 'flex';
     }
 
@@ -1641,6 +1696,48 @@
                 document.addEventListener('mouseup', onMouseUp);
             });
         });
+    }
+
+    function updateNoteUndoRedoButtons() {
+        const undoBtn = document.getElementById('btnUndoNote');
+        const redoBtn = document.getElementById('btnRedoNote');
+        undoBtn.disabled = noteHistoryIndex <= 0;
+        redoBtn.disabled = noteHistoryIndex >= noteHistory.length - 1;
+    }
+
+    function recordNoteChange() {
+        if (isUndoRedoAction) {
+            isUndoRedoAction = false;
+            return;
+        }
+        const noteArea = document.getElementById('noteArea');
+        const currentValue = noteArea.value;
+        if (noteHistory[noteHistoryIndex] === currentValue) return;
+
+        noteHistory = noteHistory.slice(0, noteHistoryIndex + 1);
+        noteHistory.push(currentValue);
+        noteHistoryIndex = noteHistory.length - 1;
+        updateNoteUndoRedoButtons();
+    }
+
+    function handleNoteUndo() {
+        if (noteHistoryIndex > 0) {
+            isUndoRedoAction = true;
+            noteHistoryIndex--;
+            document.getElementById('noteArea').value = noteHistory[noteHistoryIndex];
+            countTemplatesNoteTaker();
+            updateNoteUndoRedoButtons();
+        }
+    }
+
+    function handleNoteRedo() {
+        if (noteHistoryIndex < noteHistory.length - 1) {
+            isUndoRedoAction = true;
+            noteHistoryIndex++;
+            document.getElementById('noteArea').value = noteHistory[noteHistoryIndex];
+            countTemplatesNoteTaker();
+            updateNoteUndoRedoButtons();
+        }
     }
 
     // --- Modal Control Functions ---
@@ -1724,9 +1821,19 @@
         if (noteArea) {
             const savedNotes = localStorage.getItem(localStorageKey);
             if (savedNotes) noteArea.value = savedNotes;
-            let countTimer;
-            noteArea.addEventListener('input', () => { clearTimeout(countTimer); countTimer = setTimeout(countTemplatesNoteTaker, 300); });
-            noteArea.addEventListener('paste', () => { setTimeout(countTemplatesNoteTaker, 50); });
+            
+            noteHistory = [noteArea.value];
+            noteHistoryIndex = 0;
+            updateNoteUndoRedoButtons();
+            
+            noteArea.addEventListener('input', () => {
+                clearTimeout(noteChangeTimeout);
+                noteChangeTimeout = setTimeout(() => {
+                    recordNoteChange();
+                    countTemplatesNoteTaker();
+                }, 500);
+            });
+            noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
             noteArea.addEventListener('scroll', saveNotesToLocalStorage);
         }
         const shipmentInput = document.getElementById('shipmentInput');
@@ -1745,7 +1852,21 @@
         restoreScrollPositions();
         countTemplatesNoteTaker();
         
-        // --- Event Listeners ---
+        const parserTool = document.getElementById('parserTool');
+        const parserToggleBtn = document.getElementById('parserToggle');
+        const savedParserState = localStorage.getItem(parserStateKey);
+        if (savedParserState === 'hidden') {
+            parserTool.classList.add('is-hidden');
+            parserToggleBtn.querySelector('i').className = 'fa-solid fa-eye';
+        }
+        parserToggleBtn.addEventListener('click', () => {
+            const isHidden = parserTool.classList.toggle('is-hidden');
+            parserToggleBtn.querySelector('i').className = `fa-solid fa-eye${isHidden ? '' : '-slash'}`;
+            localStorage.setItem(parserStateKey, isHidden ? 'hidden' : 'visible');
+        });
+
+        document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
+        document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
         document.getElementById('btnHistory')?.addEventListener('click', openHistoryModal);
         document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
         document.getElementById('themeToggle')?.addEventListener('click', () => {
@@ -1778,7 +1899,6 @@
         document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
         document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
 
-        // Modal Close Listeners
         document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
         document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
         document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
@@ -1786,7 +1906,6 @@
         document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
         document.getElementById('btnConfirmClearHistory')?.addEventListener('click', handleClearAllHistory);
         document.getElementById('confirmClearHistoryModal')?.addEventListener('click', e => { if (e.target.id === 'confirmClearHistoryModal') closeClearHistoryConfirmModal(); });
-
         document.getElementById('btnCancelTelegramSend')?.addEventListener('click', closeTelegramSendModal);
         document.getElementById('telegramSendModal')?.addEventListener('click', e => { if (e.target.id === 'telegramSendModal') closeTelegramSendModal(); });
         document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
