@@ -1206,7 +1206,7 @@
                     casesAdded = parsedDataBlocksForAmzl.length;
                 }
                 const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + finalOutputString;
+                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
                 countTemplatesNoteTaker();
                 recordNoteChange();
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
@@ -1246,7 +1246,7 @@
         });
         if (processedBlocks.length > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + processedBlocks.join('\n\n');
+            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
             countTemplatesNoteTaker();
             recordNoteChange();
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
