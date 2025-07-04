@@ -334,21 +334,15 @@
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
 
-    .resize-handle {
-        position: absolute; bottom: 0; left: 0; right: 0;
-        height: 25px; cursor: ns-resize; z-index: 10;
-        overflow: hidden;
-    }
-    .resize-handle::before {
-        content: ""; position: absolute;
-        width: 14px; height: 14px;
-        right: 4px; bottom: 4px;
-        border-right: 2px solid var(--text-placeholder);
-        border-bottom: 2px solid var(--text-placeholder);
-        border-bottom-right-radius: 4px;
-        transition: border-color 0.2s ease;
-    }
-     .resize-handle:hover::before { border-color: var(--text-primary); }
+.resize-handle {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 20px;
+    cursor: ns-resize; display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+}
+.resize-pill {
+    width: 40px; height: 5px; background-color: var(--border-color);
+    border-radius: 2.5px;
+}
 
     textarea::selection { background-color: var(--highlight-bg); color: var(--highlight-text); }
     .parser-tool .macos-textfield-container {
@@ -497,7 +491,7 @@
                 </div>
                 
                 <div id="merchantList"></div>
-                <div class="resize-handle"></div>
+                <div class="resize-handle"><div class="resize-pill"></div></div>
             </div>
         </div>
 
@@ -527,7 +521,7 @@
                     </div>
                 </div>
             </div>
-            <div class="resize-handle"></div>
+            <div class="resize-handle"><div class="resize-pill"></div></div>
         </div>
     </div>
     
