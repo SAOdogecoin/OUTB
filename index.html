@@ -1200,9 +1200,9 @@
                         groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
                         casesAdded++;
                     }
-                    finalOutputString = groupedOutputs.join(noteSeparator);
+                    finalOutputString = groupedOutputs.join('\n\n');
                 } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join(noteSeparator);
+                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join('\n\n');
                     casesAdded = parsedDataBlocksForAmzl.length;
                 }
                 const currentNoteTrimmed = noteArea.value.trimEnd();
@@ -1246,7 +1246,7 @@
         });
         if (processedBlocks.length > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + processedBlocks.join(noteSeparator);
+            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + processedBlocks.join('\n\n');
             countTemplatesNoteTaker();
             recordNoteChange();
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
