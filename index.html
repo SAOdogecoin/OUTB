@@ -282,6 +282,7 @@
         margin-bottom: auto;
     }
     #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content {max-width: 520px;}
+    #preSendConfirmModal .modal-content { max-width: 600px; }
     #historyModal .modal-content { max-width: 800px; }
     #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
     .modal-content h2 {
@@ -309,9 +310,9 @@
         display: block; opacity: 1; top: 30px; transform: translateX(-50%) scale(1);
     }
 
-    .left-column-wrapper, #merchantList, #noteArea, #historyList { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar { width: 9px; }
-    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    .left-column-wrapper, #merchantList, #noteArea, #historyList, #preSendFileList { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar, #preSendFileList::-webkit-scrollbar { width: 9px; }
+    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb, #preSendFileList::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
     
     #merchantList {
         min-height: 100px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; 
@@ -386,8 +387,6 @@
     .controls-and-stats { margin-top: 16px; } 
     .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     #merchantCounterTarget { display: none; } 
-    .counter-pill-container { display: flex; justify-content: flex-end; }
-    
     .tool-card-title-bar #merchantCounterTarget { margin-top: 0; display: flex; }
 
     .settings-group { margin-bottom: 15px; }
@@ -416,6 +415,14 @@
     .history-item-content p { margin: 4px 0; font-size: 0.95em; }
     .history-item-files { margin-top: 8px; font-size: 0.9em; color: var(--text-secondary); font-family: var(--mono-font); }
     
+    #preSendFileList {
+        max-height: 40vh;
+        overflow-y: auto;
+        padding: 5px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        background-color: var(--bg-primary);
+    }
 </style>
 </head>
 <body>
@@ -514,7 +521,7 @@
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                     <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                     <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
-                    <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i>Select All</button>
+                    <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
                     <button id="btnSplitSelected" class="macos primary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
@@ -568,7 +575,7 @@
             <div>
                 <label for="splitOrdersPerTemplate">Removal Orders per Template:</label>
                 <div class="macos-textfield-container" style="width: 80px; margin-top: 4px;">
-                    <input type="number" id="splitOrdersPerTemplate" class="macos-textfield" style="text-align:center;" min="1" value="2">
+                    <input type="number" id="splitOrdersPerTemplate" class="macos-textfield" style="text-align:center;" min="1" value="1">
                 </div>
             </div>
             <div style="font-size: 0.9em; color: var(--text-secondary);">
@@ -649,6 +656,20 @@
             <div class="modal-actions">
                 <button id="btnCancelTelegramSend" class="macos secondary">Cancel</button>
                 <button id="btnConfirmTelegramSend" class="macos primary">Send File</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="preSendConfirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-file-export" style="margin-right:8px;"></i>Confirm & Send Files</h2>
+            <p>Please review the files that will be sent to Telegram. You can edit the filenames below.</p>
+            <div id="preSendFileList">
+                <!-- File items will be injected here by JS -->
+            </div>
+            <div class="modal-actions">
+                <button id="btnCancelPreSend" class="macos secondary">Cancel</button>
+                <button id="btnConfirmAndSend" class="macos primary"><i class="fa-solid fa-paper-plane"></i>Send Files</button>
             </div>
         </div>
     </div>
@@ -932,7 +953,7 @@
     async function handleConfirmTelegramSend() {
         const modal = document.getElementById('telegramSendModal');
         const sendButton = document.getElementById('btnConfirmTelegramSend');
-        const userNumberInput = document.getElementById('telegram-file-number-single');
+        const filenameInput = document.getElementById('telegram-filename-edit');
 
         sendButton.disabled = true;
         sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
@@ -944,17 +965,14 @@
              return;
         }
         
-        const userNumber = userNumberInput.value;
-        if (!userNumber || isNaN(parseInt(userNumber))) {
-            showNotification("Please enter a valid file number.", "error");
+        const filename = filenameInput.value.trim();
+        if (!filename) {
+            showNotification("Filename cannot be empty.", "error");
             sendButton.disabled = false; sendButton.innerHTML = 'Send File';
             return;
         }
         
         const fileContent = merchantsData.map(m => m.key).join(noteSeparator);
-        const totalCount = merchantsData.reduce((sum, m) => sum + m.count, 0);
-        
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCount})_${userNumber}.txt`;
         
         const result = await sendFileToTelegram(fileContent, filename, ''); 
         
@@ -1050,6 +1068,7 @@
             const displayName = item.dataset.displayName?.toLowerCase() || "";
             item.style.display = displayName.includes(searchTerm) ? 'flex' : 'none';
         });
+        updateSelectedCountNoteTaker();
     }
 
     function parseShipmentData() {
@@ -1443,6 +1462,26 @@
             totalTemplatesSpan.textContent = totalCaseCountOverall;
             merchantCountSpan.textContent = allItems.length;
         }
+
+        const btnSelectAll = document.getElementById('btnSelectAll');
+        const selectAllText = document.getElementById('selectAllText');
+        const selectAllIcon = btnSelectAll?.querySelector('i');
+
+        if (btnSelectAll && selectAllText && selectAllIcon) {
+            const allVisibleCheckboxes = Array.from(document.querySelectorAll('#merchantList .merchant-item'))
+                .filter(item => item.style.display !== 'none')
+                .map(item => item.querySelector('.macos-checkbox'));
+
+            const areAllSelected = allVisibleCheckboxes.length > 0 && allVisibleCheckboxes.every(cb => cb.checked);
+
+            if (areAllSelected) {
+                selectAllText.textContent = 'Deselect All';
+                selectAllIcon.className = 'fa-solid fa-square-xmark';
+            } else {
+                selectAllText.textContent = 'Select All';
+                selectAllIcon.className = 'fa-regular fa-square-check';
+            }
+        }
     }
     
     function downloadSelectedMerchants() {
@@ -1556,11 +1595,10 @@
     }
     
     async function generateAndSendSplitsToTelegram() {
-        const modal = document.getElementById('splitModal');
-        if (!modal) return;
+        const splitModal = document.getElementById('splitModal');
+        if (!splitModal) return;
 
-        const sendButton = document.getElementById('btnSendSplitsToTelegram');
-        const combinedText = modal.dataset.combinedText || '';
+        const combinedText = splitModal.dataset.combinedText || '';
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
 
@@ -1569,14 +1607,10 @@
             return;
         }
 
-        sendButton.disabled = true;
-        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
-
-        let templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
-            sendButton.disabled = false; sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
             return;
         }
         const templateGroups = createTemplates(ros, ordersPer);
@@ -1587,36 +1621,78 @@
         }
         if (splitOutputs.length === 0) {
             showNotification("No split files to send.", "info");
-            sendButton.disabled = false; sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
             return;
         }
 
+        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
+        const preSendModal = document.getElementById('preSendConfirmModal');
+        const fileListEl = document.getElementById('preSendFileList');
+        fileListEl.innerHTML = '';
+        
+        preSendModal.dataset.filesToSend = JSON.stringify(splitOutputs);
+        preSendModal.dataset.merchantDisplay = merchantDisplay;
+
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
         const dateStr = getFormattedDate();
-        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
         
-        const sendPromises = splitOutputs.map((output, index) => {
+        splitOutputs.forEach((output, index) => {
             const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
-            const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
+            const fileItem = document.createElement('div');
+            fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 8px;';
+            fileItem.innerHTML = `
+                <i class="fa-solid fa-file-lines" style="color: var(--text-secondary);"></i>
+                <div class="macos-textfield-container" style="flex-grow:1;">
+                    <input type="text" class="macos-textfield pre-send-filename-input" value="${filename}">
+                </div>
+            `;
+            fileListEl.appendChild(fileItem);
+        });
+        
+        preSendModal.style.display = 'flex';
+    }
+
+    async function executeTelegramsendsFromModal() {
+        const modal = document.getElementById('preSendConfirmModal');
+        const sendButton = document.getElementById('btnConfirmAndSend');
+        
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+        const filesToSend = JSON.parse(modal.dataset.filesToSend || '[]');
+        const merchantDisplay = modal.dataset.merchantDisplay || '';
+        const filenameInputs = document.querySelectorAll('#preSendFileList .pre-send-filename-input');
+
+        if (filesToSend.length !== filenameInputs.length) {
+            showNotification('File data mismatch. Please try again.', 'error');
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Files';
+            return;
+        }
+
+        const sendPromises = filesToSend.map((fileData, index) => {
+            const filename = filenameInputs[index].value.trim();
+            if (!filename) return Promise.resolve({ success: false, filename: '(empty)' }); // Skip empty filenames
+            const fileContent = merchantDisplay + '\n\n' + fileData.text + '\n';
             return sendFileToTelegram(fileContent, filename, '');
         });
 
         const results = await Promise.all(sendPromises);
         const successfulSends = results.filter(r => r && r.success);
-        
+            
         sendButton.disabled = false;
-        sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Splits';
+        sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Files';
+        modal.style.display = 'none';
         closeSplitModal();
 
         if (successfulSends.length > 0) {
-             merchantsToDeleteAfterSend = selectedMerchantDataForSplit.map(m => ({
-                 key: m.key,
-                 displayName: m.name,
-                 count: parseInt(m.count)
-             }));
-             const fileInfo = successfulSends.map(r => ({ filename: r.filename }));
-             addToHistory(merchantsToDeleteAfterSend, fileInfo);
-             document.getElementById('confirmDeleteSentModal').style.display = 'flex';
+            merchantsToDeleteAfterSend = selectedMerchantDataForSplit.map(m => ({
+                key: m.key,
+                displayName: m.name,
+                count: parseInt(m.count)
+            }));
+            const fileInfo = successfulSends.map(r => ({ filename: r.filename }));
+            addToHistory(merchantsToDeleteAfterSend, fileInfo);
+            document.getElementById('confirmDeleteSentModal').style.display = 'flex';
         }
     }
 
@@ -1824,7 +1900,7 @@
         if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
         else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
         else merchantInfoDiv.textContent = 'No valid merchants.';
-        document.getElementById('splitOrdersPerTemplate').value = '2'; document.getElementById('splitNumberInput').value = '';
+        document.getElementById('splitOrdersPerTemplate').value = '1'; document.getElementById('splitNumberInput').value = '';
         updateCalculatedTemplates(); modal.style.display = 'flex';
     }
     function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
@@ -1842,12 +1918,14 @@
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) { showNotification("No merchants selected.", "info"); return; }
         if (!appSettings.telegramBotToken || !appSettings.telegramChatId) { showNotification("Please configure Telegram settings first.", "error"); openSettingsModal(); return; }
+        
         const modal = document.getElementById('telegramSendModal');
         const listEl = document.getElementById('telegram-merchant-list');
         listEl.innerHTML = '';
         let totalCases = 0;
         let merchantInfoHtml = '<h4>Selected Merchants:</h4>';
         const merchantsToSend = [];
+
         selectedDivs.forEach((div) => {
             const displayName = div.dataset.displayName;
             const count = parseInt(div.dataset.count);
@@ -1856,17 +1934,38 @@
             merchantInfoHtml += `<p>${displayName} (${count} cases)</p>`;
             merchantsToSend.push({ key, displayName, count });
         });
+
         modal.dataset.merchantsToSend = JSON.stringify(merchantsToSend);
         listEl.innerHTML = merchantInfoHtml;
-        const inputContainer = document.createElement('div');
-        inputContainer.style.marginTop = '15px';
-        inputContainer.innerHTML = `
+
+        const fileInfoContainer = document.createElement('div');
+        fileInfoContainer.style.marginTop = '15px';
+        fileInfoContainer.innerHTML = `
             <label for="telegram-file-number-single">File Number:</label>
-            <div class="macos-textfield-container" style="width: 80px; margin-top: 4px;">
+            <div class="macos-textfield-container" style="width: 80px; margin-top: 4px; margin-bottom: 15px;">
                 <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" placeholder="#">
             </div>
+            <label for="telegram-filename-edit">Filename:</label>
+            <div class="macos-textfield-container" style="margin-top: 4px;">
+                <input type="text" id="telegram-filename-edit" class="macos-textfield">
+            </div>
         `;
-        listEl.appendChild(inputContainer);
+        listEl.appendChild(fileInfoContainer);
+
+        const numberInput = fileInfoContainer.querySelector('#telegram-file-number-single');
+        const filenameInput = fileInfoContainer.querySelector('#telegram-filename-edit');
+
+        function updateFilename() {
+            const userNumber = numberInput.value;
+            const filename = userNumber 
+                ? `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCases})_${userNumber}.txt`
+                : `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCases}).txt`;
+            filenameInput.value = filename;
+        }
+
+        numberInput.addEventListener('input', updateFilename);
+        updateFilename(); // initial call
+        
         modal.style.display = 'flex';
     }
     function closeTelegramSendModal() { document.getElementById('telegramSendModal').style.display = 'none'; }
@@ -1936,10 +2035,24 @@
         document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
         document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
         document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
-        document.getElementById('btnSelectAll')?.addEventListener('click', () => {
-            document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => { cb.checked = true; });
-            updateSelectedCountNoteTaker();
-        });
+
+        const btnSelectAll = document.getElementById('btnSelectAll');
+        if (btnSelectAll) {
+            btnSelectAll.addEventListener('click', () => {
+                const allVisibleCheckboxes = Array.from(document.querySelectorAll('#merchantList .merchant-item'))
+                    .filter(item => item.style.display !== 'none')
+                    .map(item => item.querySelector('.macos-checkbox'));
+                
+                const areAllSelected = allVisibleCheckboxes.length > 0 && allVisibleCheckboxes.every(cb => cb.checked);
+                const newCheckedState = !areAllSelected;
+
+                allVisibleCheckboxes.forEach(cb => {
+                    cb.checked = newCheckedState;
+                });
+                updateSelectedCountNoteTaker();
+            });
+        }
+
         document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
             const text = document.getElementById('noteArea').value.trim();
             if (!text) return;
@@ -1992,6 +2105,9 @@
         document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
         document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
         document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
+
+        document.getElementById('btnCancelPreSend')?.addEventListener('click', () => { document.getElementById('preSendConfirmModal').style.display = 'none'; });
+        document.getElementById('btnConfirmAndSend')?.addEventListener('click', executeTelegramsendsFromModal);
 
         document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
 
