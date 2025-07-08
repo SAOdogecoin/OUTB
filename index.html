@@ -709,6 +709,7 @@
     const historyKey = 'outboundToolHistory_v2';
     const settingsKey = 'outboundToolSettings_v2_telegram';
     const parserStateKey = 'outboundToolParserState';
+    const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -954,6 +955,7 @@
         const modal = document.getElementById('telegramSendModal');
         const sendButton = document.getElementById('btnConfirmTelegramSend');
         const filenameInput = document.getElementById('telegram-filename-edit');
+        const numberInput = document.getElementById('telegram-file-number-single');
 
         sendButton.disabled = true;
         sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
@@ -972,6 +974,11 @@
             return;
         }
         
+        const numberToSave = parseInt(numberInput.value, 10);
+        if (!isNaN(numberToSave) && numberToSave > 0) {
+            localStorage.setItem(telegramNumberKey, numberToSave);
+        }
+
         const fileContent = merchantsData.map(m => m.key).join(noteSeparator);
         
         const result = await sendFileToTelegram(fileContent, filename, ''); 
@@ -1941,8 +1948,8 @@
         const fileInfoContainer = document.createElement('div');
         fileInfoContainer.style.marginTop = '15px';
         fileInfoContainer.innerHTML = `
-            <label for="telegram-file-number-single">File Number:</label>
-            <div class="macos-textfield-container" style="width: 80px; margin-top: 4px; margin-bottom: 15px;">
+            <label for="telegram-file-number-single">File Number (Last: <span id="lastTelegramNumber" style="font-weight:bold;">N/A</span>):</label>
+            <div class="macos-textfield-container" style="width: 100px; margin-top: 4px; margin-bottom: 15px;">
                 <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" placeholder="#">
             </div>
             <label for="telegram-filename-edit">Filename:</label>
@@ -1954,6 +1961,16 @@
 
         const numberInput = fileInfoContainer.querySelector('#telegram-file-number-single');
         const filenameInput = fileInfoContainer.querySelector('#telegram-filename-edit');
+        const lastNumberSpan = fileInfoContainer.querySelector('#lastTelegramNumber');
+
+        const lastNumber = parseInt(localStorage.getItem(telegramNumberKey), 10);
+        if (!isNaN(lastNumber) && lastNumber > 0) {
+            lastNumberSpan.textContent = lastNumber;
+            numberInput.value = lastNumber + 1;
+        } else {
+            lastNumberSpan.textContent = "N/A";
+            numberInput.value = 1;
+        }
 
         function updateFilename() {
             const userNumber = numberInput.value;
