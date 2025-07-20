@@ -552,10 +552,9 @@
             <div class="controls-and-stats">
                 <div>
                     <div style="display: flex; gap: 8px; flex-wrap:wrap">
-                        <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-minus"></i>Separator</button>
-                        <button id="btnAddSpacing" class="macos secondary"><i class="fa-solid fa-grip-lines"></i>Spacing</button>
-                        <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
-                    </div>
+    <button id="btnAddMerchantSeparator" class="macos secondary"><i class="fa-solid fa-equals"></i>Merchant Separator</button>
+    <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
+</div>
                      <div id="notesCounterTarget" class="counter-pill-container">
                         <div id="theCounterPill" class="counter-pill">
                             <p><i class="fa-solid fa-users"></i>Merchants: <span id="merchantCount">0</span></p>
@@ -701,8 +700,11 @@
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
-    const noteSeparatorRegex = /\n\n-{41}\n\n/g;
+const MERCHANT_SEPARATOR_TEXT = '='.repeat(41);
+const TEMPLATE_SEPARATOR_TEXT = '-'.repeat(41);
+const MERCHANT_SEPARATOR_FULL = `\n\n${MERCHANT_SEPARATOR_TEXT}\n\n`;
+const TEMPLATE_SEPARATOR_FULL = `\n\n${TEMPLATE_SEPARATOR_TEXT}\n\n`;
+const MERCHANT_SEPARATOR_REGEX = new RegExp(`\\n\\n${MERCHANT_SEPARATOR_TEXT}\\n\\n`, 'g');
     const localStorageKey = 'savedNotesContent_amzlTool';
     
     // START: ADDED CODE
@@ -1102,7 +1104,7 @@
         updateSelectedCountNoteTaker();
     }
 
-    function parseShipmentData() {
+      function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
         const groupToggle = document.getElementById('groupToggle');
@@ -1116,10 +1118,7 @@
             return;
         }
 
-        // START: MODIFICATION 1 - Load the shipment ID database
         const processedShipmentIds = getShipmentIdDb();
-        // END: MODIFICATION 1
-
         const currentNoteValue = noteArea.value;
         const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
@@ -1149,10 +1148,7 @@
         const extractedUpsUspsNumbers = [];
         let validShipmentsFound = 0;
         let skippedDuplicateCount = 0;
-        
-        // START: MODIFICATION 2 - Add a counter for skipped shipments
         let skippedDuplicateShipmentIdCount = 0;
-        // END: MODIFICATION 2
 
         let currentBlockRemovalOrderId = '';
         overallBlocks.forEach(block => {
@@ -1164,17 +1160,13 @@
             const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
             shipmentSections.forEach(section => {
                 if (section.trim().startsWith("Removal order ID:")) return;
-
-                // START: MODIFICATION 3 - The main logic to check for duplicates
                 const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
                 const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : null;
 
                 if (shipmentId && processedShipmentIds.has(shipmentId)) {
                     skippedDuplicateShipmentIdCount++;
-                    return; // This is a duplicate, skip this entire shipment section
+                    return;
                 }
-                // END: MODIFICATION 3
-
                 const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
                 if (!trackingMatches || trackingMatches.length === 0) return;
                 const sectionCoreTNs = new Set();
@@ -1202,8 +1194,6 @@
                     return;
                 }
                 coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
-                
-                // We've already matched shipmentId above, so we can reuse it
                 const productLines = section.split('\n').map(line => line.trim());
                 const parsedProducts = [];
                 let currentProduct = null;
@@ -1245,66 +1235,72 @@
                 }
                 validShipmentsFound++;
 
-                // START: MODIFICATION 4 - Add the new shipmentId to our in-memory set
                 if (shipmentId) {
                     processedShipmentIds.add(shipmentId);
                 }
-                // END: MODIFICATION 4
             });
         });
         
-        // START: MODIFICATION 5 - Save the updated database and enhance notifications
-        saveShipmentIdDb(processedShipmentIds); // Save once at the end for efficiency
+        saveShipmentIdDb(processedShipmentIds);
         
         let casesAdded = 0;
         if (isUpsUspsMode) {
+            // Logic for UPS/USPS mode remains the same, as it doesn't use the grouping/separator logic.
+            // We just add its templates separated by the main merchant separator.
             if (extractedUpsUspsNumbers.length > 0) {
-                const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
-                upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
-                saveUpsUspsOutputToLocalStorage();
-                saveUpsUspsContextToLocalStorage();
-                let processedMessage = `Extracted ${uniqueNumbersToAdd.length} Other Carrier number(s). `;
-                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
-                if (skippedDuplicateShipmentIdCount > 0) processedMessage += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
-                showNotification(processedMessage, "info");
-            } else {
-                let message = "No new Other Carrier shipments found. ";
-                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
-                if (skippedDuplicateShipmentIdCount > 0) message += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
-                showNotification(message, "info");
+                 const uniqueBlocks = [...new Set(extractedUpsUspsNumbers.map(tn => tempUpsUspsData[tn]))];
+                 const outputString = uniqueBlocks.map(block => upsUspsTemplate + "\n\n" + block).join(MERCHANT_SEPARATOR_FULL);
+                 const currentNoteTrimmed = noteArea.value.trimEnd();
+                 noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? MERCHANT_SEPARATOR_FULL : '') + outputString;
+                 countTemplatesNoteTaker();
+                 recordNoteChange();
+                 casesAdded = uniqueBlocks.length;
             }
+             // Notification logic...
+             let processedMessage = `Extracted ${casesAdded} Other Carrier number(s). `;
+             if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
+             if (skippedDuplicateShipmentIdCount > 0) processedMessage += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
+             showNotification(processedMessage, "info");
+
         } else {
+            // START: MODIFIED LOGIC
             let finalOutputString = '';
             if (parsedDataBlocksForAmzl.length > 0) {
                 if (groupSize > 1) {
                     const groupedOutputs = [];
                     for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
                         const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
-                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
+                        // Join raw data with TEMPLATE separator, then prepend the main case template
+                        const fullTemplate = amzlTemplate + "\n\n" + dataChunk.join(TEMPLATE_SEPARATOR_FULL);
+                        groupedOutputs.push(fullTemplate);
                         casesAdded++;
                     }
-                    finalOutputString = groupedOutputs.join('\n\n');
+                    // Join final grouped templates with MERCHANT separator
+                    finalOutputString = groupedOutputs.join(MERCHANT_SEPARATOR_FULL);
                 } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join('\n\n');
+                    // If not grouping, each is a separate merchant entry
+                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join(MERCHANT_SEPARATOR_FULL);
                     casesAdded = parsedDataBlocksForAmzl.length;
                 }
                 const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
+                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? MERCHANT_SEPARATOR_FULL : '') + finalOutputString;
                 countTemplatesNoteTaker();
                 recordNoteChange();
+                
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
                 if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
                 if (skippedDuplicateShipmentIdCount > 0) processedMessage += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(processedMessage, "success");
                 if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
+
             } else {
-                let message = "No new AMZL-type shipments found. ";
+                 let message = "No new AMZL-type shipments found. ";
                 if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
                 if (skippedDuplicateShipmentIdCount > 0) message += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(message, "info");
             }
+             // END: MODIFIED LOGIC
         }
-        // END: MODIFICATION 5
         saveShipmentInputScroll();
     }
 
@@ -1348,7 +1344,7 @@
         if (notFoundCount > 0) showNotification(`Warning: Could not find data for ${notFoundCount} tracking number(s).`, "error");
     }
 
-    function clearSelectedMerchants() {
+       function clearSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) return;
 
@@ -1362,10 +1358,11 @@
         const keysToRemove = new Set(deletedMerchants.map(m => m.key));
         const noteArea = document.getElementById('noteArea');
         
-        const allSections = noteArea.value.split(noteSeparatorRegex);
+        // *** CHANGE THESE TWO LINES ***
+        const allSections = noteArea.value.split(MERCHANT_SEPARATOR_REGEX);
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
         
-        noteArea.value = remainingSections.join(noteSeparator);
+        noteArea.value = remainingSections.join(MERCHANT_SEPARATOR_FULL);
         countTemplatesNoteTaker();
         recordNoteChange();
         showNotification(`${deletedMerchants.length} merchant(s) deleted and backed up.`, "success");
@@ -1414,7 +1411,7 @@
         recordNoteChange();
     }
 
-    function countTemplatesNoteTaker() {
+       function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
         const fullText = noteArea.value;
         const merchantListDiv = document.getElementById('merchantList');
@@ -1422,8 +1419,12 @@
         const merchantsData = {};
         let totalTemplatesOverall = 0;
         let merchantIndex = 0;
-        const sections = fullText.split(noteSeparatorRegex);
+
+        // *** CHANGE THIS LINE ***
+        const sections = fullText.split(MERCHANT_SEPARATOR_REGEX);
+
         sections.forEach((sectionTextOriginal) => {
+            // ... the rest of the function is unchanged
             const sectionText = sectionTextOriginal.trim();
             if (!sectionText) return;
             const amzlTemplateCount = countTemplatesInText(sectionText, amzlTemplate);
@@ -1551,13 +1552,16 @@
         }
     }
     
-    function downloadSelectedMerchants() {
+       function downloadSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) { return; }
         const textsToDownload = []; let totalSelectedCases = 0;
         selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
         if (textsToDownload.length === 0) { return; }
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
+        
+        // *** CHANGE THIS LINE ***
+        const combinedText = textsToDownload.join(MERCHANT_SEPARATOR_FULL); 
+
         const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
         downloadText(combinedText + '\n', filename); 
     }
@@ -2139,8 +2143,15 @@
         document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
         document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
         document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
-        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
-        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
+     document.getElementById('btnAddMerchantSeparator')?.addEventListener('click', () => {
+    const ta = document.getElementById('noteArea');
+    const trimmed = ta.value.trimEnd();
+    // Use the new MERCHANT separator
+    ta.value = trimmed + (trimmed ? MERCHANT_SEPARATOR_FULL : '');
+    ta.focus();
+    countTemplatesNoteTaker();
+    recordNoteChange();
+});
         document.getElementById('btnClearAllNotes')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'flex');
         document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
         document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
