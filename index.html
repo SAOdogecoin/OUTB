@@ -704,6 +704,12 @@
     const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
     const noteSeparatorRegex = /\n\n-{41}\n\n/g;
     const localStorageKey = 'savedNotesContent_amzlTool';
+    
+    // START: ADDED CODE
+    const shipmentIdDatabaseKey = 'shipmentIdDatabase_amzlTool';
+    // END: ADDED CODE
+
+    const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
     const historyKey = 'outboundToolHistory_v2';
@@ -711,6 +717,7 @@
     const parserStateKey = 'outboundToolParserState';
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const scrollPosKeys = {
+        
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
         noteArea: 'scrollPos_noteArea_amzlTool'
@@ -773,6 +780,24 @@
             popup.classList.remove('show');
         }, duration);
     }
+
+    // START: ADDED CODE
+    function getShipmentIdDb() {
+        try {
+            const db = localStorage.getItem(shipmentIdDatabaseKey);
+            // Use a Set for efficient O(1) lookups
+            return db ? new Set(JSON.parse(db)) : new Set();
+        } catch (e) {
+            console.error("Failed to load shipment ID database:", e);
+            return new Set();
+        }
+    }
+
+    function saveShipmentIdDb(dbSet) {
+        // Convert Set to Array for JSON serialization
+        localStorage.setItem(shipmentIdDatabaseKey, JSON.stringify(Array.from(dbSet)));
+    }
+    // END: ADDED CODE
 
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
@@ -1091,6 +1116,11 @@
         } else {
             return;
         }
+
+        // START: MODIFICATION 1 - Load the shipment ID database
+        const processedShipmentIds = getShipmentIdDb();
+        // END: MODIFICATION 1
+
         const currentNoteValue = noteArea.value;
         const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
@@ -1120,6 +1150,11 @@
         const extractedUpsUspsNumbers = [];
         let validShipmentsFound = 0;
         let skippedDuplicateCount = 0;
+        
+        // START: MODIFICATION 2 - Add a counter for skipped shipments
+        let skippedDuplicateShipmentIdCount = 0;
+        // END: MODIFICATION 2
+
         let currentBlockRemovalOrderId = '';
         overallBlocks.forEach(block => {
             if (!block.trim()) return;
@@ -1130,6 +1165,17 @@
             const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
             shipmentSections.forEach(section => {
                 if (section.trim().startsWith("Removal order ID:")) return;
+
+                // START: MODIFICATION 3 - The main logic to check for duplicates
+                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
+                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : null;
+
+                if (shipmentId && processedShipmentIds.has(shipmentId)) {
+                    skippedDuplicateShipmentIdCount++;
+                    return; // This is a duplicate, skip this entire shipment section
+                }
+                // END: MODIFICATION 3
+
                 const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
                 if (!trackingMatches || trackingMatches.length === 0) return;
                 const sectionCoreTNs = new Set();
@@ -1157,8 +1203,8 @@
                     return;
                 }
                 coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
-                const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
-                const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
+                
+                // We've already matched shipmentId above, so we can reuse it
                 const productLines = section.split('\n').map(line => line.trim());
                 const parsedProducts = [];
                 let currentProduct = null;
@@ -1187,7 +1233,7 @@
                 }
                 if (parsedProducts.length === 0) return;
                 const roIdToUse = currentBlockRemovalOrderId || "N/A";
-                const outputParts = [`Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`];
+                const outputParts = [`Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId || 'N/A'}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`];
                 const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n'));
                 const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
                 if (isUpsUspsMode) {
@@ -1199,8 +1245,18 @@
                     parsedDataBlocksForAmzl.push(completeDataBlock);
                 }
                 validShipmentsFound++;
+
+                // START: MODIFICATION 4 - Add the new shipmentId to our in-memory set
+                if (shipmentId) {
+                    processedShipmentIds.add(shipmentId);
+                }
+                // END: MODIFICATION 4
             });
         });
+        
+        // START: MODIFICATION 5 - Save the updated database and enhance notifications
+        saveShipmentIdDb(processedShipmentIds); // Save once at the end for efficiency
+        
         let casesAdded = 0;
         if (isUpsUspsMode) {
             if (extractedUpsUspsNumbers.length > 0) {
@@ -1209,11 +1265,13 @@
                 saveUpsUspsOutputToLocalStorage();
                 saveUpsUspsContextToLocalStorage();
                 let processedMessage = `Extracted ${uniqueNumbersToAdd.length} Other Carrier number(s). `;
-                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
+                if (skippedDuplicateShipmentIdCount > 0) processedMessage += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(processedMessage, "info");
             } else {
                 let message = "No new Other Carrier shipments found. ";
-                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
+                if (skippedDuplicateShipmentIdCount > 0) message += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(message, "info");
             }
         } else {
@@ -1236,15 +1294,18 @@
                 countTemplatesNoteTaker();
                 recordNoteChange();
                 let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
-                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
+                if (skippedDuplicateShipmentIdCount > 0) processedMessage += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(processedMessage, "success");
                 if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
             } else {
                 let message = "No new AMZL-type shipments found. ";
-                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate TN(s). `;
+                if (skippedDuplicateShipmentIdCount > 0) message += `Skipped ${skippedDuplicateShipmentIdCount} duplicate shipment(s). `;
                 showNotification(message, "info");
             }
         }
+        // END: MODIFICATION 5
         saveShipmentInputScroll();
     }
 
