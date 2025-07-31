@@ -86,7 +86,7 @@
         margin-right: auto;
         white-space: nowrap;
     }
-    .toolbar-right { display: flex; align-items: center; gap: 16px; }
+    .toolbar-right { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap; }
     .toolbar-icon-group, .url-generator-group {
         display: flex;
         align-items: center;
@@ -120,6 +120,12 @@
 
     #marketplaceSelectUrlGen:hover {
         background-color: var(--bg-hover);
+    }
+    
+    #prefixToggleGroup .macos-icon-button {
+        font-weight: 600;
+        font-size: 12px;
+        padding: 0 10px;
     }
 
     .main-wrapper {
@@ -466,6 +472,10 @@
                     <option value="ca">CA</option>
                 </select>
             </div>
+            <div id="prefixToggleGroup" class="toolbar-icon-group">
+                <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
+                <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
+            </div>
             <div class="toolbar-icon-group">
                 <button id="btnHistory" class="macos-icon-button" title="History"><i class="fa-solid fa-history"></i></button>
             </div>
@@ -494,13 +504,6 @@
                         <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
                     </div>
                     <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
-                        <label id="groupOrdersControl" for="groupToggle" class="parser-control-row">
-                            <label class="macos-switch"><input type="checkbox" id="groupToggle"><span class="slider"></span></label>
-                            <span>Group Orders</span>
-                            <div class="macos-textfield-container fixed-width">
-                                <input type="number" id="parserGroupSize" class="macos-textfield" style="text-align:center;" min="1" value="2" disabled>
-                            </div>
-                        </label>
                         <label for="upsUspsToggle" class="parser-control-row">
                             <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
                             <span>UPS/USPS</span>
@@ -552,8 +555,7 @@
             <div class="controls-and-stats">
                 <div>
                     <div style="display: flex; gap: 8px; flex-wrap:wrap">
-                        <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-minus"></i>Separator</button>
-                        <button id="btnAddSpacing" class="macos secondary"><i class="fa-solid fa-grip-lines"></i>Spacing</button>
+                        <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-equals"></i>Separator</button>
                         <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
                     </div>
                      <div id="notesCounterTarget" class="counter-pill-container">
@@ -600,10 +602,6 @@
         <div class="modal-content">
              <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
             <div style="display:flex; flex-direction:column; gap: 15px;">
-                <div class="settings-group">
-                    <label for="settingsFilenamePrefix">Filename Prefix:</label>
-                    <div class="macos-textfield-container"><input type="text" id="settingsFilenamePrefix" class="macos-textfield" placeholder="e.g., 3COUTB"></div>
-                </div>
                  <div class="settings-group">
                      <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
                      <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
@@ -701,8 +699,9 @@
 <script>
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
-    const noteSeparator = '\n\n' + '-'.repeat(41) + '\n\n';
-    const noteSeparatorRegex = /\n\n-{41}\n\n/g;
+    const merchantSeparator = '\n\n' + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' + '\n\n';
+    const merchantSeparatorRegex = /\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n/g;
+    const caseSeparator = '\n\n' + '────────────────────────────────' + '\n\n';
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
@@ -716,7 +715,7 @@
         noteArea: 'scrollPos_noteArea_amzlTool'
     };
     let appSettings = {
-        filenamePrefix: '3COUTB',
+        prefixOption: '3C',
         amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM', 'AMZL_CA_PREMIUM', 'AMZN_UK_PRIME', 'AMZN_UK_STD'],
         otherCarriers: ['UPS', 'USPS'],
         showMerchantSearch: false,
@@ -756,6 +755,10 @@
         const day = date.getDate().toString().padStart(2, '0');
         return `${month}-${day}`;
     }
+    
+    function getFilenamePrefix() {
+        return appSettings.prefixOption === 'LS' ? 'LS-OUTB' : '3C-OUTB';
+    }
 
     function buildCarrierRegexPart(carrierArray) {
         if (!carrierArray || carrierArray.length === 0) return '(?:UNKNOWN_CARRIER_TYPE)';
@@ -781,6 +784,13 @@
             themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
         }
     }
+    
+    function setPrefix(prefix) {
+        appSettings.prefixOption = prefix;
+        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        document.getElementById('btnPrefix3C').classList.toggle('active', prefix === '3C');
+        document.getElementById('btnPrefixLS').classList.toggle('active', prefix === 'LS');
+    }
 
     function loadSettings() {
         const savedSettings = localStorage.getItem(settingsKey);
@@ -792,7 +802,7 @@
                 console.error("Error parsing settings:", e);
             }
         }
-        document.getElementById('settingsFilenamePrefix').value = appSettings.filenamePrefix;
+        setPrefix(appSettings.prefixOption);
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
         document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
@@ -809,7 +819,7 @@
     }
 
     function saveSettings() {
-        appSettings.filenamePrefix = document.getElementById('settingsFilenamePrefix').value.trim() || '3COUTB';
+        // Prefix is saved by its own toggle handler
         const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
         appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
         const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
@@ -906,9 +916,9 @@
         if (itemIndex === -1) return;
         const [itemToRestore] = history.splice(itemIndex, 1);
         const noteArea = document.getElementById('noteArea');
-        const textToRestore = itemToRestore.merchants.map(m => m.key).join(noteSeparator);
+        const textToRestore = itemToRestore.merchants.map(m => m.key).join(merchantSeparator);
         const currentNoteTrimmed = noteArea.value.trimEnd();
-        noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? noteSeparator : '') + textToRestore;
+        noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? merchantSeparator : '') + textToRestore;
         saveHistory(history);
         countTemplatesNoteTaker();
         recordNoteChange();
@@ -951,6 +961,30 @@
         }
     }
     
+    function formatMerchantBlockForOutput(blockText) {
+        let namePart = '';
+        let casesPart = blockText;
+        const lines = blockText.split('\n');
+        const firstLine = lines[0]?.trim();
+        
+        const isNameFromFirstLine = firstLine && 
+                                  !firstLine.startsWith(amzlTemplate.substring(0, 10)) && 
+                                  !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && 
+                                  !firstLine.includes(caseSeparator.trim()) && // Ensure it's not a separator
+                                  firstLine.length < 100 && 
+                                  !firstLine.includes(':') && 
+                                  !firstLine.startsWith('Removal order ID');
+
+        if (isNameFromFirstLine) {
+            namePart = firstLine;
+            casesPart = lines.slice(1).join('\n').trim();
+        } else {
+            casesPart = blockText.trim();
+        }
+        
+        return namePart ? (namePart + '\n\n' + casesPart) : casesPart;
+    }
+    
     async function handleConfirmTelegramSend() {
         const modal = document.getElementById('telegramSendModal');
         const sendButton = document.getElementById('btnConfirmTelegramSend');
@@ -979,7 +1013,7 @@
             localStorage.setItem(telegramNumberKey, numberToSave);
         }
 
-        const fileContent = merchantsData.map(m => m.key).join(noteSeparator);
+        const fileContent = merchantsData.map(m => formatMerchantBlockForOutput(m.key)).join(merchantSeparator);
         
         const result = await sendFileToTelegram(fileContent, filename, ''); 
         
@@ -998,9 +1032,9 @@
         const keysToRemove = new Set(merchantsToDeleteAfterSend.map(m => m.key));
         if (keysToRemove.size === 0) return;
         const noteArea = document.getElementById('noteArea');
-        const allSections = noteArea.value.split(noteSeparatorRegex);
+        const allSections = noteArea.value.split(merchantSeparatorRegex);
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
-        noteArea.value = remainingSections.join(noteSeparator);
+        noteArea.value = remainingSections.join(merchantSeparator);
         countTemplatesNoteTaker();
         recordNoteChange();
         document.getElementById('confirmDeleteSentModal').style.display = 'none';
@@ -1081,8 +1115,6 @@
     function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
-        const groupToggle = document.getElementById('groupToggle');
-        const groupSizeInput = document.getElementById('parserGroupSize');
         const upsUspsToggle = document.getElementById('upsUspsToggle');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const inputValue = input.value;
@@ -1109,14 +1141,8 @@
             });
         }
         const seenTrackingNumbersInCurrentInput = new Set();
-        let groupSize = 1;
-        const isGroupingActive = !isUpsUspsMode && groupToggle ? groupToggle.checked : false;
-        if (isGroupingActive && groupSizeInput) {
-            const parsedValue = parseInt(groupSizeInput.value, 10);
-            groupSize = (!isNaN(parsedValue) && parsedValue >= 1) ? parsedValue : 2;
-        }
         const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
-        const parsedDataBlocksForAmzl = [];
+        const parsedDataBlocks = [];
         const extractedUpsUspsNumbers = [];
         let validShipmentsFound = 0;
         let skippedDuplicateCount = 0;
@@ -1196,12 +1222,15 @@
                         extractedUpsUspsNumbers.push(coreTN);
                     });
                 } else {
-                    parsedDataBlocksForAmzl.push(completeDataBlock);
+                    parsedDataBlocks.push(completeDataBlock);
                 }
                 validShipmentsFound++;
             });
         });
         let casesAdded = 0;
+        let finalOutputString = '';
+        let templateUsed = isUpsUspsMode ? upsUspsTemplate : amzlTemplate;
+        
         if (isUpsUspsMode) {
             if (extractedUpsUspsNumbers.length > 0) {
                 const uniqueNumbersToAdd = Array.from(new Set(extractedUpsUspsNumbers));
@@ -1217,36 +1246,37 @@
                 showNotification(message, "info");
             }
         } else {
-            let finalOutputString = '';
-            if (parsedDataBlocksForAmzl.length > 0) {
-                if (groupSize > 1) {
-                    const groupedOutputs = [];
-                    for (let i = 0; i < parsedDataBlocksForAmzl.length; i += groupSize) {
-                        const dataChunk = parsedDataBlocksForAmzl.slice(i, i + groupSize);
-                        groupedOutputs.push(amzlTemplate + "\n\n" + dataChunk.join('\n\n'));
-                        casesAdded++;
-                    }
-                    finalOutputString = groupedOutputs.join('\n\n');
-                } else {
-                    finalOutputString = parsedDataBlocksForAmzl.map(dataBlock => amzlTemplate + "\n\n" + dataBlock).join('\n\n');
-                    casesAdded = parsedDataBlocksForAmzl.length;
-                }
-                const currentNoteTrimmed = noteArea.value.trimEnd();
-                noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + finalOutputString;
-                countTemplatesNoteTaker();
-                recordNoteChange();
-                let processedMessage = `Processed ${validShipmentsFound} new AMZL-type shipment(s). `;
-                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                showNotification(processedMessage, "success");
-                if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
-            } else {
-                let message = "No new AMZL-type shipments found. ";
-                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-                showNotification(message, "info");
+            if (parsedDataBlocks.length > 0) {
+                const templateChunks = parsedDataBlocks.map(dataBlock => templateUsed + "\n\n" + dataBlock);
+                finalOutputString = templateChunks.join(caseSeparator);
+                casesAdded = templateChunks.length;
             }
         }
+        
+        if (casesAdded > 0) {
+            const currentNoteTrimmed = noteArea.value.trimEnd();
+            let prefix = '';
+            // If the note area has content and doesn't end with a merchant separator, add a case separator.
+            if (currentNoteTrimmed && !currentNoteTrimmed.endsWith(merchantSeparator.trim())) {
+                prefix = caseSeparator;
+            }
+            noteArea.value = currentNoteTrimmed + prefix + finalOutputString;
+
+            countTemplatesNoteTaker();
+            recordNoteChange();
+            let processedMessage = `Processed ${validShipmentsFound} new shipment(s). `;
+            if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+            showNotification(processedMessage, "success");
+            if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
+        } else if (!isUpsUspsMode) {
+             let message = "No new AMZL-type shipments found. ";
+             if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+             showNotification(message, "info");
+        }
+        
         saveShipmentInputScroll();
     }
+
 
     function processUpsUspsData() {
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
@@ -1272,7 +1302,15 @@
         });
         if (processedBlocks.length > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
-            noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? '\n\n' : '') + processedBlocks.join('\n\n');
+            const finalContent = processedBlocks.join(caseSeparator);
+            
+            let prefix = '';
+             if (currentNoteTrimmed && !currentNoteTrimmed.endsWith(merchantSeparator.trim())) {
+                prefix = caseSeparator;
+            }
+
+            noteArea.value = currentNoteTrimmed + prefix + finalContent;
+            
             countTemplatesNoteTaker();
             recordNoteChange();
             const remainingOutputTNs = upsUspsOutputArea.value.split('\n').map(t => t.trim()).filter(t => t && !processedTNs.has(t.replace(/\s|-/g, '')));
@@ -1302,10 +1340,10 @@
         const keysToRemove = new Set(deletedMerchants.map(m => m.key));
         const noteArea = document.getElementById('noteArea');
         
-        const allSections = noteArea.value.split(noteSeparatorRegex);
+        const allSections = noteArea.value.split(merchantSeparatorRegex);
         const remainingSections = allSections.filter(section => !keysToRemove.has(section));
         
-        noteArea.value = remainingSections.join(noteSeparator);
+        noteArea.value = remainingSections.join(merchantSeparator);
         countTemplatesNoteTaker();
         recordNoteChange();
         showNotification(`${deletedMerchants.length} merchant(s) deleted and backed up.`, "success");
@@ -1362,7 +1400,7 @@
         const merchantsData = {};
         let totalTemplatesOverall = 0;
         let merchantIndex = 0;
-        const sections = fullText.split(noteSeparatorRegex);
+        const sections = fullText.split(merchantSeparatorRegex);
         sections.forEach((sectionTextOriginal) => {
             const sectionText = sectionTextOriginal.trim();
             if (!sectionText) return;
@@ -1497,8 +1535,9 @@
         const textsToDownload = []; let totalSelectedCases = 0;
         selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
         if (textsToDownload.length === 0) { return; }
-        const combinedText = textsToDownload.join(noteSeparator.trimEnd()); 
-        const filename = `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
+        
+        const combinedText = textsToDownload.map(formatMerchantBlockForOutput).join(merchantSeparator);
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
         downloadText(combinedText + '\n', filename); 
     }
 
@@ -1582,10 +1621,10 @@
         const splitOutputs = [];
         for (let i = 0; i < templateGroups.length; i += splitNum) {
             const chunk = templateGroups.slice(i, i + splitNum);
-            if (chunk.length > 0) splitOutputs.push({
-                text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'),
-                count: chunk.length
-            });
+            if (chunk.length > 0) {
+                 const chunkText = chunk.map(data => templateToUse + "\n\n" + data).join(caseSeparator);
+                 splitOutputs.push({ text: chunkText, count: chunk.length });
+            }
         }
         if (splitOutputs.length === 0) {
             showNotification("No split files generated.", "info");
@@ -1595,8 +1634,9 @@
         const dateStr = getFormattedDate();
         const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
         splitOutputs.forEach((output, index) => {
-            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
-            downloadText(merchantDisplay + '\n\n' + output.text + '\n', filename);
+            const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
+            downloadText(fileContent, filename);
         });
         closeSplitModal();
     }
@@ -1605,7 +1645,7 @@
         const splitModal = document.getElementById('splitModal');
         if (!splitModal) return;
 
-        const combinedText = splitModal.dataset.combinedText || '';
+        const combinedText = modal.dataset.combinedText || '';
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
 
@@ -1624,7 +1664,10 @@
         const splitOutputs = [];
         for (let i = 0; i < templateGroups.length; i += splitNum) {
             const chunk = templateGroups.slice(i, i + splitNum);
-            if (chunk.length > 0) splitOutputs.push({ text: chunk.map(data => templateToUse + "\n\n" + data).join('\n\n'), count: chunk.length });
+             if (chunk.length > 0) {
+                 const chunkText = chunk.map(data => templateToUse + "\n\n" + data).join(caseSeparator);
+                 splitOutputs.push({ text: chunkText, count: chunk.length });
+            }
         }
         if (splitOutputs.length === 0) {
             showNotification("No split files to send.", "info");
@@ -1643,7 +1686,7 @@
         const dateStr = getFormattedDate();
         
         splitOutputs.forEach((output, index) => {
-            const filename = `${appSettings.filenamePrefix}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
             const fileItem = document.createElement('div');
             fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 8px;';
             fileItem.innerHTML = `
@@ -1706,17 +1749,9 @@
     function addSeparator() {
         const ta = document.getElementById('noteArea');
         const trimmed = ta.value.trimEnd();
-        ta.value = trimmed + (trimmed ? noteSeparator : '');
+        ta.value = trimmed + (trimmed ? merchantSeparator : '');
         ta.focus();
         countTemplatesNoteTaker();
-        recordNoteChange();
-    }
-
-    function addSpacing() {
-        const ta = document.getElementById('noteArea');
-        ta.value = ta.value.trimEnd() + '\n\n';
-        ta.focus();
-        saveNotesToLocalStorage();
         recordNoteChange();
     }
 
@@ -1724,7 +1759,7 @@
         document.getElementById('clearAllConfirmModal').style.display = 'none';
         const noteArea = document.getElementById('noteArea');
         const deletedMerchants = [];
-        const sections = noteArea.value.split(noteSeparatorRegex);
+        const sections = noteArea.value.split(merchantSeparatorRegex);
         sections.forEach(sectionText => {
             if (sectionText.trim()) {
                 const count = countTemplatesInText(sectionText, amzlTemplate) + countTemplatesInText(sectionText, upsUspsTemplate);
@@ -1902,7 +1937,7 @@
             }
         });
         const names = selectedMerchantDataForSplit.map(item => item.name);
-        modal.dataset.combinedText = combinedTextParts.join(noteSeparator.trimEnd());
+        modal.dataset.combinedText = combinedTextParts.join(merchantSeparator.trimEnd());
         modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
         if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
         else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
@@ -1975,8 +2010,8 @@
         function updateFilename() {
             const userNumber = numberInput.value;
             const filename = userNumber 
-                ? `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCases})_${userNumber}.txt`
-                : `${appSettings.filenamePrefix}_${getFormattedDate()}_(${totalCases}).txt`;
+                ? `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})_${userNumber}.txt`
+                : `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).txt`;
             filenameInput.value = filename;
         }
 
@@ -2050,6 +2085,8 @@
         });
         document.getElementById('btnLayoutStacked')?.addEventListener('click', () => setLayout('stacked'));
         document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
+        document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
+        document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
         document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
         document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
 
@@ -2071,16 +2108,19 @@
         }
 
         document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
-            const text = document.getElementById('noteArea').value.trim();
-            if (!text) return;
+            const noteArea = document.getElementById('noteArea');
+            if (!noteArea.value.trim()) return;
+
+            const allMerchantBlocks = noteArea.value.split(merchantSeparatorRegex);
+            const formattedText = allMerchantBlocks.map(formatMerchantBlockForOutput).join(merchantSeparator);
+
             const count = Array.from(document.querySelectorAll('#merchantList .merchant-item')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
-            downloadText(text + '\n', `${appSettings.filenamePrefix}_${getFormattedDate()}_(${count}).txt`);
+            downloadText(formattedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`);
         });
         document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
         document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
         document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
         document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
-        document.getElementById('btnAddSpacing')?.addEventListener('click', addSpacing);
         document.getElementById('btnClearAllNotes')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'flex');
         document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
         document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
@@ -2128,24 +2168,12 @@
 
         document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
 
-        const groupToggle = document.getElementById('groupToggle');
-        const groupSizeInput = document.getElementById('parserGroupSize');
-        if (groupToggle && groupSizeInput) {
-            groupToggle.addEventListener('change', function() { groupSizeInput.disabled = !this.checked; });
-            groupSizeInput.disabled = !groupToggle.checked;
-        }
-
         const upsUspsToggle = document.getElementById('upsUspsToggle');
         const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-        const groupOrdersControl = document.getElementById('groupOrdersControl');
-        if (upsUspsToggle && upsUspsOutputContainer && groupOrdersControl && shipmentInput && upsUspsOutputArea) {
+        if (upsUspsToggle && upsUspsOutputContainer && shipmentInput) {
             function toggleUpsUspsMode(isUpsMode) {
                 upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
-                groupOrdersControl.style.opacity = isUpsMode ? '0.5' : '1';
-                groupOrdersControl.style.pointerEvents = isUpsMode ? 'none' : 'auto';
-                if (isUpsMode && groupToggle) { groupToggle.checked = false; if (groupSizeInput) groupSizeInput.disabled = true; }
                 shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
-                if (!isUpsMode && groupToggle && groupSizeInput) groupSizeInput.disabled = !groupToggle.checked;
             }
             upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
             toggleUpsUspsMode(upsUspsToggle.checked);
