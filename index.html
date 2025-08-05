@@ -1114,6 +1114,11 @@
             casesPart = blockText.trim();
         }
         
+        const trimmedCaseSeparator = caseSeparator.trim();
+        if (casesPart.startsWith(trimmedCaseSeparator)) {
+            casesPart = casesPart.substring(trimmedCaseSeparator.length).trimStart();
+        }
+        
         return namePart ? (namePart + '\n\n' + casesPart) : casesPart;
     }
     
