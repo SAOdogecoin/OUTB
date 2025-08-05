@@ -429,19 +429,34 @@
     .case-mode-tab-button.active { background-color: color-mix(in srgb, var(--accent-blue) 15%, transparent); color: var(--accent-blue-dark); border-color: var(--accent-blue); font-weight: 600; }
     html[data-theme="dark"] .case-mode-tab-button.active { color: var(--accent-blue); }
     .case-mode-tab-button.done { border-left: 4px solid var(--accent-green); padding-left: 11px; background-color: color-mix(in srgb, var(--accent-green) 10%, transparent);}
-    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: copy; }
     .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-hover); padding: 4px 10px; border-radius: 8px; margin: 0 4px;}
     .case-mode-tab-button.active .case-mode-tab-meta { color: var(--accent-blue); background-color: color-mix(in srgb, var(--accent-blue) 10%, transparent); }
     
-    /* Dropdown Styles */
-    .dropdown { position: relative; display: inline-block; }
-    .dropdown-toggle.macos-icon-button { background-color: var(--bg-hover); }
-    .case-mode-tab-button.active .dropdown-toggle.macos-icon-button { background-color: color-mix(in srgb, var(--accent-blue) 20%, transparent); }
-    .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 5px); background-color: var(--bg-window); min-width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; border-radius: 8px; padding: 0.5rem 0; border: 1px solid var(--border-color); }
-    .dropdown-menu.show { display: block; }
-    .dropdown-item { background: none; border: none; display: flex; align-items:center; gap: 8px; width: 100%; padding: 0.5rem 1rem; text-align: left; color: var(--text-primary); cursor: pointer; font-size: 0.9rem; font-weight: 500;}
-    .dropdown-item:hover:not(:disabled) { background-color: var(--bg-hover); }
-    
+    .case-mode-tab-button .delete-merchant-btn {
+        background: var(--bg-hover);
+        border: none;
+        color: var(--text-secondary);
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        margin-left: 6px;
+        flex-shrink: 0;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .case-mode-tab-button .delete-merchant-btn:hover {
+        background-color: var(--accent-red);
+        color: white;
+    }
+    .card-content.layout-right {
+        flex-direction: row-reverse;
+    }
+
     .case-mode-tab-content { display: none; }
     .case-mode-tab-content.active { display: block; }
     .case-mode-tab-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
@@ -705,6 +720,19 @@
                         </label>
                     </div>
                 </div>
+                <div class="settings-group">
+                    <label>Case Card Layout (Template Position):</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="caseTextPosition" value="left" id="caseTextPosLeft">
+                            Left
+                        </label>
+                        <label>
+                            <input type="radio" name="caseTextPosition" value="right" id="caseTextPosRight">
+                            Right
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="modal-actions">
                 <button id="btnCloseSettingsModal" class="macos secondary">Cancel</button>
@@ -820,7 +848,8 @@
         telegramBotToken: '',
         telegramChatId: '',
         autoClearHistory: true,
-        marketplaceUrlGen: 'com'
+        marketplaceUrlGen: 'com',
+        caseTextPosition: 'left'
     };
     let regexPatterns = {
         amzlSource: null,
@@ -911,6 +940,8 @@
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
         const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
         if (counterPosRadio) counterPosRadio.checked = true;
+        const caseTextPosRadio = document.querySelector(`input[name="caseTextPosition"][value="${appSettings.caseTextPosition}"]`);
+        if (caseTextPosRadio) caseTextPosRadio.checked = true;
         initializeRegexPatterns();
         applyMerchantSearchVisibility();
         setTheme(appSettings.theme);
@@ -929,6 +960,9 @@
         appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
         const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
         if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
+        const selectedCaseTextPos = document.querySelector('input[name="caseTextPosition"]:checked');
+        if (selectedCaseTextPos) appSettings.caseTextPosition = selectedCaseTextPos.value;
+
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns();
         applyMerchantSearchVisibility();
@@ -1761,7 +1795,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -2259,14 +2293,7 @@
             tabBtn.innerHTML = `
                 <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
                 <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
-                <div class="dropdown">
-                    <button class="macos-icon-button dropdown-toggle" title="Actions"><i class="fa-solid fa-ellipsis-h"></i></button>
-                    <div class="dropdown-menu">
-                        <button class="dropdown-item" data-action="copy-merchant-display-name"><i class="fa-solid fa-paste"></i> Copy Merchant</button>
-                        <div style="height: 1px; background-color: var(--border-subtle); margin: 4px 0;"></div>
-                        <button class="dropdown-item" data-action="delete-merchant" style="color: var(--accent-red);"><i class="fa-solid fa-trash"></i> Delete Merchant</button>
-                    </div>
-                </div>
+                <button class="delete-merchant-btn" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>
             `;
             if (merchant.id === activeCaseModeTabId) tabBtn.classList.add('active');
             if (filedCount === totalCount && totalCount > 0) tabBtn.classList.add('done');
@@ -2345,13 +2372,17 @@
                 </div>
             </div>`;
         
+        const cardContent = card.querySelector('.card-content');
+        if (appSettings.caseTextPosition === 'right') {
+            cardContent.classList.add('layout-right');
+        }
+
         if (caseItem.filedId !== null) {
             card.classList.add('filed');
         } else {
             card.classList.add('unfiled');
         }
         
-        // Add paste listener after the element is created
         const inputs = card.querySelectorAll('.case-id-input');
         inputs.forEach(input => input.addEventListener('paste', handleCasePaste));
 
@@ -2363,33 +2394,23 @@
         const contentContainer = document.getElementById('caseModeTabContents');
         
         tabContainer.addEventListener('click', e => {
-            const dropdownToggle = e.target.closest('.dropdown-toggle');
-            if (dropdownToggle) {
-                e.stopPropagation();
-                const dropdown = dropdownToggle.closest('.dropdown');
-                if (!dropdown) return;
-                const menu = dropdown.querySelector('.dropdown-menu');
-                if (!menu) return;
-
-                document.querySelectorAll('.dropdown-menu.show').forEach(m => m !== menu && m.classList.remove('show'));
-                menu.classList.toggle('show');
+            const merchantNameSpan = e.target.closest('.case-mode-merchant-name');
+            if (merchantNameSpan) {
+                e.stopPropagation(); // prevent tab switching
+                const merchantId = merchantNameSpan.closest('.case-mode-tab-button').dataset.tabId;
+                const merchant = caseModeData.find(m => m.id === merchantId);
+                if (merchant) {
+                    navigator.clipboard.writeText(merchant.displayName);
+                    showNotification(`Copied: ${merchant.displayName}`, 'success');
+                }
                 return;
             }
 
-            const dropdownItem = e.target.closest('.dropdown-item');
-            if (dropdownItem) {
+            const deleteBtn = e.target.closest('.delete-merchant-btn');
+            if (deleteBtn) {
                 e.stopPropagation();
-                const merchant = caseModeData.find(m => m.id === dropdownItem.closest('.case-mode-tab-button').dataset.tabId);
-                if (!merchant) return;
-                
-                const action = dropdownItem.dataset.action;
-                if (action === 'delete-merchant') {
-                    handleDeleteMerchant(merchant.id);
-                } else if (action === 'copy-merchant-display-name') {
-                    navigator.clipboard.writeText(merchant.displayName);
-                    showNotification(`Copied: Merchant Name`, 'success');
-                }
-                dropdownItem.closest('.dropdown-menu')?.classList.remove('show');
+                const merchantId = deleteBtn.closest('.case-mode-tab-button').dataset.tabId;
+                handleDeleteMerchant(merchantId);
                 return;
             }
             
@@ -2429,20 +2450,10 @@
             }
         });
         
-        window.addEventListener('click', e => { if (!e.target.closest('.dropdown')) { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); } });
     }
 
     function handleCasePaste(event) {
-        const input = event.target;
-        setTimeout(() => {
-            const card = input.closest('.case-card');
-            if (card) {
-                const saveButton = card.querySelector('[data-action="save-case"], [data-action="update-case"]');
-                if (saveButton) {
-                    handleCaseCardAction(saveButton);
-                }
-            }
-        }, 0);
+        // Removed auto-save functionality as requested. User must click to save.
     }
     
     function handleCaseCardAction(button) {
@@ -2466,11 +2477,22 @@
                 const inputSelector = action === 'save-case' ? '.unfiled-controls input' : '.editing-info input';
                 const input = card.querySelector(inputSelector);
                 const newId = input.value.trim();
-                caseItem.filedId = newId;
-                localStorage.setItem(caseItem.uid, newId);
+
+                caseItem.filedId = newId ? newId : null;
+                
+                if (newId) {
+                    localStorage.setItem(caseItem.uid, newId);
+                    card.classList.add('filed');
+                    card.classList.remove('unfiled', 'editing');
+                    showNotification('Case ID saved!', 'success');
+                } else {
+                    localStorage.removeItem(caseItem.uid);
+                    card.classList.add('unfiled');
+                    card.classList.remove('filed', 'editing');
+                    card.querySelector('.unfiled-controls input.case-id-input').value = '';
+                    showNotification('Case ID cleared.', 'info');
+                }
                 card.querySelector('.case-id-display').textContent = newId;
-                card.classList.remove('unfiled', 'editing');
-                card.classList.add('filed');
                 updateCaseModeStats();
                 break;
             case 'view-case':
@@ -2486,7 +2508,7 @@
                 card.classList.remove('filed');
                 break;
             case 'delete-case':
-                if (confirm('Are you sure you want to delete this case ID?')) {
+                if (confirm('Are you sure you want to clear this case ID? This will mark it as un-filed.')) {
                     caseItem.filedId = null;
                     localStorage.removeItem(caseItem.uid);
                     card.querySelector('.unfiled-controls input').value = '';
