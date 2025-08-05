@@ -27,6 +27,7 @@
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
+        --accent-orange: #ff9500;
         --highlight-bg: #B4D7FF; 
         --highlight-text: #000000; 
         --top-bar-height: 50px;
@@ -49,6 +50,7 @@
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
+        --accent-orange: #ff9f0a;
         --highlight-bg: #0052A3; 
         --highlight-text: #FFFFFF; 
         color-scheme: dark;
@@ -237,6 +239,8 @@
     button.macos.danger { background-color: var(--accent-red); color: white; box-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
     button.macos.danger:hover { background-color: var(--accent-red-hover); }
     button.macos.success { background-color: var(--accent-green); color: white; }
+    button.macos.warning { background-color: var(--accent-orange); color: white; }
+
 
     .macos-icon-button {
         background: transparent; border: none; cursor: pointer;
@@ -244,12 +248,12 @@
         display: inline-flex; align-items: center; justify-content: center;
         color: var(--text-secondary); transition: all 0.15s ease;
     }
-    .macos-icon-button:hover { background-color: var(--bg-hover); color: var(--text-primary); }
+    .macos-icon-button:hover:not(:disabled) { background-color: var(--bg-hover); color: var(--text-primary); }
     .macos-icon-button.active { background-color: var(--accent-blue); color: white; }
     .macos-icon-button:disabled { color: var(--text-placeholder); background: transparent; cursor: not-allowed; }
     .macos-icon-button:disabled:hover { background: transparent; }
 
-    textarea, input[type="text"], input[type="number"] { all: unset; box-sizing: border-box; }
+    textarea, input[type="text"], input[type="number"], input[type="file"] { all: unset; box-sizing: border-box; }
     .macos-textfield-container {
         width: 100%;
         border-radius: 12px;
@@ -287,7 +291,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
         margin-bottom: auto;
     }
-    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content {max-width: 520px;}
+    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content, #pasteTextModal .modal-content {max-width: 520px;}
     #preSendConfirmModal .modal-content { max-width: 600px; }
     #historyModal .modal-content { max-width: 800px; }
     #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
@@ -299,6 +303,8 @@
     #clearAllConfirmModal p, #clearAllSuccessPopup p, #confirmDeleteSentModal p, #confirmClearHistoryModal p { margin: 10px 0 20px; font-size: 1.05em;}
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
     #clearAllConfirmModal .modal-actions, #confirmDeleteSentModal .modal-actions, #confirmClearHistoryModal .modal-actions { justify-content: center; }
+    .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; gap: 0.5rem; }
+    .modal-footer .right-actions { display: flex; gap: 0.5rem; }
     
     .notification-popup {
         display: none; position: fixed; top: 20px; left: 50%;
@@ -388,7 +394,7 @@
         flex-grow: 1;
         min-height: 0;
     }
-    #shipmentInput, #upsUspsOutputArea, #noteArea { height: 100%; }
+    #shipmentInput, #upsUspsOutputArea, #noteArea, #paste-textarea { height: 100%; }
     .parser-controls label.parser-control-row { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
     .controls-and-stats { margin-top: 16px; } 
     .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -401,34 +407,79 @@
     .settings-group .radio-group input[type="radio"] { margin-right: 5px; }
     
     #telegram-merchant-list h4 { margin: 0 0 8px 0; }
-    #telegram-merchant-list p {
-        margin: 2px 0 2px 10px;
-        font-size: 0.9em;
-        color: var(--text-secondary);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    #historyList { max-height: 60vh; overflow-y: auto; margin-top: 10px; }
-    .history-item {
-        background-color: var(--bg-input); padding: 10px 15px;
-        border: 1px solid var(--border-subtle); border-radius: 10px;
-        margin-bottom: 10px;
-    }
+    #telegram-merchant-list p { margin: 2px 0 2px 10px; font-size: 0.9em; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #historyList, #caseModeActionModalBody { max-height: 60vh; overflow-y: auto; margin-top: 10px; }
+    .history-item { background-color: var(--bg-input); padding: 10px 15px; border: 1px solid var(--border-subtle); border-radius: 10px; margin-bottom: 10px; }
     .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .history-item-date { font-size: 0.9em; color: var(--text-secondary); }
     .history-item-content p { margin: 4px 0; font-size: 0.95em; }
     .history-item-files { margin-top: 8px; font-size: 0.9em; color: var(--text-secondary); font-family: var(--mono-font); }
     
-    #preSendFileList {
-        max-height: 40vh;
-        overflow-y: auto;
-        padding: 5px;
-        border: 1px solid var(--border-subtle);
-        border-radius: 8px;
-        background-color: var(--bg-primary);
-    }
+    #preSendFileList { max-height: 40vh; overflow-y: auto; padding: 5px; border: 1px solid var(--border-subtle); border-radius: 8px; background-color: var(--bg-primary); }
+    
+    /* --- CASE MODE STYLES --- */
+    .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+    .case-mode-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .case-mode-title-group { display: flex; align-items: center; gap: 1rem; }
+    .case-mode-title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text-primary); }
+    #caseModeGlobalStats { font-weight: 600; color: var(--text-secondary); background-color: var(--bg-hover); padding: 6px 12px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
+    .case-mode-tab-container { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .case-mode-tab-button { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 6px 6px 6px 14px; background-color: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .case-mode-tab-button:hover:not(.active) { border-color: var(--text-secondary); background-color: var(--bg-hover); }
+    .case-mode-tab-button.active { background-color: color-mix(in srgb, var(--accent-blue) 15%, transparent); color: var(--accent-blue-dark); border-color: var(--accent-blue); font-weight: 600; }
+    html[data-theme="dark"] .case-mode-tab-button.active { color: var(--accent-blue); }
+    .case-mode-tab-button.done { border-left: 4px solid var(--accent-green); padding-left: 11px; background-color: color-mix(in srgb, var(--accent-green) 10%, transparent);}
+    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-hover); padding: 4px 10px; border-radius: 8px; margin: 0 4px;}
+    .case-mode-tab-button.active .case-mode-tab-meta { color: var(--accent-blue); background-color: color-mix(in srgb, var(--accent-blue) 10%, transparent); }
+    
+    /* Dropdown Styles */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle.macos-icon-button { background-color: var(--bg-hover); }
+    .case-mode-tab-button.active .dropdown-toggle.macos-icon-button { background-color: color-mix(in srgb, var(--accent-blue) 20%, transparent); }
+    .dropdown-menu { display: none; position: absolute; right: 0; top: calc(100% + 5px); background-color: var(--bg-window); min-width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; border-radius: 8px; padding: 0.5rem 0; border: 1px solid var(--border-color); }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item { background: none; border: none; display: flex; align-items:center; gap: 8px; width: 100%; padding: 0.5rem 1rem; text-align: left; color: var(--text-primary); cursor: pointer; font-size: 0.9rem; font-weight: 500;}
+    .dropdown-item:hover:not(:disabled) { background-color: var(--bg-hover); }
+    
+    .case-mode-tab-content { display: none; }
+    .case-mode-tab-content.active { display: block; }
+    .case-mode-tab-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+    .tab-actions-left, .tab-actions-right { display: flex; gap: 8px; flex-wrap: wrap; }
+    #resetFilterBtn { display: none; }
+    .case-card { background-color: var(--bg-window); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.2s ease-in-out; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border-subtle); }
+    .case-card.filtered-out { display: none; }
+    .case-card.editing { border-color: var(--accent-orange); }
+    .card-content { display: flex; gap: 1rem; padding: 10px 16px; align-items: stretch; }
+    .case-card:not(.unfiled) .card-content { align-items: center; }
+    .left-pane { flex-grow: 1; display: flex; gap: 1rem; align-items: flex-start; }
+    .case-card:not(.unfiled) .left-pane { align-items: center; }
+    .case-number { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); width: 30px; text-align: center; flex-shrink: 0; padding-top: 4px; }
+    .case-card:not(.unfiled) .case-number { padding-top: 0; }
+    .main-content { flex-grow: 1; }
+    .case-text { white-space: pre-wrap; font-family: var(--mono-font); max-height: 150px; overflow-y: auto; font-size: 0.85rem; background: var(--bg-primary); padding: 8px; border-radius: 8px; }
+    .filed-info { display: none; }
+    .case-id-display { font-weight: 600; font-family: var(--mono-font); color: var(--accent-green); font-size: 1.1rem; }
+    .editing-info { display: none; align-items: center; gap: 0.5rem; width: 100%;}
+    .editing-info .macos-textfield-container { flex-grow: 1; }
+    .case-card.editing .editing-info { display: flex; }
+    .right-pane { flex-shrink: 0; width: 200px; display: flex; }
+    .case-card:not(.unfiled) .right-pane { align-items: center; justify-content: flex-end; }
+    .unfiled-controls { display: flex; flex-direction: column; width: 100%; gap: 8px; align-items: stretch; }
+    .filed-controls { display: none; }
+    .case-card.filed .filed-controls { display: flex; gap: 8px; }
+    .case-card:is(.filed, .editing) .unfiled-controls { display: none; }
+    .case-card.editing .right-pane { display: none; }
+    .case-card.filed .case-text, .case-card.editing .case-text { display: none; }
+    .case-card.filed .filed-info { display: block; }
+    #caseTextModal .modal-content pre { white-space: pre-wrap; font-family: var(--mono-font); background-color: var(--bg-input); padding: 12px; border-radius: 12px; max-height: 60vh; overflow-y: auto; font-size: 0.9rem; border: 1px solid var(--border-subtle); }
+    #paste-textarea { height: 40vh; resize: vertical; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--bg-input); color: var(--text-primary); font-family: var(--mono-font); }
+    .ro-id-list, .history-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .ro-id-item, .history-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-subtle); }
+    .ro-id-checkbox { width: 16px; height: 16px; flex-shrink: 0; }
+    .ro-id-text, .history-text { font-family: var(--mono-font); font-weight: 600; flex-grow: 1; }
+    .history-merchant-name { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin-left: 1rem; }
+    .history-timestamp { color: var(--text-secondary); }
 </style>
 </head>
 <body>
@@ -436,7 +487,7 @@
     <div id="clearAllConfirmModal" class="modal-overlay">
         <div class="modal-content">
             <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 8px;"></i>Clear All Notes?</h2>
-            <p>Are you sure you want to clear ALL notes and merchant entries? This action cannot be undone.</p>
+            <p>Are you sure you want to clear ALL notes and case data? This action cannot be undone.</p>
             <div class="modal-actions">
                 <button id="cancelClearAllBtn" class="macos secondary">Cancel</button>
                 <button id="confirmClearAllBtn" class="macos danger">Clear All</button>
@@ -477,7 +528,8 @@
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
             <div class="toolbar-icon-group">
-                <button id="btnHistory" class="macos-icon-button" title="History"><i class="fa-solid fa-history"></i></button>
+                <button id="btnHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+                <button id="btnCaseMode" class="macos-icon-button" title="Case Mode"><i class="fa-solid fa-briefcase"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
@@ -568,6 +620,20 @@
             </div>
             <div class="resize-handle"></div>
         </div>
+    </div>
+
+    <div id="caseModeWrapper" class="case-mode-wrapper" style="display: none;">
+        <header class="case-mode-header">
+            <div class="case-mode-title-group">
+                <h2 class="case-mode-title">Case Tracker</h2>
+                <span id="caseModeGlobalStats"></span>
+            </div>
+            <div class="tab-actions-right">
+                <button id="copyAllMerchantsBtn" class="macos success" style="display: none;"><i class="fa-solid fa-copy"></i>Copy All Merchants & IDs</button>
+            </div>
+        </header>
+        <div id="caseModeTabContainer" class="case-mode-tab-container"></div>
+        <div id="caseModeTabContents"></div>
     </div>
     
     <div id="splitModal" class="modal-overlay">
@@ -685,13 +751,40 @@
 
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content">
-            <h2><i class="fa-solid fa-history" style="margin-right:8px;"></i>Deletion History</h2>
+            <h2><i class="fa-solid fa-trash-alt" style="margin-right:8px;"></i>Deletion History</h2>
             <div id="historyList">
                 <p>No history found.</p>
             </div>
             <div class="modal-actions">
                 <button id="btnClearAllHistory" class="macos danger"><i class="fa-solid fa-trash"></i> Clear History</button>
                 <button id="btnCloseHistoryModal" class="macos primary">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals for Case Mode -->
+    <div id="caseTextModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-file-alt" style="margin-right:8px;"></i>Original Template</h2>
+            <pre id="caseTextModalContent"></pre>
+            <div class="modal-actions">
+                <button id="closeCaseTextModalBtn" class="macos primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="caseModeActionModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="caseModeActionModalTitle">Action</h2>
+            <div id="caseModeActionModalBody"></div>
+            <div class="modal-footer">
+                <div class="left-actions">
+                    <button id="caseModeActionModalCopyAllBtn" class="macos secondary" style="display:none;">Copy All</button>
+                </div>
+                <div class="right-actions">
+                    <button id="caseModeActionModalCancelBtn" class="macos secondary">Cancel</button>
+                    <button id="caseModeActionModalActionBtn" class="macos primary">Action</button>
+                </div>
             </div>
         </div>
     </div>
@@ -702,6 +795,7 @@
     const merchantSeparator = '\n\n' + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' + '\n\n';
     const merchantSeparatorRegex = /\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n/g;
     const caseSeparator = '\n\n' + '────────────────────────────────' + '\n\n';
+    const caseSeparatorRegex = /\n\n────────────────────────────────\n\n/g;
     const localStorageKey = 'savedNotesContent_amzlTool';
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
@@ -709,6 +803,7 @@
     const settingsKey = 'outboundToolSettings_v2_telegram';
     const parserStateKey = 'outboundToolParserState';
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
+    const caseModeStateKey = 'outboundToolCaseModeState_v3';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -740,6 +835,10 @@
     let noteHistoryIndex = -1;
     let isUndoRedoAction = false;
     let noteChangeTimeout;
+
+    // --- CASE MODE VARIABLES ---
+    let caseModeData = [];
+    let activeCaseModeTabId = null;
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -819,7 +918,6 @@
     }
 
     function saveSettings() {
-        // Prefix is saved by its own toggle handler
         const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
         appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
         const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
@@ -1256,7 +1354,6 @@
         if (casesAdded > 0) {
             const currentNoteTrimmed = noteArea.value.trimEnd();
             let prefix = '';
-            // If the note area has content and doesn't end with a merchant separator, add a case separator.
             if (currentNoteTrimmed && !currentNoteTrimmed.endsWith(merchantSeparator.trim())) {
                 prefix = caseSeparator;
             }
@@ -1470,8 +1567,18 @@
         });
         filterMerchants();
         updateSelectedCountNoteTaker();
-        localStorage.setItem(localStorageKey, noteArea.value);
+        updateStateContent(noteArea.value);
     }
+    
+    function updateStateContent(content) {
+        const state = JSON.parse(localStorage.getItem(caseModeStateKey)) || {};
+        state.fileContent = content;
+        if (!state.fileNames) {
+            state.fileNames = [];
+        }
+        localStorage.setItem(caseModeStateKey, JSON.stringify(state));
+    }
+
 
     function updateSelectedCountNoteTaker() {
         const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
@@ -1516,7 +1623,7 @@
             const allVisibleCheckboxes = Array.from(document.querySelectorAll('#merchantList .merchant-item'))
                 .filter(item => item.style.display !== 'none')
                 .map(item => item.querySelector('.macos-checkbox'));
-
+            
             const areAllSelected = allVisibleCheckboxes.length > 0 && allVisibleCheckboxes.every(cb => cb.checked);
 
             if (areAllSelected) {
@@ -1654,7 +1761,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -1771,6 +1878,9 @@
             addToHistory(deletedMerchants);
         }
         noteArea.value = '';
+        localStorage.removeItem(caseModeStateKey);
+        Object.keys(localStorage).filter(key => key.startsWith('case-')).forEach(key => localStorage.removeItem(key));
+
         countTemplatesNoteTaker();
         recordNoteChange();
         document.getElementById('clearAllSuccessPopup').style.display = 'flex';
@@ -1779,7 +1889,7 @@
     function saveNotesToLocalStorage() {
         const noteArea = document.getElementById('noteArea');
         if (noteArea) {
-            localStorage.setItem(localStorageKey, noteArea.value);
+            updateStateContent(noteArea.value);
             localStorage.setItem(scrollPosKeys.noteArea, noteArea.scrollTop);
         }
     }
@@ -1917,6 +2027,7 @@
         return `https://${marketplaceDomain}/reportcentral/REMOVAL_ORDER_DETAIL/0/${encodedPayload}`;
     }
 
+    // --- MODAL CONTROLS ---
     function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
     function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
     function openSplitModal() {
@@ -2021,29 +2132,535 @@
         modal.style.display = 'flex';
     }
     function closeTelegramSendModal() { document.getElementById('telegramSendModal').style.display = 'none'; }
+    
+    // --- CASE MODE ---
+    
+    function toggleCaseMode() {
+        const mainWrapper = document.getElementById('mainWrapper');
+        const caseModeWrapper = document.getElementById('caseModeWrapper');
+        const caseModeBtn = document.getElementById('btnCaseMode');
 
+        const isCaseModeActive = caseModeWrapper.style.display !== 'none';
+        
+        if (isCaseModeActive) {
+            mainWrapper.style.display = 'flex';
+            caseModeWrapper.style.display = 'none';
+            caseModeBtn.classList.remove('active');
+        } else {
+            mainWrapper.style.display = 'none';
+            caseModeWrapper.style.display = 'flex';
+            caseModeBtn.classList.add('active');
+            initCaseMode();
+        }
+    }
+
+    function initCaseMode() {
+        parseNotesForCaseMode();
+        renderCaseModeUI();
+    }
+
+    function generateUID(merchantId, caseIndex, text) {
+        let hash = 0;
+        if (text.length === 0) return `case-${merchantId}-${caseIndex}-${hash}`;
+        for (let i = 0; i < text.length; i++) {
+            const char = text.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash |= 0;
+        }
+        return `case-${merchantId}-${caseIndex}-${hash}`;
+    }
+
+    function parseNotesForCaseMode() {
+        const fullText = document.getElementById('noteArea').value;
+        caseModeData = [];
+        let merchantIndex = 0;
+        const merchantBlocks = fullText.split(merchantSeparatorRegex).filter(b => b.trim());
+
+        merchantBlocks.forEach(block => {
+            let merchantName = `Merchant ${++merchantIndex}`;
+            let casesText = block.trim();
+            const firstLine = block.trim().split('\n')[0].trim();
+            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100) {
+                 merchantName = firstLine;
+                 casesText = block.trim().substring(firstLine.length).trim();
+            }
+
+            const merchantId = sanitizeFilename(merchantName).replace(/ /g, '-');
+            const merchantObject = {
+                id: merchantId,
+                displayName: merchantName,
+                originalText: block,
+                cases: []
+            };
+            
+            const caseTemplatesRaw = casesText.split(caseSeparatorRegex).filter(c => c.trim());
+            const separatorLine = '────────────────────────────────';
+
+            const caseTemplates = caseTemplatesRaw.map(template => {
+                let cleanedTemplate = template.trim();
+                if (cleanedTemplate.startsWith(separatorLine)) {
+                    cleanedTemplate = cleanedTemplate.substring(separatorLine.length).trim();
+                }
+                return cleanedTemplate;
+            }).filter(c => c);
+
+            caseTemplates.forEach((caseText, caseIdx) => {
+                const uid = generateUID(merchantId, caseIdx, caseText);
+                merchantObject.cases.push({
+                    uid: uid,
+                    text: caseText,
+                    filedId: localStorage.getItem(uid) || null,
+                });
+            });
+            
+            if (merchantObject.cases.length > 0) {
+                caseModeData.push(merchantObject);
+            }
+        });
+
+        const savedState = JSON.parse(localStorage.getItem(caseModeStateKey));
+        if (savedState && savedState.activeTabId && caseModeData.some(m => m.id === savedState.activeTabId)) {
+            activeCaseModeTabId = savedState.activeTabId;
+        } else if (caseModeData.length > 0) {
+            activeCaseModeTabId = caseModeData[0].id;
+        } else {
+            activeCaseModeTabId = null;
+        }
+        saveCaseModeState();
+    }
+
+    function saveCaseModeState() {
+        const state = JSON.parse(localStorage.getItem(caseModeStateKey)) || {};
+        state.activeTabId = activeCaseModeTabId;
+        localStorage.setItem(caseModeStateKey, JSON.stringify(state));
+    }
+
+    function renderCaseModeUI() {
+        const tabContainer = document.getElementById('caseModeTabContainer');
+        const contentContainer = document.getElementById('caseModeTabContents');
+        const state = JSON.parse(localStorage.getItem(caseModeStateKey)) || {};
+        updateFileInfo(state.fileNames);
+        tabContainer.innerHTML = '';
+        contentContainer.innerHTML = '';
+
+        if (caseModeData.length === 0) {
+            tabContainer.innerHTML = '<p>No cases found. Use the Parser to add data.</p>';
+            updateCaseModeStats();
+            return;
+        }
+
+        caseModeData.forEach(merchant => {
+            const filedCount = merchant.cases.filter(c => c.filedId !== null).length;
+            const totalCount = merchant.cases.length;
+            
+            const tabBtn = document.createElement('div');
+            tabBtn.className = 'case-mode-tab-button';
+            tabBtn.dataset.tabId = merchant.id;
+            tabBtn.innerHTML = `
+                <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
+                <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
+                <div class="dropdown">
+                    <button class="macos-icon-button dropdown-toggle" title="Actions"><i class="fa-solid fa-ellipsis-h"></i></button>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" data-action="copy-merchant-display-name"><i class="fa-solid fa-paste"></i> Copy Merchant</button>
+                        <div style="height: 1px; background-color: var(--border-subtle); margin: 4px 0;"></div>
+                        <button class="dropdown-item" data-action="delete-merchant" style="color: var(--accent-red);"><i class="fa-solid fa-trash"></i> Delete Merchant</button>
+                    </div>
+                </div>
+            `;
+            if (merchant.id === activeCaseModeTabId) tabBtn.classList.add('active');
+            if (filedCount === totalCount && totalCount > 0) tabBtn.classList.add('done');
+            
+            tabContainer.appendChild(tabBtn);
+
+            const tabContent = document.createElement('div');
+            tabContent.id = `case-content-${merchant.id}`;
+            tabContent.className = 'case-mode-tab-content';
+            if (merchant.id === activeCaseModeTabId) tabContent.classList.add('active');
+            
+            tabContent.innerHTML = `
+                <div class="case-mode-tab-content-header">
+                    <div class="tab-actions-left">
+                       <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
+                       <button id="resetFilterBtn" class="macos warning"><i class="fa-solid fa-filter-circle-xmark"></i> Reset Filter</button>
+                    </div>
+                    <div class="tab-actions-right">
+                       <button class="macos success" data-action="copy-merchant-ids" data-merchant-id="${merchant.id}" ${filedCount === 0 ? 'disabled' : ''}>
+                           <i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)
+                       </button>
+                    </div>
+                </div>
+            `;
+            
+            const casesList = document.createElement('div');
+            merchant.cases.forEach((caseItem, index) => {
+                casesList.appendChild(createCaseCard(caseItem, index + 1));
+            });
+            tabContent.appendChild(casesList);
+            contentContainer.appendChild(tabContent);
+        });
+
+        addCaseModeEventListeners();
+        updateCaseModeStats();
+    }
+    
+    function createCaseCard(caseItem, number) {
+        const card = document.createElement('div');
+        card.className = 'case-card';
+        card.id = caseItem.uid;
+        
+        card.innerHTML = `
+            <div class="card-content">
+                <div class="left-pane">
+                    <div class="case-number">${number}</div>
+                    <div class="main-content">
+                        <div class="case-text">${caseItem.text}</div>
+                        <div class="editing-info">
+                            <div class="macos-textfield-container">
+                                <input type="text" class="macos-textfield case-id-input" placeholder="Update Case ID..." value="${caseItem.filedId || ''}">
+                            </div>
+                            <button class="macos danger" data-action="delete-case"><i class="fa-solid fa-trash"></i></button>
+                            <button class="macos primary" data-action="update-case"><i class="fa-solid fa-save"></i>Update</button>
+                        </div>
+                        <div class="filed-info">
+                            <span class="case-id-display">${caseItem.filedId || ''}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="right-pane">
+                    <div class="unfiled-controls">
+                        <div class="macos-textfield-container">
+                             <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID...">
+                        </div>
+                        <button class="macos success" data-action="save-case" style="width: 100%;"><i class="fa-solid fa-save"></i>Save Case ID</button>
+                        <div style="height: 1px; background-color: var(--border-subtle); margin: 4px 0;"></div>
+                        <button class="macos secondary" data-action="copy-text" style="width: 100%;"><i class="fa-solid fa-copy"></i>Copy Template</button>
+                        <button class="macos secondary" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
+                    </div>
+                    <div class="filed-controls">
+                        <button class="macos secondary" data-action="view-case">View</button>
+                        <button class="macos primary" data-action="copy-id">Copy ID</button>
+                        <button class="macos warning" data-action="edit-case">Edit</button>
+                    </div>
+                </div>
+            </div>`;
+        
+        if (caseItem.filedId !== null) {
+            card.classList.add('filed');
+        } else {
+            card.classList.add('unfiled');
+        }
+        
+        // Add paste listener after the element is created
+        const inputs = card.querySelectorAll('.case-id-input');
+        inputs.forEach(input => input.addEventListener('paste', handleCasePaste));
+
+        return card;
+    }
+
+    function addCaseModeEventListeners() {
+        const tabContainer = document.getElementById('caseModeTabContainer');
+        const contentContainer = document.getElementById('caseModeTabContents');
+        
+        tabContainer.addEventListener('click', e => {
+            const dropdownToggle = e.target.closest('.dropdown-toggle');
+            if (dropdownToggle) {
+                e.stopPropagation();
+                const dropdown = dropdownToggle.closest('.dropdown');
+                if (!dropdown) return;
+                const menu = dropdown.querySelector('.dropdown-menu');
+                if (!menu) return;
+
+                document.querySelectorAll('.dropdown-menu.show').forEach(m => m !== menu && m.classList.remove('show'));
+                menu.classList.toggle('show');
+                return;
+            }
+
+            const dropdownItem = e.target.closest('.dropdown-item');
+            if (dropdownItem) {
+                e.stopPropagation();
+                const merchant = caseModeData.find(m => m.id === dropdownItem.closest('.case-mode-tab-button').dataset.tabId);
+                if (!merchant) return;
+                
+                const action = dropdownItem.dataset.action;
+                if (action === 'delete-merchant') {
+                    handleDeleteMerchant(merchant.id);
+                } else if (action === 'copy-merchant-display-name') {
+                    navigator.clipboard.writeText(merchant.displayName);
+                    showNotification(`Copied: Merchant Name`, 'success');
+                }
+                dropdownItem.closest('.dropdown-menu')?.classList.remove('show');
+                return;
+            }
+            
+            const tabButton = e.target.closest('.case-mode-tab-button');
+            if (tabButton && !tabButton.classList.contains('active')) {
+                activeCaseModeTabId = tabButton.dataset.tabId;
+                saveCaseModeState();
+                renderCaseModeUI();
+            }
+        });
+
+        contentContainer.addEventListener('click', e => {
+            const button = e.target.closest('button');
+            if (!button) return;
+            
+            if (button.closest('.case-card')) {
+                handleCaseCardAction(button);
+                return;
+            }
+            
+            const merchant = caseModeData.find(m => m.id === activeCaseModeTabId);
+            if (!merchant) return;
+
+            const action = button.dataset.action;
+            if (action === 'copy-merchant-ids') {
+                const header = merchant.displayName;
+                const ids = merchant.cases.map(c => c.filedId).filter(id => id !== null).join('\n');
+                const filedCases = merchant.cases.filter(c => c.filedId !== null);
+                if (filedCases.length > 0) {
+                    navigator.clipboard.writeText(`${header}\n${ids}`);
+                    showNotification(`Copied formatted IDs for ${merchant.displayName}`, 'success');
+                }
+            } else if (action === 'view-ro-ids') {
+                viewRemovalOrderIds(merchant);
+            } else if (button.id === 'resetFilterBtn') {
+                resetCaseFilter();
+            }
+        });
+        
+        window.addEventListener('click', e => { if (!e.target.closest('.dropdown')) { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); } });
+    }
+
+    function handleCasePaste(event) {
+        const input = event.target;
+        setTimeout(() => {
+            const card = input.closest('.case-card');
+            if (card) {
+                const saveButton = card.querySelector('[data-action="save-case"], [data-action="update-case"]');
+                if (saveButton) {
+                    handleCaseCardAction(saveButton);
+                }
+            }
+        }, 0);
+    }
+    
+    function handleCaseCardAction(button) {
+        const card = button.closest('.case-card');
+        const caseItem = findCaseByUID(card.id);
+        if (!caseItem) return;
+
+        const action = button.dataset.action;
+
+        switch(action) {
+            case 'copy-text':
+                navigator.clipboard.writeText(caseItem.text);
+                showNotification('Case text copied!', 'success');
+                break;
+            case 'copy-case-title':
+                 navigator.clipboard.writeText('REMOVAL ORDER - LOST OUTBOUND');
+                showNotification('Case title copied', 'success');
+                break;
+            case 'save-case':
+            case 'update-case':
+                const inputSelector = action === 'save-case' ? '.unfiled-controls input' : '.editing-info input';
+                const input = card.querySelector(inputSelector);
+                const newId = input.value.trim();
+                caseItem.filedId = newId;
+                localStorage.setItem(caseItem.uid, newId);
+                card.querySelector('.case-id-display').textContent = newId;
+                card.classList.remove('unfiled', 'editing');
+                card.classList.add('filed');
+                updateCaseModeStats();
+                break;
+            case 'view-case':
+                document.getElementById('caseTextModalContent').textContent = caseItem.text;
+                document.getElementById('caseTextModal').style.display = 'flex';
+                break;
+            case 'copy-id':
+                navigator.clipboard.writeText(caseItem.filedId);
+                showNotification('Case ID copied!', 'success');
+                break;
+            case 'edit-case':
+                card.classList.add('editing');
+                card.classList.remove('filed');
+                break;
+            case 'delete-case':
+                if (confirm('Are you sure you want to delete this case ID?')) {
+                    caseItem.filedId = null;
+                    localStorage.removeItem(caseItem.uid);
+                    card.querySelector('.unfiled-controls input').value = '';
+                    card.classList.remove('filed', 'editing');
+                    card.classList.add('unfiled');
+                    updateCaseModeStats();
+                }
+                break;
+        }
+    }
+    
+    function findCaseByUID(uid) {
+        for (const merchant of caseModeData) {
+            const caseItem = merchant.cases.find(c => c.uid === uid);
+            if (caseItem) return caseItem;
+        }
+        return null;
+    }
+
+    function handleDeleteMerchant(merchantId) {
+        if (!confirm("Are you sure you want to permanently delete this merchant and all its cases? This cannot be undone.")) return;
+
+        const merchant = caseModeData.find(m => m.id === merchantId);
+        if (!merchant) return;
+
+        merchant.cases.forEach(caseItem => localStorage.removeItem(caseItem.uid));
+
+        const noteArea = document.getElementById('noteArea');
+        const allSections = noteArea.value.split(merchantSeparatorRegex);
+        const remainingSections = allSections.filter(section => section.trim() !== merchant.originalText.trim());
+        noteArea.value = remainingSections.join(merchantSeparator);
+
+        countTemplatesNoteTaker();
+        recordNoteChange();
+        
+        initCaseMode();
+
+        showNotification(`Merchant "${merchant.displayName}" deleted.`, 'success');
+    }
+    
+    function viewRemovalOrderIds(merchant) {
+        const modal = document.getElementById('caseModeActionModal');
+        const modalTitle = document.getElementById('caseModeActionModalTitle');
+        const modalBody = document.getElementById('caseModeActionModalBody');
+        const actionBtn = document.getElementById('caseModeActionModalActionBtn');
+
+        if (!merchant || merchant.cases.length === 0) return;
+        const regex = /Removal order ID:\s*(\S+)/g;
+        const uniqueIds = [...new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])))];
+
+        modalTitle.innerHTML = `<i class="fa-solid fa-list-ol"></i> Unique Removal Order IDs`;
+        if (uniqueIds.length > 0) {
+            modalBody.innerHTML = `<div class="ro-id-list">${uniqueIds.map(id => `
+                <div class="ro-id-item" data-id="${id}">
+                    <label class="macos-checkbox-container" style="padding: 5px; cursor:pointer;">
+                        <input type="checkbox" class="macos-checkbox ro-id-checkbox" data-id="${id}">
+                        <span class="ro-id-text">${id}</span>
+                    </label>
+                </div>`).join('')}</div>`;
+        } else {
+            modalBody.textContent = "No 'Removal order ID' found in templates.";
+        }
+        
+        actionBtn.innerHTML = `<i class="fa-solid fa-filter"></i> Filter`;
+        actionBtn.style.display = 'inline-flex';
+        actionBtn.onclick = () => {
+            const checkedIds = [...modal.querySelectorAll('.ro-id-checkbox:checked')].map(cb => cb.dataset.id);
+            if (checkedIds.length > 0) {
+                filterCasesByRemovalId(checkedIds);
+            }
+            modal.style.display = 'none';
+        };
+        modal.style.display = 'flex';
+    }
+
+    function filterCasesByRemovalId(removalIds) {
+        const caseCards = document.querySelectorAll(`#case-content-${activeCaseModeTabId} .case-card`);
+        caseCards.forEach(card => {
+            const caseItem = findCaseByUID(card.id);
+            if (caseItem) {
+                const matches = removalIds.some(id => caseItem.text.includes(id));
+                card.classList.toggle('filtered-out', !matches);
+            }
+        });
+        document.querySelector(`#case-content-${activeCaseModeTabId} #resetFilterBtn`).style.display = 'inline-flex';
+    }
+
+    function resetCaseFilter() {
+         const caseCards = document.querySelectorAll(`#case-content-${activeCaseModeTabId} .case-card`);
+         caseCards.forEach(card => card.classList.remove('filtered-out'));
+         document.querySelector(`#case-content-${activeCaseModeTabId} #resetFilterBtn`).style.display = 'none';
+    }
+    
+    function updateFileInfo(fileNames = []) {
+        const fileInfoBtn = document.getElementById('fileInfoBtn');
+        if (!fileInfoBtn) return;
+        
+        const hasData = fileNames && fileNames.length > 0;
+
+        if (!hasData || fileNames.length <= 1) {
+            fileInfoBtn.style.display = 'none';
+        } else {
+            fileInfoBtn.style.display = 'inline-flex';
+            fileInfoBtn.title = `Loaded files:\n${fileNames.join('\n')}`;
+        }
+    }
+
+    function updateCaseModeStats() {
+        let globalFiled = 0, globalTotal = 0;
+        caseModeData.forEach(m => {
+            const filedCount = m.cases.filter(c => c.filedId !== null).length;
+            const totalCount = m.cases.length;
+            globalFiled += filedCount;
+            globalTotal += totalCount;
+            
+            const tabBtn = document.querySelector(`.case-mode-tab-button[data-tab-id="${m.id}"]`);
+            if(tabBtn) {
+                tabBtn.querySelector('.case-mode-tab-meta').textContent = `${filedCount}/${totalCount}`;
+                tabBtn.classList.toggle('done', filedCount === totalCount && totalCount > 0);
+            }
+
+            const copyBtn = document.querySelector(`#case-content-${m.id} [data-action="copy-merchant-ids"]`);
+            if(copyBtn) {
+                copyBtn.innerHTML = `<i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)`;
+                copyBtn.disabled = filedCount === 0;
+            }
+        });
+
+        document.getElementById('caseModeGlobalStats').textContent = `Total Filed: ${globalFiled} / ${globalTotal}`;
+        const copyAllBtn = document.getElementById('copyAllMerchantsBtn');
+        copyAllBtn.style.display = globalFiled > 0 ? 'inline-flex' : 'none';
+    }
+    
+    function copyAllMerchantsWithIds() {
+        const merchantsWithFiledCases = caseModeData.filter(m => m.cases.some(c => c.filedId !== null));
+        if (merchantsWithFiledCases.length === 0) return;
+
+        const output = merchantsWithFiledCases.map(merchant => {
+            const header = merchant.displayName;
+            const ids = merchant.cases.map(c => c.filedId).filter(id => id !== null).join('\n');
+            const filedCases = merchant.cases.filter(c => c.filedId !== null);
+            return filedCases.length > 0 ? `${header}\n${ids}` : null;
+        }).filter(Boolean).join('\n\n');
+
+        if (output) {
+            navigator.clipboard.writeText(output);
+            showNotification(`Copied data for ${merchantsWithFiledCases.length} merchants!`, 'success');
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', () => {
         loadSettings();
         autoClearOldHistory();
         const noteArea = document.getElementById('noteArea');
-        if (noteArea) {
-            const savedNotes = localStorage.getItem(localStorageKey);
-            if (savedNotes) noteArea.value = savedNotes;
-            
-            noteHistory = [noteArea.value];
-            noteHistoryIndex = 0;
-            updateNoteUndoRedoButtons();
-            
-            noteArea.addEventListener('input', () => {
-                clearTimeout(noteChangeTimeout);
-                noteChangeTimeout = setTimeout(() => {
-                    recordNoteChange();
-                    countTemplatesNoteTaker();
-                }, 500);
-            });
-            noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
-            noteArea.addEventListener('scroll', saveNotesToLocalStorage);
+
+        const savedState = JSON.parse(localStorage.getItem(caseModeStateKey));
+        if (savedState && savedState.fileContent) {
+            noteArea.value = savedState.fileContent;
         }
+        
+        noteHistory = [noteArea.value];
+        noteHistoryIndex = 0;
+        updateNoteUndoRedoButtons();
+        
+        noteArea.addEventListener('input', () => {
+            clearTimeout(noteChangeTimeout);
+            noteChangeTimeout = setTimeout(() => {
+                recordNoteChange();
+                countTemplatesNoteTaker();
+            }, 500);
+        });
+        noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
+        noteArea.addEventListener('scroll', saveNotesToLocalStorage);
+        
         const shipmentInput = document.getElementById('shipmentInput');
         if (shipmentInput) {
              let parseTimer;
@@ -2089,6 +2706,7 @@
         document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
         document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
         document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
+        document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
 
         const btnSelectAll = document.getElementById('btnSelectAll');
         if (btnSelectAll) {
@@ -2178,6 +2796,12 @@
             upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
             toggleUpsUspsMode(upsUspsToggle.checked);
         }
+
+        // --- NEW/UPDATED Listeners for Case Mode & Data Management ---
+        document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
+        document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
+        const actionModal = document.getElementById('caseModeActionModal');
+        actionModal.querySelector('#caseModeActionModalCancelBtn').addEventListener('click', () => actionModal.style.display = 'none');
         
         window.addEventListener('resize', handleAutoLayout);
         window.addEventListener('beforeunload', saveAllScrollPositions);
