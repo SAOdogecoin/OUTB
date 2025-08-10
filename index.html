@@ -69,6 +69,8 @@
         transition: background-color 0.2s ease, color 0.2s ease;
     }
     body.is-resizing { user-select: none; }
+    body.is-standalone-mode #mainWrapper { display: none; }
+    body.is-standalone-mode .top-bar .non-standalone { display: none; }
 
     .top-bar {
         background-color: var(--bg-toolbar);
@@ -461,9 +463,7 @@
     .case-mode-tab-content.active { display: block; }
     .case-mode-tab-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
     .tab-actions-left, .tab-actions-right { display: flex; gap: 8px; flex-wrap: wrap; }
-    #resetFilterBtn { display: none; }
     .case-card { background-color: var(--bg-window); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.2s ease-in-out; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border-subtle); }
-    .case-card.filtered-out { display: none; }
     .case-card.editing { border-color: var(--accent-orange); }
     .card-content { display: flex; gap: 1rem; padding: 10px 16px; align-items: stretch; }
     .case-card:not(.unfiled) .card-content { align-items: center; }
@@ -471,6 +471,14 @@
     .case-card:not(.unfiled) .left-pane { align-items: center; }
     .case-number { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); width: 30px; text-align: center; flex-shrink: 0; padding-top: 4px; }
     .case-card:not(.unfiled) .case-number { padding-top: 0; }
+    .ro-match-indicator {
+        display: none;
+        margin-left: -12px;
+        margin-right: 4px;
+        font-size: 1.1em;
+        color: var(--accent-green);
+    }
+    .case-card.ro-matched .ro-match-indicator { display: inline-block; }
     .main-content { flex-grow: 1; }
     .case-text { white-space: pre-wrap; font-family: var(--mono-font); max-height: 150px; overflow-y: auto; font-size: 0.85rem; background: var(--bg-primary); padding: 8px; border-radius: 8px; }
     .filed-info { display: none; }
@@ -488,13 +496,24 @@
     .case-card.filed .case-text, .case-card.editing .case-text { display: none; }
     .case-card.filed .filed-info { display: block; }
     #caseTextModal .modal-content pre { white-space: pre-wrap; font-family: var(--mono-font); background-color: var(--bg-input); padding: 12px; border-radius: 12px; max-height: 60vh; overflow-y: auto; font-size: 0.9rem; border: 1px solid var(--border-subtle); }
-    #paste-textarea { height: 40vh; resize: vertical; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--bg-input); color: var(--text-primary); font-family: var(--mono-font); }
+    #paste-textarea, #ro-paste-area { height: 40vh; resize: vertical; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--bg-input); color: var(--text-primary); font-family: var(--mono-font); }
+    #ro-paste-area { height: 20vh; min-height: 120px; }
     .ro-id-list, .history-list { display: flex; flex-direction: column; gap: 0.5rem; }
-    .ro-id-item, .history-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-subtle); }
-    .ro-id-checkbox { width: 16px; height: 16px; flex-shrink: 0; }
+    .ro-id-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.5rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-subtle); }
     .ro-id-text, .history-text { font-family: var(--mono-font); font-weight: 600; flex-grow: 1; }
+    .ro-id-match-status {
+        font-weight: 600;
+        font-size: 0.9em;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background-color: color-mix(in srgb, var(--accent-green) 15%, transparent);
+        color: var(--accent-green);
+        margin-left: 1rem;
+    }
     .history-merchant-name { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin-left: 1rem; }
     .history-timestamp { color: var(--text-secondary); }
+    #caseModeActionModalBody .macos-textfield-container { margin-top: 1rem; }
+
 </style>
 </head>
 <body>
@@ -530,7 +549,7 @@
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
-            <div class="url-generator-group">
+            <div class="url-generator-group non-standalone">
                 <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -538,22 +557,23 @@
                     <option value="ca">CA</option>
                 </select>
             </div>
-            <div id="prefixToggleGroup" class="toolbar-icon-group">
+            <div id="prefixToggleGroup" class="toolbar-icon-group non-standalone">
                 <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
             <div class="toolbar-icon-group">
-                <button id="btnHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
-                <button id="btnCaseMode" class="macos-icon-button" title="Case Mode"><i class="fa-solid fa-briefcase"></i></button>
+                <button id="btnHistory" class="macos-icon-button non-standalone" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+                <button id="btnCaseMode" class="macos-icon-button non-standalone" title="Case Mode"><i class="fa-solid fa-briefcase"></i></button>
+                <button id="btnGenerateFilerUrl" class="macos-icon-button" title="Generate Filer URL"><i class="fa-solid fa-share-square"></i></button>
             </div>
-            <div class="toolbar-icon-group">
+            <div class="toolbar-icon-group non-standalone">
                 <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
                 <button id="btnLayoutSide" class="macos-icon-button" title="Side-by-Side View"><i class="fa-solid fa-table-columns"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
             </div>
-            <div class="toolbar-icon-group">
+            <div class="toolbar-icon-group non-standalone">
                 <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
             </div>
         </div>
@@ -810,8 +830,8 @@
                     <button id="caseModeActionModalCopyAllBtn" class="macos secondary" style="display:none;">Copy All</button>
                 </div>
                 <div class="right-actions">
-                    <button id="caseModeActionModalCancelBtn" class="macos secondary">Cancel</button>
-                    <button id="caseModeActionModalActionBtn" class="macos primary">Action</button>
+                    <button id="caseModeActionModalCancelBtn" class="macos secondary">Close</button>
+                    <button id="caseModeActionModalActionBtn" class="macos primary" style="display:none;">Action</button>
                 </div>
             </div>
         </div>
@@ -868,13 +888,15 @@
     // --- CASE MODE VARIABLES ---
     let caseModeData = [];
     let activeCaseModeTabId = null;
+    let matchedRoIds = new Set();
+
 
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function sanitizeFilename(name) {
-        return name.replace(/[\s\\/:"*?<>|]+/g, '_').substring(0, 50);
+        return name.replace(/[\s\\/:"*?<>|()]+/g, '_').substring(0, 50);
     }
 
     function getFormattedDate() {
@@ -1121,6 +1143,33 @@
         
         return namePart ? (namePart + '\n\n' + casesPart) : casesPart;
     }
+
+    function isMerchantVerified(merchantObj) {
+        const roIdRegex = /Removal order ID:\s*(\S+)/g;
+        const allRoIdsInMerchant = merchantObj.cases.flatMap(c => [...c.text.matchAll(roIdRegex)].map(match => match[1]));
+
+        if (allRoIdsInMerchant.length === 0) {
+            return false; // Not verifiable if no RO IDs exist
+        }
+
+        // Check if every RO ID found in the merchant's cases is also in the matched set
+        return allRoIdsInMerchant.every(id => matchedRoIds.has(id));
+    }
+
+    function getFormattedBlockWithVerification(merchantObj) {
+        let formattedBlock = formatMerchantBlockForOutput(merchantObj.originalText);
+        
+        if (isMerchantVerified(merchantObj)) {
+            const lines = formattedBlock.split('\n\n');
+            // The first part is the name, the rest is the case data.
+            // This handles both cases where a name was parsed or not.
+            if (lines.length > 0) {
+                lines[0] = `${lines[0]} ***Verified Removal***`;
+                return lines.join('\n\n');
+            }
+        }
+        return formattedBlock;
+    }
     
     async function handleConfirmTelegramSend() {
         const modal = document.getElementById('telegramSendModal');
@@ -1149,9 +1198,10 @@
         if (!isNaN(numberToSave) && numberToSave > 0) {
             localStorage.setItem(telegramNumberKey, numberToSave);
         }
-
-        const fileContent = merchantsData.map(m => formatMerchantBlockForOutput(m.key)).join(merchantSeparator);
         
+        const merchantObjectsToSend = merchantsData.map(m => caseModeData.find(obj => obj.originalText === m.key)).filter(Boolean);
+        const fileContent = merchantObjectsToSend.map(getFormattedBlockWithVerification).join(merchantSeparator);
+
         const result = await sendFileToTelegram(fileContent, filename, ''); 
         
         sendButton.disabled = false;
@@ -1677,14 +1727,20 @@
     
     function downloadSelectedMerchants() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { return; }
-        const textsToDownload = []; let totalSelectedCases = 0;
-        selectedDivs.forEach((div) => { const key = div.dataset.key; if (key) { textsToDownload.push(key); totalSelectedCases += parseInt(div.dataset.count || '0', 10); } });
-        if (textsToDownload.length === 0) { return; }
-        
-        const combinedText = textsToDownload.map(formatMerchantBlockForOutput).join(merchantSeparator);
+        if (selectedDivs.length === 0) return;
+
+        let totalSelectedCases = 0;
+        const merchantObjectsToDownload = Array.from(selectedDivs).map(div => {
+            const key = div.dataset.key;
+            totalSelectedCases += parseInt(div.dataset.count || '0', 10);
+            return caseModeData.find(m => m.originalText === key);
+        }).filter(Boolean);
+
+        if (merchantObjectsToDownload.length === 0) return;
+
+        const combinedText = merchantObjectsToDownload.map(getFormattedBlockWithVerification).join(merchantSeparator);
         const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename); 
+        downloadText(combinedText + '\n', filename);
     }
 
     function processSingleROBlock(roBlockText, removalOrdersArray) {
@@ -1776,9 +1832,19 @@
             showNotification("No split files generated.", "info");
             return;
         }
+        
+        let merchantDisplay = selectedMerchantDataForSplit.map(item => {
+            const merchantObj = caseModeData.find(m => m.key === item.key);
+            let name = item.name;
+            if(merchantObj && isMerchantVerified(merchantObj)){
+                name += ' ***Verified Removal***';
+            }
+            return name;
+        }).join(' & ');
+
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
         const dateStr = getFormattedDate();
-        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
+        
         splitOutputs.forEach((output, index) => {
             const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
             const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
@@ -1791,7 +1857,7 @@
         const splitModal = document.getElementById('splitModal');
         if (!splitModal) return;
 
-        const combinedText = modal.dataset.combinedText || '';
+        const combinedText = splitModal.dataset.combinedText || '';
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
 
@@ -1820,7 +1886,15 @@
             return;
         }
 
-        const merchantDisplay = selectedMerchantDataForSplit.map(m => m.name).join(' & ');
+        const merchantDisplay = selectedMerchantDataForSplit.map(item => {
+            const merchantObj = caseModeData.find(m => m.originalText === item.key);
+            let name = item.name;
+            if(merchantObj && isMerchantVerified(merchantObj)){
+                name += ' ***Verified Removal***';
+            }
+            return name;
+        }).join(' & ');
+        
         const preSendModal = document.getElementById('preSendConfirmModal');
         const fileListEl = document.getElementById('preSendFileList');
         fileListEl.innerHTML = '';
@@ -2182,13 +2256,15 @@
         const isCaseModeActive = caseModeWrapper.style.display !== 'none';
         
         if (isCaseModeActive) {
-            mainWrapper.style.display = 'flex';
-            caseModeWrapper.style.display = 'none';
-            caseModeBtn.classList.remove('active');
+            if (!document.body.classList.contains('is-standalone-mode')) {
+                mainWrapper.style.display = 'flex';
+                caseModeWrapper.style.display = 'none';
+                caseModeBtn.classList.remove('active');
+            }
         } else {
             mainWrapper.style.display = 'none';
             caseModeWrapper.style.display = 'flex';
-            caseModeBtn.classList.add('active');
+            if (caseModeBtn) caseModeBtn.classList.add('active');
             initCaseMode();
         }
     }
@@ -2196,6 +2272,51 @@
     function initCaseMode() {
         parseNotesForCaseMode();
         renderCaseModeUI();
+    }
+    
+    function initStandaloneMode() {
+        document.body.classList.add('is-standalone-mode');
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#casetracker_data=')) {
+            try {
+                const encodedData = hash.substring('#casetracker_data='.length);
+                const jsonData = decodeURIComponent(escape(atob(encodedData)));
+                caseModeData = JSON.parse(jsonData);
+                if (caseModeData.length > 0) {
+                    activeCaseModeTabId = caseModeData[0].id;
+                }
+                document.getElementById('mainWrapper').style.display = 'none';
+                document.getElementById('caseModeWrapper').style.display = 'flex';
+                renderCaseModeUI();
+            } catch (e) {
+                console.error("Failed to load standalone data from URL:", e);
+                alert("Error: Could not load data from the URL. It might be corrupted.");
+            }
+        }
+    }
+    
+    function generateFilerUrl() {
+        parseNotesForCaseMode();
+        if (caseModeData.length === 0) {
+            showNotification("No case data to share.", "info");
+            return;
+        }
+        
+        try {
+            const dataString = JSON.stringify(caseModeData);
+            const encodedData = btoa(unescape(encodeURIComponent(dataString)));
+            const url = `${window.location.origin}${window.location.pathname}#casetracker_data=${encodedData}`;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification("Filer URL copied to clipboard!", "success");
+            }).catch(err => {
+                console.error("Failed to copy URL:", err);
+                showNotification("Failed to copy URL.", "error");
+            });
+        } catch (e) {
+            console.error("Error generating filer URL:", e);
+            showNotification("Could not generate URL. Data may be too large.", "error");
+        }
     }
 
     function generateUID(merchantId, caseIndex, text) {
@@ -2210,7 +2331,9 @@
     }
 
     function parseNotesForCaseMode() {
-        const fullText = document.getElementById('noteArea').value;
+        const noteArea = document.getElementById('noteArea');
+        if (!noteArea) return;
+        const fullText = noteArea.value;
         caseModeData = [];
         let merchantIndex = 0;
         const merchantBlocks = fullText.split(merchantSeparatorRegex).filter(b => b.trim());
@@ -2248,7 +2371,7 @@
                 merchantObject.cases.push({
                     uid: uid,
                     text: caseText,
-                    filedId: localStorage.getItem(uid) || null,
+                    filedId: document.body.classList.contains('is-standalone-mode') ? null : localStorage.getItem(uid) || null,
                 });
             });
             
@@ -2269,6 +2392,7 @@
     }
 
     function saveCaseModeState() {
+        if (document.body.classList.contains('is-standalone-mode')) return;
         const state = JSON.parse(localStorage.getItem(caseModeStateKey)) || {};
         state.activeTabId = activeCaseModeTabId;
         localStorage.setItem(caseModeStateKey, JSON.stringify(state));
@@ -2314,7 +2438,6 @@
                 <div class="case-mode-tab-content-header">
                     <div class="tab-actions-left">
                        <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
-                       <button id="resetFilterBtn" class="macos warning"><i class="fa-solid fa-filter-circle-xmark"></i> Reset Filter</button>
                     </div>
                     <div class="tab-actions-right">
                        <button class="macos success" data-action="copy-merchant-ids" data-merchant-id="${merchant.id}" ${filedCount === 0 ? 'disabled' : ''}>
@@ -2334,6 +2457,7 @@
 
         addCaseModeEventListeners();
         updateCaseModeStats();
+        updateCaseCardMatchStatus();
     }
     
     function createCaseCard(caseItem, number) {
@@ -2344,6 +2468,7 @@
         card.innerHTML = `
             <div class="card-content">
                 <div class="left-pane">
+                    <span class="ro-match-indicator"><i class="fa-solid fa-check-circle"></i></span>
                     <div class="case-number">${number}</div>
                     <div class="main-content">
                         <div class="case-text">${caseItem.text}</div>
@@ -2450,8 +2575,6 @@
                 }
             } else if (action === 'view-ro-ids') {
                 viewRemovalOrderIds(merchant);
-            } else if (button.id === 'resetFilterBtn') {
-                resetCaseFilter();
             }
         });
         
@@ -2486,12 +2609,17 @@
                 caseItem.filedId = newId ? newId : null;
                 
                 if (newId) {
-                    localStorage.setItem(caseItem.uid, newId);
+                    // In standalone mode, we don't save to localstorage
+                    if (!document.body.classList.contains('is-standalone-mode')) {
+                        localStorage.setItem(caseItem.uid, newId);
+                    }
                     card.classList.add('filed');
                     card.classList.remove('unfiled', 'editing');
                     showNotification('Case ID saved!', 'success');
                 } else {
-                    localStorage.removeItem(caseItem.uid);
+                    if (!document.body.classList.contains('is-standalone-mode')) {
+                        localStorage.removeItem(caseItem.uid);
+                    }
                     card.classList.add('unfiled');
                     card.classList.remove('filed', 'editing');
                     card.querySelector('.unfiled-controls input.case-id-input').value = '';
@@ -2515,7 +2643,9 @@
             case 'delete-case':
                 if (confirm('Are you sure you want to clear this case ID? This will mark it as un-filed.')) {
                     caseItem.filedId = null;
-                    localStorage.removeItem(caseItem.uid);
+                     if (!document.body.classList.contains('is-standalone-mode')) {
+                        localStorage.removeItem(caseItem.uid);
+                    }
                     card.querySelector('.unfiled-controls input').value = '';
                     card.classList.remove('filed', 'editing');
                     card.classList.add('unfiled');
@@ -2534,6 +2664,10 @@
     }
 
     function handleDeleteMerchant(merchantId) {
+        if (document.body.classList.contains('is-standalone-mode')) {
+            showNotification("Cannot delete merchants in Filer Mode.", "error");
+            return;
+        }
         if (!confirm("Are you sure you want to permanently delete this merchant and all its cases? This cannot be undone.")) return;
 
         const merchant = caseModeData.find(m => m.id === merchantId);
@@ -2555,56 +2689,77 @@
     }
     
     function viewRemovalOrderIds(merchant) {
+        matchedRoIds.clear();
         const modal = document.getElementById('caseModeActionModal');
         const modalTitle = document.getElementById('caseModeActionModalTitle');
         const modalBody = document.getElementById('caseModeActionModalBody');
         const actionBtn = document.getElementById('caseModeActionModalActionBtn');
+        const copyAllBtn = document.getElementById('caseModeActionModalCopyAllBtn');
 
         if (!merchant || merchant.cases.length === 0) return;
+
         const regex = /Removal order ID:\s*(\S+)/g;
         const uniqueIds = [...new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])))];
 
-        modalTitle.innerHTML = `<i class="fa-solid fa-list-ol"></i> Unique Removal Order IDs`;
+        modalTitle.innerHTML = `<i class="fa-solid fa-tags"></i> Match Removal Order IDs`;
+        
         if (uniqueIds.length > 0) {
-            modalBody.innerHTML = `<div class="ro-id-list">${uniqueIds.map(id => `
+            const idListHTML = uniqueIds.map(id => `
                 <div class="ro-id-item" data-id="${id}">
-                    <label class="macos-checkbox-container" style="padding: 5px; cursor:pointer;">
-                        <input type="checkbox" class="macos-checkbox ro-id-checkbox" data-id="${id}">
-                        <span class="ro-id-text">${id}</span>
-                    </label>
-                </div>`).join('')}</div>`;
+                    <span class="ro-id-text">${id}</span>
+                    <span class="ro-id-match-status"></span>
+                </div>`).join('');
+            
+            modalBody.innerHTML = `
+                <div class="ro-id-list">${idListHTML}</div>
+                <div class="macos-textfield-container">
+                    <textarea id="ro-paste-area" class="macos-textfield" placeholder="Paste removal report data here to find matches..."></textarea>
+                </div>
+            `;
         } else {
-            modalBody.textContent = "No 'Removal order ID' found in templates.";
+            modalBody.innerHTML = "<p>No 'Removal order ID' found in this merchant's templates.</p>";
         }
         
-        actionBtn.innerHTML = `<i class="fa-solid fa-filter"></i> Filter`;
-        actionBtn.style.display = 'inline-flex';
-        actionBtn.onclick = () => {
-            const checkedIds = [...modal.querySelectorAll('.ro-id-checkbox:checked')].map(cb => cb.dataset.id);
-            if (checkedIds.length > 0) {
-                filterCasesByRemovalId(checkedIds);
-            }
-            modal.style.display = 'none';
-        };
+        actionBtn.style.display = 'none';
+        copyAllBtn.style.display = 'none';
         modal.style.display = 'flex';
+
+        const pasteArea = document.getElementById('ro-paste-area');
+        if (pasteArea) {
+            pasteArea.addEventListener('input', (event) => {
+                const pastedText = event.target.value;
+                const foundIdsInPaste = new Set(pastedText.match(/\b[a-zA-Z0-9/]{8,}\b/g) || []);
+                
+                uniqueIds.forEach(id => {
+                    const itemDiv = modalBody.querySelector(`.ro-id-item[data-id="${CSS.escape(id)}"]`);
+                    if (itemDiv) {
+                        const statusSpan = itemDiv.querySelector('.ro-id-match-status');
+                        if (foundIdsInPaste.has(id)) {
+                            statusSpan.textContent = 'Matched';
+                            matchedRoIds.add(id);
+                        } else {
+                            statusSpan.textContent = '';
+                            matchedRoIds.delete(id);
+                        }
+                    }
+                });
+            });
+        }
     }
 
-    function filterCasesByRemovalId(removalIds) {
+    function updateCaseCardMatchStatus() {
+        if (!activeCaseModeTabId) return;
         const caseCards = document.querySelectorAll(`#case-content-${activeCaseModeTabId} .case-card`);
+        const roIdRegex = /Removal order ID:\s*(\S+)/;
+
         caseCards.forEach(card => {
             const caseItem = findCaseByUID(card.id);
             if (caseItem) {
-                const matches = removalIds.some(id => caseItem.text.includes(id));
-                card.classList.toggle('filtered-out', !matches);
+                const match = caseItem.text.match(roIdRegex);
+                const roId = match ? match[1] : null;
+                card.classList.toggle('ro-matched', roId && matchedRoIds.has(roId));
             }
         });
-        document.querySelector(`#case-content-${activeCaseModeTabId} #resetFilterBtn`).style.display = 'inline-flex';
-    }
-
-    function resetCaseFilter() {
-         const caseCards = document.querySelectorAll(`#case-content-${activeCaseModeTabId} .case-card`);
-         caseCards.forEach(card => card.classList.remove('filtered-out'));
-         document.querySelector(`#case-content-${activeCaseModeTabId} #resetFilterBtn`).style.display = 'none';
     }
     
     function updateFileInfo(fileNames = []) {
@@ -2665,175 +2820,180 @@
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-        loadSettings();
-        autoClearOldHistory();
-        const noteArea = document.getElementById('noteArea');
+        // Check for standalone "Filer Mode" first
+        if (window.location.hash.startsWith('#casetracker_data=')) {
+            initStandaloneMode();
+        } else {
+            // Normal tool initialization
+            loadSettings();
+            autoClearOldHistory();
+            const noteArea = document.getElementById('noteArea');
 
-        const savedState = JSON.parse(localStorage.getItem(caseModeStateKey));
-        if (savedState && savedState.fileContent) {
-            noteArea.value = savedState.fileContent;
-        }
-        
-        noteHistory = [noteArea.value];
-        noteHistoryIndex = 0;
-        updateNoteUndoRedoButtons();
-        
-        noteArea.addEventListener('input', () => {
-            clearTimeout(noteChangeTimeout);
-            noteChangeTimeout = setTimeout(() => {
-                recordNoteChange();
-                countTemplatesNoteTaker();
-            }, 500);
-        });
-        noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
-        noteArea.addEventListener('scroll', saveNotesToLocalStorage);
-        
-        const shipmentInput = document.getElementById('shipmentInput');
-        if (shipmentInput) {
-             let parseTimer;
-             shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
-             shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
-        }
-        const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
-        if(upsUspsOutputArea) {
-            const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved;
-            upsUspsOutputArea.addEventListener('scroll', saveUpsUspsOutputToLocalStorage);
-        }
-        try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
-        catch (e) { tempUpsUspsData = {}; }
-        restoreScrollPositions();
-        countTemplatesNoteTaker();
-        
-        const parserTool = document.getElementById('parserTool');
-        const parserToggleBtn = document.getElementById('parserToggle');
-        const savedParserState = localStorage.getItem(parserStateKey);
-        if (savedParserState === 'hidden') {
-            parserTool.classList.add('is-hidden');
-            parserToggleBtn.querySelector('i').className = 'fa-solid fa-eye';
-        }
-        parserToggleBtn.addEventListener('click', () => {
-            const isHidden = parserTool.classList.toggle('is-hidden');
-            parserToggleBtn.querySelector('i').className = `fa-solid fa-eye${isHidden ? '' : '-slash'}`;
-            localStorage.setItem(parserStateKey, isHidden ? 'hidden' : 'visible');
-        });
+            const savedState = JSON.parse(localStorage.getItem(caseModeStateKey));
+            if (savedState && savedState.fileContent) {
+                noteArea.value = savedState.fileContent;
+            }
+            
+            noteHistory = [noteArea.value];
+            noteHistoryIndex = 0;
+            updateNoteUndoRedoButtons();
+            
+            noteArea.addEventListener('input', () => {
+                clearTimeout(noteChangeTimeout);
+                noteChangeTimeout = setTimeout(() => {
+                    recordNoteChange();
+                    countTemplatesNoteTaker();
+                }, 500);
+            });
+            noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
+            noteArea.addEventListener('scroll', saveNotesToLocalStorage);
+            
+            const shipmentInput = document.getElementById('shipmentInput');
+            if (shipmentInput) {
+                 let parseTimer;
+                 shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
+                 shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
+            }
+            const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
+            if(upsUspsOutputArea) {
+                const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved;
+                upsUspsOutputArea.addEventListener('scroll', saveUpsUspsOutputToLocalStorage);
+            }
+            try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
+            catch (e) { tempUpsUspsData = {}; }
+            restoreScrollPositions();
+            countTemplatesNoteTaker();
+            
+            const parserTool = document.getElementById('parserTool');
+            const parserToggleBtn = document.getElementById('parserToggle');
+            const savedParserState = localStorage.getItem(parserStateKey);
+            if (savedParserState === 'hidden') {
+                parserTool.classList.add('is-hidden');
+                parserToggleBtn.querySelector('i').className = 'fa-solid fa-eye';
+            }
+            parserToggleBtn.addEventListener('click', () => {
+                const isHidden = parserTool.classList.toggle('is-hidden');
+                parserToggleBtn.querySelector('i').className = `fa-solid fa-eye${isHidden ? '' : '-slash'}`;
+                localStorage.setItem(parserStateKey, isHidden ? 'hidden' : 'visible');
+            });
 
-        document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
-        document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
-        document.getElementById('btnHistory')?.addEventListener('click', openHistoryModal);
-        document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
+            document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
+            document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
+            document.getElementById('btnHistory')?.addEventListener('click', openHistoryModal);
+            document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
+
+            document.getElementById('btnLayoutStacked')?.addEventListener('click', () => setLayout('stacked'));
+            document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
+            document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
+            document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
+            document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
+            document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
+            document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
+
+            const btnSelectAll = document.getElementById('btnSelectAll');
+            if (btnSelectAll) {
+                btnSelectAll.addEventListener('click', () => {
+                    const allVisibleCheckboxes = Array.from(document.querySelectorAll('#merchantList .merchant-item'))
+                        .filter(item => item.style.display !== 'none')
+                        .map(item => item.querySelector('.macos-checkbox'));
+                    
+                    const areAllSelected = allVisibleCheckboxes.length > 0 && allVisibleCheckboxes.every(cb => cb.checked);
+                    const newCheckedState = !areAllSelected;
+
+                    allVisibleCheckboxes.forEach(cb => {
+                        cb.checked = newCheckedState;
+                    });
+                    updateSelectedCountNoteTaker();
+                });
+            }
+
+            document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
+                const count = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
+                const combinedText = caseModeData.map(getFormattedBlockWithVerification).join(merchantSeparator);
+                downloadText(combinedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`);
+            });
+            document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
+            document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
+            document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
+            document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
+            document.getElementById('btnClearAllNotes')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'flex');
+            document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
+            document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
+            document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
+            
+            const marketplaceSelectUrlGen = document.getElementById('marketplaceSelectUrlGen');
+            const copyUrlBtn = document.getElementById('copyUrlBtn');
+            marketplaceSelectUrlGen.addEventListener('change', () => {
+                appSettings.marketplaceUrlGen = marketplaceSelectUrlGen.value;
+                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+            });
+            copyUrlBtn.addEventListener('click', () => {
+                const urlToCopy = generateReportUrl();
+                navigator.clipboard.writeText(urlToCopy).then(() => {
+                    showNotification('URL Copied!', 'success');
+                }, () => {
+                    showNotification('Copy Failed!', 'error');
+                });
+            });
+
+            document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
+            document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
+            document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
+            document.getElementById('btnClearAllHistory')?.addEventListener('click', openClearHistoryConfirmModal);
+            document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
+            document.getElementById('btnConfirmClearHistory')?.addEventListener('click', handleClearAllHistory);
+            document.getElementById('confirmClearHistoryModal')?.addEventListener('click', e => { if (e.target.id === 'confirmClearHistoryModal') closeClearHistoryConfirmModal(); });
+            document.getElementById('btnCancelTelegramSend')?.addEventListener('click', closeTelegramSendModal);
+            document.getElementById('telegramSendModal')?.addEventListener('click', e => { if (e.target.id === 'telegramSendModal') closeTelegramSendModal(); });
+            document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
+            document.getElementById('btnYesDeleteSent')?.addEventListener('click', confirmAndDeleteSentMerchants);
+            document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
+            document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
+            document.getElementById('settingsModal')?.addEventListener('click', e => { if (e.target.id === 'settingsModal') closeSettingsModal(); });
+            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
+            document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
+            document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
+            document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
+            document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
+            document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
+            document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
+
+            document.getElementById('btnCancelPreSend')?.addEventListener('click', () => { document.getElementById('preSendConfirmModal').style.display = 'none'; });
+            document.getElementById('btnConfirmAndSend')?.addEventListener('click', executeTelegramsendsFromModal);
+
+            document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
+
+            const upsUspsToggle = document.getElementById('upsUspsToggle');
+            const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
+            if (upsUspsToggle && upsUspsOutputContainer && shipmentInput) {
+                function toggleUpsUspsMode(isUpsMode) {
+                    upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
+                    shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
+                }
+                upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
+                toggleUpsUspsMode(upsUspsToggle.checked);
+            }
+             window.addEventListener('resize', handleAutoLayout);
+            window.addEventListener('beforeunload', saveAllScrollPositions);
+            initDraggableWindows();
+            handleAutoLayout();
+        }
+
+        // --- Common Listeners for both modes ---
+        document.getElementById('btnGenerateFilerUrl')?.addEventListener('click', generateFilerUrl);
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
             appSettings.theme = newTheme;
             localStorage.setItem(settingsKey, JSON.stringify(appSettings));
             setTheme(newTheme);
         });
-        document.getElementById('btnLayoutStacked')?.addEventListener('click', () => setLayout('stacked'));
-        document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
-        document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
-        document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
-        document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
-        document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
-        document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
-
-        const btnSelectAll = document.getElementById('btnSelectAll');
-        if (btnSelectAll) {
-            btnSelectAll.addEventListener('click', () => {
-                const allVisibleCheckboxes = Array.from(document.querySelectorAll('#merchantList .merchant-item'))
-                    .filter(item => item.style.display !== 'none')
-                    .map(item => item.querySelector('.macos-checkbox'));
-                
-                const areAllSelected = allVisibleCheckboxes.length > 0 && allVisibleCheckboxes.every(cb => cb.checked);
-                const newCheckedState = !areAllSelected;
-
-                allVisibleCheckboxes.forEach(cb => {
-                    cb.checked = newCheckedState;
-                });
-                updateSelectedCountNoteTaker();
-            });
-        }
-
-        document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
-            const noteArea = document.getElementById('noteArea');
-            if (!noteArea.value.trim()) return;
-
-            const allMerchantBlocks = noteArea.value.split(merchantSeparatorRegex);
-            const formattedText = allMerchantBlocks.map(formatMerchantBlockForOutput).join(merchantSeparator);
-
-            const count = Array.from(document.querySelectorAll('#merchantList .merchant-item')).reduce((sum, el) => sum + parseInt(el.dataset.count || '0', 10), 0);
-            downloadText(formattedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`);
-        });
-        document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
-        document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
-        document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
-        document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
-        document.getElementById('btnClearAllNotes')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'flex');
-        document.getElementById('cancelClearAllBtn')?.addEventListener('click', () => document.getElementById('clearAllConfirmModal').style.display = 'none');
-        document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
-        document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
-        
-        const marketplaceSelectUrlGen = document.getElementById('marketplaceSelectUrlGen');
-        const copyUrlBtn = document.getElementById('copyUrlBtn');
-        marketplaceSelectUrlGen.addEventListener('change', () => {
-            appSettings.marketplaceUrlGen = marketplaceSelectUrlGen.value;
-            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        });
-        copyUrlBtn.addEventListener('click', () => {
-            const urlToCopy = generateReportUrl();
-            navigator.clipboard.writeText(urlToCopy).then(() => {
-                showNotification('URL Copied!', 'success');
-            }, () => {
-                showNotification('Copy Failed!', 'error');
-            });
-        });
-
-        document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
-        document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
-        document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
-        document.getElementById('btnClearAllHistory')?.addEventListener('click', openClearHistoryConfirmModal);
-        document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
-        document.getElementById('btnConfirmClearHistory')?.addEventListener('click', handleClearAllHistory);
-        document.getElementById('confirmClearHistoryModal')?.addEventListener('click', e => { if (e.target.id === 'confirmClearHistoryModal') closeClearHistoryConfirmModal(); });
-        document.getElementById('btnCancelTelegramSend')?.addEventListener('click', closeTelegramSendModal);
-        document.getElementById('telegramSendModal')?.addEventListener('click', e => { if (e.target.id === 'telegramSendModal') closeTelegramSendModal(); });
-        document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
-        document.getElementById('btnYesDeleteSent')?.addEventListener('click', confirmAndDeleteSentMerchants);
-        document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
-        document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
-        document.getElementById('settingsModal')?.addEventListener('click', e => { if (e.target.id === 'settingsModal') closeSettingsModal(); });
-        document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
-        document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
-        document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
-        document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
-        document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
-        document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
-        document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
-
-        document.getElementById('btnCancelPreSend')?.addEventListener('click', () => { document.getElementById('preSendConfirmModal').style.display = 'none'; });
-        document.getElementById('btnConfirmAndSend')?.addEventListener('click', executeTelegramsendsFromModal);
-
-        document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
-
-        const upsUspsToggle = document.getElementById('upsUspsToggle');
-        const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-        if (upsUspsToggle && upsUspsOutputContainer && shipmentInput) {
-            function toggleUpsUspsMode(isUpsMode) {
-                upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
-                shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
-            }
-            upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
-            toggleUpsUspsMode(upsUspsToggle.checked);
-        }
-
-        // --- NEW/UPDATED Listeners for Case Mode & Data Management ---
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
         const actionModal = document.getElementById('caseModeActionModal');
-        actionModal.querySelector('#caseModeActionModalCancelBtn').addEventListener('click', () => actionModal.style.display = 'none');
-        
-        window.addEventListener('resize', handleAutoLayout);
-        window.addEventListener('beforeunload', saveAllScrollPositions);
-        initDraggableWindows();
-        handleAutoLayout();
+        actionModal.querySelector('#caseModeActionModalCancelBtn').addEventListener('click', () => {
+             actionModal.style.display = 'none';
+             updateCaseCardMatchStatus(); // Update UI when modal is closed
+        });
     });
 </script>
 </body>
