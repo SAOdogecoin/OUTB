@@ -2394,6 +2394,18 @@
             showNotification("Could not find data for selected merchants.", "error");
             return;
         }
+        
+        const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
+        let filenamePart;
+        if (selectedMerchantsData.length === 1) {
+            filenamePart = sanitizeFilename(selectedMerchantsData[0].displayName);
+        } else if (selectedMerchantsData.length > 1) {
+            filenamePart = sanitizeFilename(`${selectedMerchantsData[0].displayName}_Multi`);
+        } else {
+            filenamePart = 'FilerView'; // Fallback
+        }
+
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
 
         const payload = {
             data: selectedMerchantsData,
@@ -2410,26 +2422,16 @@
         let fileContent = document.documentElement.outerHTML;
         fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
 
-        // New filename logic
-        const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
-        let filenamePart;
-        if (selectedMerchantsData.length === 1) {
-            filenamePart = sanitizeFilename(selectedMerchantsData[0].displayName);
-        } else if (selectedMerchantsData.length > 1) {
-            filenamePart = sanitizeFilename(`${selectedMerchantsData[0].displayName}_Multi`);
-        } else {
-            filenamePart = 'FilerView'; // Fallback
-        }
-
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
-
-
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification("Filer View HTML file has been downloaded.", "success");
     }
 
     function exportSingleMerchantFilerView(merchant) {
         if (!merchant) return;
+
+        const totalCases = merchant.cases.length;
+        const filenamePart = sanitizeFilename(merchant.displayName);
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
 
         const payload = {
             data: [merchant], // Pass as an array with one item
@@ -2446,7 +2448,6 @@
         let fileContent = document.documentElement.outerHTML;
         fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
 
-        const filename = `CaseTracker_${sanitizeFilename(merchant.displayName)}_${getFormattedDate()}.html`;
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification(`Filer View for ${merchant.displayName} downloaded.`, "success");
     }
@@ -2633,12 +2634,13 @@
                 </div>
                 <div class="right-pane">
                     <div class="unfiled-controls">
-                        <div class="macos-textfield-container">
-                             <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID...">
+                         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                            <div class="macos-textfield-container" style="flex-grow: 1;">
+                                 <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID...">
+                            </div>
+                            <button class="macos-icon-button active" data-action="save-case" title="Save Case ID" style="flex-shrink: 0;"><i class="fa-solid fa-save"></i></button>
                         </div>
-                        <button class="macos success" data-action="save-case" style="width: 100%;"><i class="fa-solid fa-save"></i>Save Case ID</button>
-                        <div style="height: 1px; background-color: var(--border-subtle); margin: 4px 0;"></div>
-                        <button class="macos secondary" data-action="copy-text" style="width: 100%;"><i class="fa-solid fa-copy"></i>Copy Template</button>
+                        <button class="macos primary" data-action="copy-text" style="width: 100%; padding: 10px 14px;"><i class="fa-solid fa-copy"></i>Copy Template</button>
                         <button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
                     </div>
                     <div class="filed-controls">
@@ -3043,13 +3045,7 @@
     }
 
     function syncExcludeCheckboxes(source) {
-        if (!source) return;
-        const isChecked = source.checked;
-        document.querySelectorAll('.exclude-non-numeric-local, #excludeNonNumericGlobal').forEach(cb => {
-            if (cb.checked !== isChecked) {
-                cb.checked = isChecked;
-            }
-        });
+       // This function is no longer needed as the global checkbox was removed.
     }
 
     function applyCaseCardLayout() {
