@@ -420,6 +420,8 @@
     #preSendFileList { max-height: 40vh; overflow-y: auto; padding: 5px; border: 1px solid var(--border-subtle); border-radius: 8px; background-color: var(--bg-primary); }
     
     /* --- CASE MODE STYLES --- */
+    .standalone-only { display: none; }
+    body.is-standalone-mode .standalone-only { display: flex; }
     .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
     .case-mode-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .case-mode-title-group { display: flex; align-items: center; gap: 1rem; }
@@ -431,30 +433,20 @@
     .case-mode-tab-button.active { background-color: color-mix(in srgb, var(--accent-blue) 15%, transparent); color: var(--accent-blue-dark); border-color: var(--accent-blue); font-weight: 600; }
     html[data-theme="dark"] .case-mode-tab-button.active { color: var(--accent-blue); }
     .case-mode-tab-button.done { border-left: 4px solid var(--accent-green); padding-left: 11px; background-color: color-mix(in srgb, var(--accent-green) 10%, transparent);}
-    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: copy; }
+    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+    .copy-merchant-btn { all: unset; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; margin-left: 6px; flex-shrink: 0; }
+    .copy-merchant-btn:hover { background-color: var(--bg-hover); color: var(--text-primary); }
     .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-hover); padding: 4px 10px; border-radius: 8px; margin: 0 4px;}
     .case-mode-tab-button.active .case-mode-tab-meta { color: var(--accent-blue); background-color: color-mix(in srgb, var(--accent-blue) 10%, transparent); }
     
-    .case-mode-tab-button .delete-merchant-btn {
-        background: var(--bg-hover);
-        border: none;
-        color: var(--text-secondary);
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        margin-left: 6px;
-        flex-shrink: 0;
-        transition: background-color 0.2s, color 0.2s;
+    .case-mode-tab-button .tab-action-btn {
+        background: var(--bg-hover); border: none; color: var(--text-secondary); width: 20px; height: 20px;
+        border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        font-size: 11px; margin-left: 6px; flex-shrink: 0; transition: all 0.2s ease;
     }
-    .case-mode-tab-button .delete-merchant-btn:hover {
-        background-color: var(--accent-red);
-        color: white;
-    }
+    .case-mode-tab-button .delete-merchant-btn:hover { background-color: var(--accent-red); color: white; }
+    .case-mode-tab-button .toggle-complete-btn:hover { background-color: var(--accent-green); color: white; }
+    
     .card-content.layout-right {
         flex-direction: row-reverse;
     }
@@ -551,6 +543,7 @@
         <div class="toolbar-right">
             <div class="url-generator-group non-standalone">
                 <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
+                <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
                     <option value="co.uk">UK</option>
@@ -561,14 +554,11 @@
                 <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
-            <div class="toolbar-icon-group">
-                <button id="btnHistory" class="macos-icon-button non-standalone" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
-                <button id="btnCaseMode" class="macos-icon-button non-standalone" title="Case Mode"><i class="fa-solid fa-briefcase"></i></button>
-                <button id="btnGenerateFilerUrl" class="macos-icon-button" title="Generate Filer URL"><i class="fa-solid fa-share-square"></i></button>
-            </div>
-            <div class="toolbar-icon-group non-standalone">
-                <button id="btnLayoutStacked" class="macos-icon-button" title="Stacked View"><i class="fa-solid fa-bars-staggered"></i></button>
-                <button id="btnLayoutSide" class="macos-icon-button" title="Side-by-Side View"><i class="fa-solid fa-table-columns"></i></button>
+
+            <button id="btnCaseMode" class="macos secondary non-standalone"><i class="fa-solid fa-briefcase"></i>File Cases</button>
+            
+            <div class="toolbar-icon-group standalone-only">
+                 <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
@@ -610,6 +600,8 @@
                 </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                     <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <button id="btnExportCaseTracker" class="macos primary" disabled><i class="fa-solid fa-file-export"></i>Export Filer View</button>
+                    <button id="btnViewRoIdsMain" class="macos secondary" disabled><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
                     <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
                     <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
@@ -660,7 +652,7 @@
     <div id="caseModeWrapper" class="case-mode-wrapper" style="display: none;">
         <header class="case-mode-header">
             <div class="case-mode-title-group">
-                <h2 class="case-mode-title">Case Tracker</h2>
+                <h2 class="case-mode-title">File Cases</h2>
                 <span id="caseModeGlobalStats"></span>
             </div>
             <div class="tab-actions-right">
@@ -753,6 +745,9 @@
                         </label>
                     </div>
                 </div>
+                <div class="settings-group">
+                     <button id="btnViewHistoryFromSettings" class="macos secondary"><i class="fa-solid fa-trash-alt"></i> View Deletion History</button>
+                </div>
             </div>
             <div class="modal-actions">
                 <button id="btnCloseSettingsModal" class="macos secondary">Cancel</button>
@@ -838,6 +833,7 @@
     </div>
 
 <script>
+    // STANDALONE_DATA_PLACEHOLDER
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
     const upsUspsTemplate = `The Removal Order Status indicates "Completed," yet we never received this order. We kindly request a reimbursement for this discrepancy.`;
     const merchantSeparator = '\n\n' + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' + '\n\n';
@@ -968,6 +964,7 @@
         applyMerchantSearchVisibility();
         setTheme(appSettings.theme);
         updateCounterPillLocation();
+        applyCaseCardLayout();
     }
 
     function saveSettings() {
@@ -989,6 +986,7 @@
         initializeRegexPatterns();
         applyMerchantSearchVisibility();
         updateCounterPillLocation();
+        applyCaseCardLayout();
         showNotification("Settings saved successfully!", "success");
     }
 
@@ -1258,26 +1256,15 @@
         }
     }
 
-    function setLayout(layout, saveUserChoice = true) {
+    function setLayout(layout) {
         const mainWrapper = document.getElementById('mainWrapper');
         mainWrapper.classList.remove('layout-stacked', 'layout-side-by-side');
         mainWrapper.classList.add(`layout-${layout}`);
-        document.getElementById('btnLayoutStacked').classList.toggle('active', layout === 'stacked');
-        document.getElementById('btnLayoutSide').classList.toggle('active', layout === 'side-by-side');
-        if (saveUserChoice) {
-            appSettings.layout = layout;
-            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        }
     }
 
     function handleAutoLayout() {
         const isCurrentlyNarrow = window.innerWidth < 1100;
-        if (isCurrentlyNarrow) {
-            setLayout('stacked', false);
-        } else {
-            const userLayout = appSettings.layout === 'auto' ? 'side-by-side' : appSettings.layout;
-            setLayout(userLayout, false);
-        }
+        setLayout(isCurrentlyNarrow ? 'stacked' : 'side-by-side');
     }
 
     function applyMerchantSearchVisibility() {
@@ -1541,10 +1528,8 @@
         return (text.match(new RegExp(escapedTemplate, 'g')) || []).length;
     }
 
-    function downloadText(text, filename) {
-        const blob = new Blob([text], {
-            type: 'text/plain;charset=utf-8'
-        });
+    function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -1674,6 +1659,8 @@
         const splitButton = document.getElementById('btnSplitSelected');
         const sendButton = document.getElementById('btnSendToTelegram');
         const downloadSelectedButton = document.getElementById('btnDownloadSelected');
+        const exportButton = document.getElementById('btnExportCaseTracker');
+        const btnViewRoIdsMain = document.getElementById('btnViewRoIdsMain');
 
         let selectedCaseCount = 0;
         document.querySelectorAll('.merchant-item').forEach(item => {
@@ -1690,6 +1677,8 @@
         if (splitButton) splitButton.disabled = !isAnythingSelected;
         if (sendButton) sendButton.disabled = !isAnythingSelected;
         if (downloadSelectedButton) downloadSelectedButton.disabled = !isAnythingSelected;
+        if (exportButton) exportButton.disabled = !isAnythingSelected;
+        if (btnViewRoIdsMain) btnViewRoIdsMain.disabled = selectedCheckboxes.length !== 1;
 
         const totalTemplatesSpan = document.getElementById('totalTemplates');
         const merchantCountSpan = document.getElementById('merchantCount');
@@ -1740,7 +1729,7 @@
 
         const combinedText = merchantObjectsToDownload.map(getFormattedBlockWithVerification).join(merchantSeparator);
         const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadText(combinedText + '\n', filename);
+        downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
     }
 
     function processSingleROBlock(roBlockText, removalOrdersArray) {
@@ -1833,8 +1822,8 @@
             return;
         }
         
-        let merchantDisplay = selectedMerchantDataForSplit.map(item => {
-            const merchantObj = caseModeData.find(m => m.key === item.key);
+        const merchantDisplay = selectedMerchantDataForSplit.map(item => {
+            const merchantObj = caseModeData.find(m => m.originalText === item.key);
             let name = item.name;
             if(merchantObj && isMerchantVerified(merchantObj)){
                 name += ' ***Verified Removal***';
@@ -1848,7 +1837,7 @@
         splitOutputs.forEach((output, index) => {
             const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
             const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
-            downloadText(fileContent, filename);
+            downloadFile(fileContent, filename, 'text/plain;charset=utf-8');
         });
         closeSplitModal();
     }
@@ -1895,7 +1884,7 @@
             return name;
         }).join(' & ');
         
-        const preSendModal = document.getElementById('preSendConfirmModal');
+        const preSendConfirmModal = document.getElementById('preSendConfirmModal');
         const fileListEl = document.getElementById('preSendFileList');
         fileListEl.innerHTML = '';
         
@@ -2140,6 +2129,11 @@
         return `https://${marketplaceDomain}/reportcentral/REMOVAL_ORDER_DETAIL/0/${encodedPayload}`;
     }
 
+    function openReportUrl() {
+        const url = generateReportUrl();
+        window.open(url, '_blank');
+    }
+
     // --- MODAL CONTROLS ---
     function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
     function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
@@ -2274,49 +2268,77 @@
         renderCaseModeUI();
     }
     
-    function initStandaloneMode() {
+    function initStandaloneMode(payload) {
         document.body.classList.add('is-standalone-mode');
-        const hash = window.location.hash;
-        if (hash && hash.startsWith('#casetracker_data=')) {
-            try {
-                const encodedData = hash.substring('#casetracker_data='.length);
-                const jsonData = decodeURIComponent(escape(atob(encodedData)));
-                caseModeData = JSON.parse(jsonData);
-                if (caseModeData.length > 0) {
-                    activeCaseModeTabId = caseModeData[0].id;
-                }
-                document.getElementById('mainWrapper').style.display = 'none';
-                document.getElementById('caseModeWrapper').style.display = 'flex';
-                renderCaseModeUI();
-            } catch (e) {
-                console.error("Failed to load standalone data from URL:", e);
-                alert("Error: Could not load data from the URL. It might be corrupted.");
+        if (payload) {
+            if (payload.data) { // New payload format
+                caseModeData = payload.data;
+                appSettings.caseTextPosition = payload.layout || 'left';
+                matchedRoIds = new Set(payload.matched || []);
+            } else { // Old format for backward compatibility
+                caseModeData = payload;
             }
+
+            if (caseModeData.length > 0) {
+                activeCaseModeTabId = caseModeData[0].id;
+            }
+            document.getElementById('mainWrapper').style.display = 'none';
+            document.getElementById('caseModeWrapper').style.display = 'flex';
+            renderCaseModeUI();
+        } else {
+            alert("Error: Standalone mode initiated without data.");
         }
     }
     
-    function generateFilerUrl() {
-        parseNotesForCaseMode();
-        if (caseModeData.length === 0) {
-            showNotification("No case data to share.", "info");
+    function exportCaseTrackerFile() {
+        parseNotesForCaseMode(); // Ensure data is current
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) {
+            showNotification("No merchants selected to export.", "info");
             return;
         }
-        
-        try {
-            const dataString = JSON.stringify(caseModeData);
-            const encodedData = btoa(unescape(encodeURIComponent(dataString)));
-            const url = `${window.location.origin}${window.location.pathname}#casetracker_data=${encodedData}`;
-            
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification("Filer URL copied to clipboard!", "success");
-            }).catch(err => {
-                console.error("Failed to copy URL:", err);
-                showNotification("Failed to copy URL.", "error");
-            });
-        } catch (e) {
-            console.error("Error generating filer URL:", e);
-            showNotification("Could not generate URL. Data may be too large.", "error");
+
+        const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
+        const selectedMerchantsData = caseModeData.filter(m => selectedKeys.has(m.originalText));
+
+        if (selectedMerchantsData.length === 0) {
+            showNotification("Could not find data for selected merchants.", "error");
+            return;
         }
+
+        const payload = {
+            data: selectedMerchantsData,
+            layout: appSettings.caseTextPosition,
+            matched: Array.from(matchedRoIds)
+        };
+        
+        const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        
+        let fileContent = document.documentElement.outerHTML;
+        fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
+
+        const filename = `CaseTracker_FilerView_${getFormattedDate()}.html`;
+        downloadFile(fileContent, filename, 'text/html;charset=utf-8');
+        showNotification("Filer View HTML file has been downloaded.", "success");
+    }
+
+    function exportSingleMerchantFilerView(merchant) {
+        if (!merchant) return;
+
+        const payload = {
+            data: [merchant], // Pass as an array with one item
+            layout: appSettings.caseTextPosition,
+            matched: Array.from(matchedRoIds)
+        };
+        
+        const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        
+        let fileContent = document.documentElement.outerHTML;
+        fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
+
+        const filename = `CaseTracker_${sanitizeFilename(merchant.displayName)}_${getFormattedDate()}.html`;
+        downloadFile(fileContent, filename, 'text/html;charset=utf-8');
+        showNotification(`Filer View for ${merchant.displayName} downloaded.`, "success");
     }
 
     function generateUID(merchantId, caseIndex, text) {
@@ -2332,7 +2354,7 @@
 
     function parseNotesForCaseMode() {
         const noteArea = document.getElementById('noteArea');
-        if (!noteArea) return;
+        if (!noteArea || document.body.classList.contains('is-standalone-mode')) return; // Don't re-parse in standalone
         const fullText = noteArea.value;
         caseModeData = [];
         let merchantIndex = 0;
@@ -2352,6 +2374,7 @@
                 id: merchantId,
                 displayName: merchantName,
                 originalText: block,
+                isCompleted: false, // For Filer View toggling
                 cases: []
             };
             
@@ -2419,13 +2442,20 @@
             const tabBtn = document.createElement('div');
             tabBtn.className = 'case-mode-tab-button';
             tabBtn.dataset.tabId = merchant.id;
+
+            const isStandalone = document.body.classList.contains('is-standalone-mode');
+            const actionButtonHtml = isStandalone ?
+                `<button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>` :
+                `<button class="tab-action-btn delete-merchant-btn" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>`;
+
             tabBtn.innerHTML = `
                 <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
+                <button class="copy-merchant-btn" title="Copy Name"><i class="fa-regular fa-copy"></i></button>
                 <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
-                <button class="delete-merchant-btn" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>
+                ${actionButtonHtml}
             `;
             if (merchant.id === activeCaseModeTabId) tabBtn.classList.add('active');
-            if (filedCount === totalCount && totalCount > 0) tabBtn.classList.add('done');
+            if ((filedCount === totalCount && totalCount > 0) || merchant.isCompleted) tabBtn.classList.add('done');
             
             tabContainer.appendChild(tabBtn);
 
@@ -2438,6 +2468,7 @@
                 <div class="case-mode-tab-content-header">
                     <div class="tab-actions-left">
                        <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
+                       <button class="macos primary" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
                     </div>
                     <div class="tab-actions-right">
                        <button class="macos success" data-action="copy-merchant-ids" data-merchant-id="${merchant.id}" ${filedCount === 0 ? 'disabled' : ''}>
@@ -2524,10 +2555,10 @@
         const contentContainer = document.getElementById('caseModeTabContents');
         
         tabContainer.addEventListener('click', e => {
-            const merchantNameSpan = e.target.closest('.case-mode-merchant-name');
-            if (merchantNameSpan) {
-                e.stopPropagation(); // prevent tab switching
-                const merchantId = merchantNameSpan.closest('.case-mode-tab-button').dataset.tabId;
+            const copyBtn = e.target.closest('.copy-merchant-btn');
+            if (copyBtn) {
+                e.stopPropagation();
+                const merchantId = copyBtn.closest('.case-mode-tab-button').dataset.tabId;
                 const merchant = caseModeData.find(m => m.id === merchantId);
                 if (merchant) {
                     navigator.clipboard.writeText(merchant.displayName);
@@ -2541,6 +2572,20 @@
                 e.stopPropagation();
                 const merchantId = deleteBtn.closest('.case-mode-tab-button').dataset.tabId;
                 handleDeleteMerchant(merchantId);
+                return;
+            }
+
+            const completeBtn = e.target.closest('.toggle-complete-btn');
+            if (completeBtn) {
+                e.stopPropagation();
+                const tabButton = completeBtn.closest('.case-mode-tab-button');
+                const merchantId = tabButton.dataset.tabId;
+                const merchant = caseModeData.find(m => m.id === merchantId);
+                if(merchant) {
+                    merchant.isCompleted = !merchant.isCompleted;
+                    tabButton.classList.toggle('done', merchant.isCompleted);
+                    completeBtn.innerHTML = merchant.isCompleted ? `<i class="fa-solid fa-check-circle"></i>` : `<i class="fa-regular fa-circle"></i>`;
+                }
                 return;
             }
             
@@ -2575,6 +2620,12 @@
                 }
             } else if (action === 'view-ro-ids') {
                 viewRemovalOrderIds(merchant);
+            } else if (action === 'export-filer-view') {
+                const merchantId = button.dataset.merchantId;
+                const merchantToExport = caseModeData.find(m => m.id === merchantId);
+                if (merchantToExport) {
+                    exportSingleMerchantFilerView(merchantToExport);
+                }
             }
         });
         
@@ -2609,7 +2660,6 @@
                 caseItem.filedId = newId ? newId : null;
                 
                 if (newId) {
-                    // In standalone mode, we don't save to localstorage
                     if (!document.body.classList.contains('is-standalone-mode')) {
                         localStorage.setItem(caseItem.uid, newId);
                     }
@@ -2787,7 +2837,7 @@
             const tabBtn = document.querySelector(`.case-mode-tab-button[data-tab-id="${m.id}"]`);
             if(tabBtn) {
                 tabBtn.querySelector('.case-mode-tab-meta').textContent = `${filedCount}/${totalCount}`;
-                tabBtn.classList.toggle('done', filedCount === totalCount && totalCount > 0);
+                tabBtn.classList.toggle('done', (filedCount === totalCount && totalCount > 0) || m.isCompleted);
             }
 
             const copyBtn = document.querySelector(`#case-content-${m.id} [data-action="copy-merchant-ids"]`);
@@ -2818,11 +2868,27 @@
             showNotification(`Copied data for ${merchantsWithFiledCases.length} merchants!`, 'success');
         }
     }
+
+    function applyCaseCardLayout() {
+        const isRight = appSettings.caseTextPosition === 'right';
+        document.querySelectorAll('.case-card .card-content').forEach(el => {
+            el.classList.toggle('layout-right', isRight);
+        });
+        const icon = document.getElementById('btnToggleFilerLayout')?.querySelector('i');
+        if (icon) {
+            icon.className = `fa-solid fa-align-${isRight ? 'right' : 'left'}`;
+        }
+    }
+
+    function toggleFilerLayout() {
+        appSettings.caseTextPosition = appSettings.caseTextPosition === 'left' ? 'right' : 'left';
+        applyCaseCardLayout();
+    }
     
     document.addEventListener('DOMContentLoaded', () => {
         // Check for standalone "Filer Mode" first
-        if (window.location.hash.startsWith('#casetracker_data=')) {
-            initStandaloneMode();
+        if (typeof standalonePayload !== 'undefined') {
+             initStandaloneMode(standalonePayload);
         } else {
             // Normal tool initialization
             loadSettings();
@@ -2879,16 +2945,26 @@
 
             document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
             document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
-            document.getElementById('btnHistory')?.addEventListener('click', openHistoryModal);
             document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
+            document.getElementById('btnExportCaseTracker')?.addEventListener('click', exportCaseTrackerFile);
+            document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
 
-            document.getElementById('btnLayoutStacked')?.addEventListener('click', () => setLayout('stacked'));
-            document.getElementById('btnLayoutSide')?.addEventListener('click', () => setLayout('side-by-side'));
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
             document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
+            document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
+                parseNotesForCaseMode(); // Ensure data is fresh
+                const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
+                if (selectedDiv) {
+                    const merchantKey = selectedDiv.dataset.key;
+                    const merchant = caseModeData.find(m => m.originalText === merchantKey);
+                    if (merchant) {
+                        viewRemovalOrderIds(merchant);
+                    }
+                }
+            });
 
             const btnSelectAll = document.getElementById('btnSelectAll');
             if (btnSelectAll) {
@@ -2910,7 +2986,7 @@
             document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
                 const count = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
                 const combinedText = caseModeData.map(getFormattedBlockWithVerification).join(merchantSeparator);
-                downloadText(combinedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`);
+                downloadFile(combinedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`, 'text/plain;charset=utf-8');
             });
             document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
@@ -2923,6 +2999,8 @@
             
             const marketplaceSelectUrlGen = document.getElementById('marketplaceSelectUrlGen');
             const copyUrlBtn = document.getElementById('copyUrlBtn');
+            const openUrlBtn = document.getElementById('openUrlBtn');
+
             marketplaceSelectUrlGen.addEventListener('change', () => {
                 appSettings.marketplaceUrlGen = marketplaceSelectUrlGen.value;
                 localStorage.setItem(settingsKey, JSON.stringify(appSettings));
@@ -2935,6 +3013,7 @@
                     showNotification('Copy Failed!', 'error');
                 });
             });
+            openUrlBtn.addEventListener('click', openReportUrl);
 
             document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
             document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
@@ -2980,7 +3059,7 @@
         }
 
         // --- Common Listeners for both modes ---
-        document.getElementById('btnGenerateFilerUrl')?.addEventListener('click', generateFilerUrl);
+        document.getElementById('btnToggleFilerLayout')?.addEventListener('click', toggleFilerLayout);
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
             appSettings.theme = newTheme;
@@ -2990,6 +3069,12 @@
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
         const actionModal = document.getElementById('caseModeActionModal');
+        actionModal.addEventListener('click', e => {
+            if(e.target === actionModal) { // Only close if clicking on the overlay itself
+                 actionModal.style.display = 'none';
+                 updateCaseCardMatchStatus();
+            }
+        });
         actionModal.querySelector('#caseModeActionModalCancelBtn').addEventListener('click', () => {
              actionModal.style.display = 'none';
              updateCaseCardMatchStatus(); // Update UI when modal is closed
