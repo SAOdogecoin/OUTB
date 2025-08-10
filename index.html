@@ -436,11 +436,11 @@
     .standalone-only { display: none; }
     body.is-standalone-mode .standalone-only { display: flex; }
     .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-    .case-mode-header { flex-shrink:0; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .case-mode-header { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .case-mode-title-group { display: flex; align-items: center; gap: 1rem; }
     .case-mode-title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text-primary); }
     #caseModeGlobalStats { font-weight: 600; color: var(--text-secondary); background-color: var(--bg-hover); padding: 6px 12px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
-    .case-mode-tab-container { flex-shrink:0; background-color: var(--bg-primary); display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .case-mode-tab-container { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
     .case-mode-tab-button { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 10px; background-color: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; min-width: 180px; }
     .case-mode-tab-button:hover:not(.active) { background-color: color-mix(in srgb, var(--text-secondary) 15%, transparent); color: var(--text-primary); }
     .case-mode-tab-button.active { background-color: var(--accent-blue); color: white; border-color: var(--accent-blue-dark); font-weight: 600; }
@@ -677,9 +677,6 @@
                 <span id="caseModeGlobalStats"></span>
             </div>
             <div class="tab-actions-right">
-                 <label class="macos-checkbox-container" style="font-weight: normal; font-size: 0.85rem; margin-right: 8px;">
-                    <input type="checkbox" id="excludeNonNumericGlobal" class="macos-checkbox" onchange="syncExcludeCheckboxes(this)" checked> Exclude non-Case IDs
-                </label>
                 <button id="copyAllMerchantsBtn" class="macos success" style="display: none;"><i class="fa-solid fa-copy"></i>Copy All Merchants & IDs</button>
             </div>
         </header>
@@ -877,6 +874,8 @@
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
     const matchedRoIdsKey = 'outboundToolMatchedRoIds_v1';
+    const caseModeActiveKey = 'outboundToolCaseModeActive';
+    const filerViewStateKey = 'outboundToolFilerViewState';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -2305,20 +2304,19 @@
         const mainWrapper = document.getElementById('mainWrapper');
         const caseModeWrapper = document.getElementById('caseModeWrapper');
         const caseModeBtn = document.getElementById('btnCaseMode');
+        const isActivating = caseModeWrapper.style.display === 'none';
 
-        const isCaseModeActive = caseModeWrapper.style.display !== 'none';
-        
-        if (isCaseModeActive) {
-            if (!document.body.classList.contains('is-standalone-mode')) {
-                mainWrapper.style.display = 'flex';
-                caseModeWrapper.style.display = 'none';
-                caseModeBtn.classList.remove('active');
-            }
-        } else {
+        if (isActivating) {
             mainWrapper.style.display = 'none';
             caseModeWrapper.style.display = 'flex';
             if (caseModeBtn) caseModeBtn.classList.add('active');
+            localStorage.setItem(caseModeActiveKey, 'true');
             initCaseMode();
+        } else if (!document.body.classList.contains('is-standalone-mode')) {
+            mainWrapper.style.display = 'flex';
+            caseModeWrapper.style.display = 'none';
+            if (caseModeBtn) caseModeBtn.classList.remove('active');
+            localStorage.removeItem(caseModeActiveKey);
         }
     }
 
@@ -2327,39 +2325,58 @@
         renderCaseModeUI();
     }
     
+    function saveFilerViewState() {
+        if (!document.body.classList.contains('is-standalone-mode')) return;
+
+        const state = {
+            caseModeData: caseModeData,
+            appSettings: {
+                caseTextPosition: appSettings.caseTextPosition,
+                showCopyTitleBtn: appSettings.showCopyTitleBtn,
+            }
+        };
+        localStorage.setItem(filerViewStateKey, JSON.stringify(state));
+    }
+    
     function initStandaloneMode(payload) {
         document.body.classList.add('is-standalone-mode');
-        if (payload) {
-            // New structure with a `settings` object
-            if (payload.settings) {
-                appSettings.showCopyTitleBtn = payload.settings.showCopyTitleBtn;
-                appSettings.marketplaceUrlGen = payload.settings.marketplaceUrlGen;
-            }
-            
-            // data and layout could be at the root for compatibility
-            if (payload.data) {
-                caseModeData = payload.data;
-            } else {
-                // for very old format where payload is just the data array
-                caseModeData = payload; 
-            }
-            appSettings.caseTextPosition = payload.layout || 'left';
-            matchedRoIds = new Set(payload.matched || []);
-            
-            // Set initial state of UI elements from loaded settings
-            document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
-            document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
-
-            if (caseModeData.length > 0) {
-                activeCaseModeTabId = caseModeData[0].id;
-            }
-            document.getElementById('mainWrapper').style.display = 'none';
-            document.getElementById('caseModeWrapper').style.display = 'flex';
-            renderCaseModeUI();
-            applyCaseCardLayout();
-        } else {
-            alert("Error: Standalone mode initiated without data.");
+        
+        // Initial load from payload
+        if (payload.settings) {
+            appSettings.showCopyTitleBtn = payload.settings.showCopyTitleBtn;
+            appSettings.marketplaceUrlGen = payload.settings.marketplaceUrlGen;
         }
+        caseModeData = payload.data || (Array.isArray(payload) ? payload : []);
+        appSettings.caseTextPosition = payload.layout || 'left';
+        matchedRoIds = new Set(payload.matched || []);
+        
+        // Check for persistent state and override
+        const savedStateJSON = localStorage.getItem(filerViewStateKey);
+        if (savedStateJSON) {
+            try {
+                const savedState = JSON.parse(savedStateJSON);
+                // Simple check to see if the saved data might match the payload data
+                if (savedState.caseModeData && savedState.caseModeData[0]?.id === caseModeData[0]?.id) {
+                    caseModeData = savedState.caseModeData;
+                    if (savedState.appSettings) {
+                        appSettings.caseTextPosition = savedState.appSettings.caseTextPosition;
+                        appSettings.showCopyTitleBtn = savedState.appSettings.showCopyTitleBtn;
+                    }
+                }
+            } catch(e) { console.error("Could not load Filer View state.", e); localStorage.removeItem(filerViewStateKey); }
+        }
+
+        // Set initial UI state
+        document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
+        document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
+
+        if (caseModeData.length > 0) {
+            activeCaseModeTabId = caseModeData[0].id;
+        }
+        document.getElementById('mainWrapper').style.display = 'none';
+        document.getElementById('caseModeWrapper').style.display = 'flex';
+        renderCaseModeUI();
+        applyCaseCardLayout();
     }
     
     function exportCaseTrackerFile() {
@@ -2393,7 +2410,20 @@
         let fileContent = document.documentElement.outerHTML;
         fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
 
-        const filename = `CaseTracker_FilerView_${getFormattedDate()}.html`;
+        // New filename logic
+        const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
+        let filenamePart;
+        if (selectedMerchantsData.length === 1) {
+            filenamePart = sanitizeFilename(selectedMerchantsData[0].displayName);
+        } else if (selectedMerchantsData.length > 1) {
+            filenamePart = sanitizeFilename(`${selectedMerchantsData[0].displayName}_Multi`);
+        } else {
+            filenamePart = 'FilerView'; // Fallback
+        }
+
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
+
+
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification("Filer View HTML file has been downloaded.", "success");
     }
@@ -2525,7 +2555,7 @@
 
             const isStandalone = document.body.classList.contains('is-standalone-mode');
             const actionButtonHtml = isStandalone ?
-                `<button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>` :
+                `<button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>`:
                 `<button class="tab-action-btn delete-merchant-btn" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>`;
 
             tabBtn.innerHTML = `
@@ -2554,7 +2584,7 @@
                     </div>
                     <div class="tab-actions-right">
                         <label class="macos-checkbox-container" style="font-weight: normal; font-size: 0.85rem; margin-right: 8px;">
-                            <input type="checkbox" class="macos-checkbox exclude-non-numeric-local" onchange="syncExcludeCheckboxes(this)" checked> Exclude non-Case IDs
+                            <input type="checkbox" class="macos-checkbox exclude-non-numeric-local" checked> Exclude non-Case IDs
                         </label>
                        <button class="macos success" data-action="copy-merchant-ids" data-merchant-id="${merchant.id}" ${filedCount === 0 ? 'disabled' : ''}>
                            <i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)
@@ -2575,7 +2605,6 @@
         updateCaseModeStats();
         updateCaseCardMatchStatus();
         applyCopyTitleButtonVisibility();
-        syncExcludeCheckboxes(document.getElementById('excludeNonNumericGlobal'));
     }
     
     function createCaseCard(caseItem, number) {
@@ -2673,6 +2702,7 @@
                     tabButton.classList.toggle('done', merchant.isCompleted);
                     completeBtn.innerHTML = merchant.isCompleted ? `<i class="fa-solid fa-check-circle"></i>` : `<i class="fa-regular fa-circle"></i>`;
                 }
+                saveFilerViewState();
                 return;
             }
             
@@ -2693,7 +2723,6 @@
                 if (newContent) newContent.classList.add('active');
 
                 saveCaseModeState();
-                syncExcludeCheckboxes(document.getElementById('excludeNonNumericGlobal'));
             }
         });
 
@@ -2780,6 +2809,7 @@
                 }
                 card.querySelector('.case-id-display').textContent = newId;
                 updateCaseModeStats();
+                saveFilerViewState();
                 break;
             case 'view-case':
                 document.getElementById('caseTextModalContent').textContent = caseItem.text;
@@ -2803,6 +2833,7 @@
                     card.classList.remove('filed', 'editing');
                     card.classList.add('unfiled');
                     updateCaseModeStats();
+                    saveFilerViewState();
                 }
                 break;
         }
@@ -2988,7 +3019,9 @@
     }
     
     function copyAllMerchantsWithIds() {
-        const exclude = document.getElementById('excludeNonNumericGlobal').checked;
+        const activeTabContent = document.querySelector('.case-mode-tab-content.active');
+        const exclude = activeTabContent?.querySelector('.exclude-non-numeric-local')?.checked || true;
+
         const merchantsWithFiledCases = caseModeData.filter(m => m.cases.some(c => c.filedId !== null && (!exclude || /^\d+$/.test(c.filedId))));
         if (merchantsWithFiledCases.length === 0) {
             showNotification('No matching IDs to copy.', 'info');
@@ -3010,19 +3043,13 @@
     }
 
     function syncExcludeCheckboxes(source) {
+        if (!source) return;
         const isChecked = source.checked;
-        const globalCheckbox = document.getElementById('excludeNonNumericGlobal');
-        if (globalCheckbox && globalCheckbox !== source) {
-            globalCheckbox.checked = isChecked;
-        }
-
-        const activeTabContent = document.querySelector('.case-mode-tab-content.active');
-        if (activeTabContent) {
-            const localCheckbox = activeTabContent.querySelector('.exclude-non-numeric-local');
-            if (localCheckbox && localCheckbox !== source) {
-                localCheckbox.checked = isChecked;
+        document.querySelectorAll('.exclude-non-numeric-local, #excludeNonNumericGlobal').forEach(cb => {
+            if (cb.checked !== isChecked) {
+                cb.checked = isChecked;
             }
-        }
+        });
     }
 
     function applyCaseCardLayout() {
@@ -3043,12 +3070,14 @@
     function toggleFilerLayout() {
         appSettings.caseTextPosition = appSettings.caseTextPosition === 'left' ? 'right' : 'left';
         applyCaseCardLayout();
+        saveFilerViewState();
     }
     
     function toggleCopyTitleVisibility() {
         appSettings.showCopyTitleBtn = !appSettings.showCopyTitleBtn;
         applyCopyTitleButtonVisibility();
         document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
+        saveFilerViewState();
     }
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -3205,6 +3234,9 @@
             window.addEventListener('beforeunload', saveAllScrollPositions);
             initDraggableWindows();
             handleAutoLayout();
+            if (localStorage.getItem(caseModeActiveKey) === 'true') {
+                toggleCaseMode();
+            }
         }
 
         // --- Common Listeners for both modes ---
