@@ -499,6 +499,10 @@
     .right-pane { flex-shrink: 0; width: 200px; display: flex; }
     .case-card:not(.unfiled) .right-pane { align-items: center; justify-content: flex-end; }
     .unfiled-controls { display: flex; flex-direction: column; width: 100%; gap: 8px; align-items: stretch; }
+    .unfiled-controls .case-id-input-group { display: flex; gap: 8px; align-items: center; }
+    .unfiled-controls .case-id-input-group .macos-textfield-container { flex-grow: 1; }
+    .unfiled-controls .case-id-input-group .macos-icon-button { flex-shrink: 0; }
+    .unfiled-controls button.macos.primary { padding-top: 10px; padding-bottom: 10px; }
     button.copy-case-title { display: none; }
     #caseModeWrapper.show-copy-title .copy-case-title { display: inline-flex; }
     .filed-controls { display: none; }
@@ -2553,11 +2557,12 @@
             const tabBtn = document.createElement('div');
             tabBtn.className = 'case-mode-tab-button';
             tabBtn.dataset.tabId = merchant.id;
+            
+            const actionButtonHtml = `
+                <button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>
+                <button class="tab-action-btn delete-merchant-btn non-standalone" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>
+            `;
 
-            const isStandalone = document.body.classList.contains('is-standalone-mode');
-            const actionButtonHtml = isStandalone ?
-                `<button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>`:
-                `<button class="tab-action-btn delete-merchant-btn" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>`;
 
             tabBtn.innerHTML = `
                 <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
@@ -2609,6 +2614,11 @@
     }
     
     function createCaseCard(caseItem, number) {
+        const roIdMatch = caseItem.text.match(/Removal order ID:\s*(\S+)/);
+        const roId = roIdMatch ? roIdMatch[1] : null;
+        const isMatched = roId && matchedRoIds.has(roId);
+        const controlsDisabled = !isMatched ? 'disabled' : '';
+
         const card = document.createElement('div');
         card.className = 'case-card';
         card.id = caseItem.uid;
@@ -2634,13 +2644,13 @@
                 </div>
                 <div class="right-pane">
                     <div class="unfiled-controls">
-                         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-                            <div class="macos-textfield-container" style="flex-grow: 1;">
-                                 <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID...">
+                         <div class="case-id-input-group">
+                            <div class="macos-textfield-container">
+                                 <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID..." ${controlsDisabled}>
                             </div>
-                            <button class="macos-icon-button active" data-action="save-case" title="Save Case ID" style="flex-shrink: 0;"><i class="fa-solid fa-save"></i></button>
+                            <button class="macos-icon-button active" data-action="save-case" title="Save Case ID" ${controlsDisabled}><i class="fa-solid fa-save"></i></button>
                         </div>
-                        <button class="macos primary" data-action="copy-text" style="width: 100%; padding: 10px 14px;"><i class="fa-solid fa-copy"></i>Copy Template</button>
+                        <button class="macos primary" data-action="copy-text" style="padding-top: 8px; padding-bottom: 8px;" ${controlsDisabled}><i class="fa-solid fa-copy"></i>Copy Template</button>
                         <button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
                     </div>
                     <div class="filed-controls">
@@ -2915,17 +2925,21 @@
         if (uniqueIds.length > 0) {
             const idListHTML = uniqueIds.map(id => {
                 const isMatched = matchedRoIds.has(id);
+                const uniqueId = `ro-check-${id.replace(/\W/g, '')}`;
                 return `
-                <div class="ro-id-item" data-id="${id}">
+                <label class="ro-id-item macos-checkbox-container" for="${uniqueId}">
+                    <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox" data-id="${id}" ${isMatched ? 'checked' : ''}>
                     <span class="ro-id-text">${id}</span>
-                    <span class="ro-id-match-status">${isMatched ? 'Matched' : ''}</span>
-                </div>`;
+                </label>`;
             }).join('');
             
             modalBody.innerHTML = `
+                <p style="font-size: 0.9em; color: var(--text-secondary); margin: 0 0 10px;">Manually mark RO IDs as matched to enable case filing controls.</p>
                 <div class="ro-id-list">${idListHTML}</div>
+                <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 12px 0;">
+                <p style="font-size: 0.9em; color: var(--text-secondary); margin: 0 0 10px;">Or, paste removal report data here to auto-match.</p>
                 <div class="macos-textfield-container">
-                    <textarea id="ro-paste-area" class="macos-textfield" placeholder="Paste removal report data here to find matches..."></textarea>
+                    <textarea id="ro-paste-area" class="macos-textfield" placeholder="Paste removal report data here..."></textarea>
                 </div>
             `;
         } else {
@@ -2934,26 +2948,34 @@
         
         modal.style.display = 'flex';
 
+        modalBody.addEventListener('change', e => {
+            if (e.target.classList.contains('ro-match-checkbox')) {
+                const id = e.target.dataset.id;
+                if (e.target.checked) {
+                    matchedRoIds.add(id);
+                } else {
+                    matchedRoIds.delete(id);
+                }
+                saveMatchedRoIds();
+                updateCaseCardMatchStatus(); // Update main UI in real-time
+            }
+        });
+
         const pasteArea = document.getElementById('ro-paste-area');
         if (pasteArea) {
             pasteArea.addEventListener('input', (event) => {
                 const pastedText = event.target.value;
                 const foundIdsInPaste = new Set(pastedText.match(/\b[a-zA-Z0-9/]{8,}\b/g) || []);
                 
-                uniqueIds.forEach(id => {
-                    const itemDiv = modalBody.querySelector(`.ro-id-item[data-id="${CSS.escape(id)}"]`);
-                    if (itemDiv) {
-                        const statusSpan = itemDiv.querySelector('.ro-id-match-status');
-                        if (foundIdsInPaste.has(id)) {
-                            statusSpan.textContent = 'Matched';
-                            matchedRoIds.add(id);
-                        } else {
-                            statusSpan.textContent = '';
-                            matchedRoIds.delete(id);
-                        }
+                modalBody.querySelectorAll('.ro-match-checkbox').forEach(checkbox => {
+                    const id = checkbox.dataset.id;
+                    if (foundIdsInPaste.has(id)) {
+                        checkbox.checked = true;
+                        matchedRoIds.add(id);
                     }
                 });
                 saveMatchedRoIds();
+                updateCaseCardMatchStatus();
             });
         }
     }
@@ -2967,7 +2989,19 @@
             if (caseItem) {
                 const match = caseItem.text.match(roIdRegex);
                 const roId = match ? match[1] : null;
-                card.classList.toggle('ro-matched', roId && matchedRoIds.has(roId));
+                const isMatched = roId && matchedRoIds.has(roId);
+
+                card.classList.toggle('ro-matched', isMatched);
+
+                if (card.classList.contains('unfiled')) {
+                    const saveBtn = card.querySelector('.unfiled-controls [data-action="save-case"]');
+                    const copyBtn = card.querySelector('.unfiled-controls [data-action="copy-text"]');
+                    const caseIdInput = card.querySelector('.unfiled-controls .case-id-input');
+
+                    if (saveBtn) saveBtn.disabled = !isMatched;
+                    if (copyBtn) copyBtn.disabled = !isMatched;
+                    if (caseIdInput) caseIdInput.disabled = !isMatched;
+                }
             }
         });
     }
