@@ -63,14 +63,14 @@
         background-color: var(--bg-primary);
         color: var(--text-primary);
         margin: 0; padding: 0; display: flex; flex-direction: column;
-        min-height: 100vh;
+        height: 100vh; max-height: 100vh; overflow: hidden;
         -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         font-size: 13px;
         transition: background-color 0.2s ease, color 0.2s ease;
     }
     body.is-resizing { user-select: none; }
     body.is-standalone-mode #mainWrapper { display: none; }
-    body.is-standalone-mode .top-bar .non-standalone { display: none; }
+    body.is-standalone-mode .non-standalone { display: none !important; }
 
     .top-bar {
         background-color: var(--bg-toolbar);
@@ -81,7 +81,8 @@
         justify-content: space-between;
         flex-shrink: 0;
         gap: 16px;
-        position: relative; 
+        position: sticky; top: 0; z-index: 1001;
+        border-bottom: 1px solid var(--border-subtle);
     }
     .top-bar-title {
         font-size: 1.4em;
@@ -134,7 +135,7 @@
 
     .main-wrapper {
         display: flex; flex-direction: column; flex-grow: 1; padding: 16px; gap: 16px;
-        width: 100%; max-width: 1600px; margin: 0 auto; overflow: hidden;
+        width: 100%; max-width: 1600px; margin: 0 auto; overflow-y: auto;
     }
     .left-column-wrapper { display: flex; flex-direction: column; gap: 16px; }
 
@@ -184,7 +185,7 @@
     }
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
-    .main-wrapper.layout-side-by-side { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; }
+    .main-wrapper.layout-side-by-side { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; overflow: hidden; }
     .main-wrapper.layout-side-by-side .left-column-wrapper {
         width: 480px;
         flex-shrink: 0;
@@ -352,7 +353,7 @@
     }
     .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
     
-    .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: 100%; }
+    .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: auto; }
     .macos-checkbox {
         appearance: none; margin: 0; width: 15px; height: 15px; border-radius: 4px;
         display: flex; align-items: center; justify-content: center;
@@ -403,8 +404,20 @@
     #merchantCounterTarget { display: none; } 
     .tool-card-title-bar #merchantCounterTarget { margin-top: 0; display: flex; }
 
-    .settings-group { margin-bottom: 15px; }
+    .settings-group { margin-bottom: 8px; }
+    .settings-category h4 { 
+        margin: 18px 0 10px 0; 
+        font-size: 0.9em; 
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .settings-category:first-of-type h4 { margin-top: 0; }
     .settings-group label { display: block; margin-bottom: 5px; font-weight: 500;}
+    .settings-group.inline { display: flex; justify-content: space-between; align-items: center; }
+    .settings-group.inline label:first-child { margin-bottom: 0; }
     .settings-group .radio-group label { display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal; }
     .settings-group .radio-group input[type="radio"] { margin-right: 5px; }
     
@@ -422,27 +435,31 @@
     /* --- CASE MODE STYLES --- */
     .standalone-only { display: none; }
     body.is-standalone-mode .standalone-only { display: flex; }
-    .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
-    .case-mode-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+    .case-mode-header { flex-shrink:0; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .case-mode-title-group { display: flex; align-items: center; gap: 1rem; }
     .case-mode-title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text-primary); }
     #caseModeGlobalStats { font-weight: 600; color: var(--text-secondary); background-color: var(--bg-hover); padding: 6px 12px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
-    .case-mode-tab-container { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
-    .case-mode-tab-button { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 6px 6px 6px 14px; background-color: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .case-mode-tab-button:hover:not(.active) { border-color: var(--text-secondary); background-color: var(--bg-hover); }
-    .case-mode-tab-button.active { background-color: color-mix(in srgb, var(--accent-blue) 15%, transparent); color: var(--accent-blue-dark); border-color: var(--accent-blue); font-weight: 600; }
-    html[data-theme="dark"] .case-mode-tab-button.active { color: var(--accent-blue); }
-    .case-mode-tab-button.done { border-left: 4px solid var(--accent-green); padding-left: 11px; background-color: color-mix(in srgb, var(--accent-green) 10%, transparent);}
-    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-    .copy-merchant-btn { all: unset; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; margin-left: 6px; flex-shrink: 0; }
+    .case-mode-tab-container { flex-shrink:0; background-color: var(--bg-primary); display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .case-mode-tab-button { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 10px; background-color: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; min-width: 180px; }
+    .case-mode-tab-button:hover:not(.active) { background-color: color-mix(in srgb, var(--text-secondary) 15%, transparent); color: var(--text-primary); }
+    .case-mode-tab-button.active { background-color: var(--accent-blue); color: white; border-color: var(--accent-blue-dark); font-weight: 600; }
+    .case-mode-tab-button.done { background-color: color-mix(in srgb, var(--accent-green) 10%, var(--bg-primary)); color: color-mix(in srgb, var(--accent-green) 85%, #000); border: 1px solid color-mix(in srgb, var(--accent-green) 30%, transparent); }
+    .case-mode-tab-button.done.active { background-color: var(--accent-green); color: white; border-color: color-mix(in srgb, var(--accent-green) 85%, black); }
+    html[data-theme="dark"] .case-mode-tab-button.done:not(.active) { color: var(--accent-green); }
+    .case-mode-tab-button.active .case-mode-tab-meta, .case-mode-tab-button.active .copy-merchant-btn, .case-mode-tab-button.active .tab-action-btn { background-color: rgba(255,255,255,0.2); color: white; }
+    .case-mode-tab-button.active .copy-merchant-btn:hover { background-color: rgba(255,255,255,0.3); }
+
+    .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; width: 100%; margin-bottom: 4px; font-weight: 600; }
+    .case-mode-tab-bottom-row { display: flex; width: 100%; align-items: center; }
+    .copy-merchant-btn { all: unset; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; }
     .copy-merchant-btn:hover { background-color: var(--bg-hover); color: var(--text-primary); }
-    .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-hover); padding: 4px 10px; border-radius: 8px; margin: 0 4px;}
-    .case-mode-tab-button.active .case-mode-tab-meta { color: var(--accent-blue); background-color: color-mix(in srgb, var(--accent-blue) 10%, transparent); }
+    .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-window); padding: 4px 10px; border-radius: 8px; margin: 0 auto 0 8px;}
     
     .case-mode-tab-button .tab-action-btn {
-        background: var(--bg-hover); border: none; color: var(--text-secondary); width: 20px; height: 20px;
+        background: var(--bg-window); border: none; color: var(--text-secondary); width: 22px; height: 22px;
         border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        font-size: 11px; margin-left: 6px; flex-shrink: 0; transition: all 0.2s ease;
+        font-size: 11px; flex-shrink: 0; transition: all 0.2s ease;
     }
     .case-mode-tab-button .delete-merchant-btn:hover { background-color: var(--accent-red); color: white; }
     .case-mode-tab-button .toggle-complete-btn:hover { background-color: var(--accent-green); color: white; }
@@ -450,11 +467,12 @@
     .card-content.layout-right {
         flex-direction: row-reverse;
     }
-
+    
+    #caseModeTabContents { flex-grow: 1; overflow-y: auto; }
     .case-mode-tab-content { display: none; }
     .case-mode-tab-content.active { display: block; }
-    .case-mode-tab-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
-    .tab-actions-left, .tab-actions-right { display: flex; gap: 8px; flex-wrap: wrap; }
+    .case-mode-tab-content-header { position: sticky; top: 0; z-index: 99; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); }
+    .tab-actions-left, .tab-actions-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;}
     .case-card { background-color: var(--bg-window); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.2s ease-in-out; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border-subtle); }
     .case-card.editing { border-color: var(--accent-orange); }
     .card-content { display: flex; gap: 1rem; padding: 10px 16px; align-items: stretch; }
@@ -481,6 +499,8 @@
     .right-pane { flex-shrink: 0; width: 200px; display: flex; }
     .case-card:not(.unfiled) .right-pane { align-items: center; justify-content: flex-end; }
     .unfiled-controls { display: flex; flex-direction: column; width: 100%; gap: 8px; align-items: stretch; }
+    button.copy-case-title { display: none; }
+    #caseModeWrapper.show-copy-title .copy-case-title { display: inline-flex; }
     .filed-controls { display: none; }
     .case-card.filed .filed-controls { display: flex; gap: 8px; }
     .case-card:is(.filed, .editing) .unfiled-controls { display: none; }
@@ -541,8 +561,8 @@
     <div class="top-bar">
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
-            <div class="url-generator-group non-standalone">
-                <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
+            <div class="url-generator-group">
+                <button id="copyUrlBtn" class="macos-icon-button non-standalone" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
                 <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -559,6 +579,7 @@
             
             <div class="toolbar-icon-group standalone-only">
                  <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
+                 <button id="btnToggleCopyTitle" class="macos-icon-button" title="Toggle 'Copy Case Title' Button"><i class="fa-solid fa-heading"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
@@ -656,6 +677,9 @@
                 <span id="caseModeGlobalStats"></span>
             </div>
             <div class="tab-actions-right">
+                 <label class="macos-checkbox-container" style="font-weight: normal; font-size: 0.85rem; margin-right: 8px;">
+                    <input type="checkbox" id="excludeNonNumericGlobal" class="macos-checkbox" onchange="syncExcludeCheckboxes(this)" checked> Exclude non-Case IDs
+                </label>
                 <button id="copyAllMerchantsBtn" class="macos success" style="display: none;"><i class="fa-solid fa-copy"></i>Copy All Merchants & IDs</button>
             </div>
         </header>
@@ -694,59 +718,63 @@
     <div id="settingsModal" class="modal-overlay">
         <div class="modal-content">
              <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
-            <div style="display:flex; flex-direction:column; gap: 15px;">
-                 <div class="settings-group">
-                     <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
-                     <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
-                </div>
-                <div class="settings-group">
-                     <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
-                     <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
-                </div>
-                <div class="settings-group">
-                    <label for="settingsTelegramToken">Telegram Bot Token:</label>
-                    <div class="macos-textfield-container"><input type="text" id="settingsTelegramToken" class="macos-textfield" placeholder="Enter your bot token"></div>
-                </div>
-                <div class="settings-group">
-                    <label for="settingsTelegramChatId">Telegram Chat ID:</label>
-                    <div class="macos-textfield-container"><input type="text" id="settingsTelegramChatId" class="macos-textfield" placeholder="Enter your group/chat ID"></div>
-                </div>
-                 <div class="settings-group" style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="margin-bottom:0;">Show Merchant Search Bar</label>
-                    <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
-                </div>
-                 <div class="settings-group" style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="margin-bottom:0;">Auto-clear history older than 24 hours</label>
-                    <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
-                </div>
-                <div class="settings-group">
-                    <label>Counter Position:</label>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="counterPosition" value="notes" id="counterPosNotes" checked>
-                            Notes Area
-                        </label>
-                        <label>
-                            <input type="radio" name="counterPosition" value="merchants" id="counterPosMerchants">
-                            Merchant List
-                        </label>
+            <div class="settings-categories">
+                <div class="settings-category">
+                    <h4>UI Preferences</h4>
+                    <div class="settings-group">
+                        <label>Counter Position:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="counterPosition" value="notes" id="counterPosNotes"> Notes Area</label>
+                            <label><input type="radio" name="counterPosition" value="merchants" id="counterPosMerchants"> Merchant List</label>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <label>Case Card Layout (Template Position):</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="caseTextPosition" value="left" id="caseTextPosLeft"> Left</label>
+                            <label><input type="radio" name="caseTextPosition" value="right" id="caseTextPosRight"> Right</label>
+                        </div>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Show Merchant Search Bar</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Show "Copy Case Title" Button</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsShowCopyTitleToggleInput"><span class="slider"></span></label>
                     </div>
                 </div>
-                <div class="settings-group">
-                    <label>Case Card Layout (Template Position):</label>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="caseTextPosition" value="left" id="caseTextPosLeft">
-                            Left
-                        </label>
-                        <label>
-                            <input type="radio" name="caseTextPosition" value="right" id="caseTextPosRight">
-                            Right
-                        </label>
+                <div class="settings-category">
+                    <h4>Carrier Settings</h4>
+                    <div class="settings-group">
+                        <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
+                    </div>
+                    <div class="settings-group">
+                        <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
                     </div>
                 </div>
-                <div class="settings-group">
-                     <button id="btnViewHistoryFromSettings" class="macos secondary"><i class="fa-solid fa-trash-alt"></i> View Deletion History</button>
+                <div class="settings-category">
+                    <h4>Telegram Integration (Send Files)</h4>
+                    <div class="settings-group">
+                        <label for="settingsTelegramToken">Telegram Bot Token:</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsTelegramToken" class="macos-textfield" placeholder="Enter your bot token"></div>
+                    </div>
+                    <div class="settings-group">
+                        <label for="settingsTelegramChatId">Telegram Chat ID:</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsTelegramChatId" class="macos-textfield" placeholder="Enter your group/chat ID"></div>
+                    </div>
+                </div>
+                 <div class="settings-category">
+                    <h4>Data & History</h4>
+                    <div class="settings-group inline">
+                        <label>Auto-clear history older than 24 hours</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
+                    </div>
+                    <div class="settings-group">
+                        <button id="btnViewHistoryFromSettings" class="macos secondary"><i class="fa-solid fa-trash-alt"></i> View Deletion History</button>
+                    </div>
                 </div>
             </div>
             <div class="modal-actions">
@@ -848,6 +876,7 @@
     const parserStateKey = 'outboundToolParserState';
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
+    const matchedRoIdsKey = 'outboundToolMatchedRoIds_v1';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -865,7 +894,8 @@
         telegramChatId: '',
         autoClearHistory: true,
         marketplaceUrlGen: 'com',
-        caseTextPosition: 'left'
+        caseTextPosition: 'left',
+        showCopyTitleBtn: false,
     };
     let regexPatterns = {
         amzlSource: null,
@@ -955,16 +985,15 @@
         document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
         document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
+        document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
         const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
         if (counterPosRadio) counterPosRadio.checked = true;
         const caseTextPosRadio = document.querySelector(`input[name="caseTextPosition"][value="${appSettings.caseTextPosition}"]`);
         if (caseTextPosRadio) caseTextPosRadio.checked = true;
         initializeRegexPatterns();
-        applyMerchantSearchVisibility();
+        applyAppSettings();
         setTheme(appSettings.theme);
-        updateCounterPillLocation();
-        applyCaseCardLayout();
     }
 
     function saveSettings() {
@@ -976,6 +1005,7 @@
         appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
         appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
         appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+        appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
         appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
         const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
         if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
@@ -984,10 +1014,15 @@
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns();
+        applyAppSettings();
+        showNotification("Settings saved successfully!", "success");
+    }
+    
+    function applyAppSettings() {
         applyMerchantSearchVisibility();
         updateCounterPillLocation();
         applyCaseCardLayout();
-        showNotification("Settings saved successfully!", "success");
+        applyCopyTitleButtonVisibility();
     }
 
     function getHistory() {
@@ -1081,7 +1116,7 @@
     async function sendFileToTelegram(fileContent, filename, caption = '') {
         const { telegramBotToken, telegramChatId } = appSettings;
         if (!telegramBotToken || !telegramChatId) {
-            showNotification("Telegram Bot Token or Chat ID is missing in settings.", "error");
+            showNotification("Telegram Bot Token or Chat ID for sending files is missing in settings.", "error");
             return null;
         }
         
@@ -1855,7 +1890,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -1884,7 +1919,7 @@
             return name;
         }).join(' & ');
         
-        const preSendConfirmModal = document.getElementById('preSendConfirmModal');
+        const preSendModal = document.getElementById('preSendConfirmModal');
         const fileListEl = document.getElementById('preSendFileList');
         fileListEl.innerHTML = '';
         
@@ -1981,6 +2016,7 @@
         }
         noteArea.value = '';
         localStorage.removeItem(caseModeStateKey);
+        localStorage.removeItem(matchedRoIdsKey);
         Object.keys(localStorage).filter(key => key.startsWith('case-')).forEach(key => localStorage.removeItem(key));
 
         countTemplatesNoteTaker();
@@ -2134,112 +2170,135 @@
         window.open(url, '_blank');
     }
 
-    // --- MODAL CONTROLS ---
-    function openSettingsModal() { loadSettings(); document.getElementById('settingsModal').style.display = 'flex'; }
-    function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
-    function openSplitModal() {
-        selectedMerchantDataForSplit = [];
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { return; }
-        const modal = document.getElementById('splitModal'); const merchantInfoDiv = document.getElementById('splitMerchantInfo');
-        if (!modal || !merchantInfoDiv) { return; }
-        let combinedTextParts = []; let containsUpsUsps = false; let containsAmzl = false;
-        selectedDivs.forEach((div) => {
-            const key = div.dataset.key;
-            const name = div.dataset.displayName || `Unknown`;
-            const count = div.dataset.count;
-            if (key) {
-                selectedMerchantDataForSplit.push({ key, name, count });
-                combinedTextParts.push(key);
-                if (key.includes(upsUspsTemplate)) containsUpsUsps = true; if (key.includes(amzlTemplate)) containsAmzl = true;
-            }
-        });
-        const names = selectedMerchantDataForSplit.map(item => item.name);
-        modal.dataset.combinedText = combinedTextParts.join(merchantSeparator.trimEnd());
-        modal.dataset.containsAmzl = containsAmzl; modal.dataset.containsUpsUsps = containsUpsUsps;
-        if (names.length === 1) merchantInfoDiv.textContent = `Merchant: ${names[0]}`;
-        else if (names.length > 1) merchantInfoDiv.textContent = `Merchants: ${names.slice(0,3).join(', ')}${names.length > 3 ? '...' : ''} (${names.length} total)`;
-        else merchantInfoDiv.textContent = 'No valid merchants.';
-        document.getElementById('splitOrdersPerTemplate').value = '1'; document.getElementById('splitNumberInput').value = '';
-        updateCalculatedTemplates(); modal.style.display = 'flex';
-    }
-    function closeSplitModal() { document.getElementById('splitModal').style.display = 'none'; }
-    function openHistoryModal() { renderHistoryModal(); document.getElementById('historyModal').style.display = 'flex'; }
-    function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
-    function openClearHistoryConfirmModal() { document.getElementById('confirmClearHistoryModal').style.display = 'flex'; }
-    function closeClearHistoryConfirmModal() { document.getElementById('confirmClearHistoryModal').style.display = 'none'; }
-    function handleClearAllHistory() {
-        localStorage.removeItem(historyKey);
-        closeClearHistoryConfirmModal();
-        renderHistoryModal();
-        showNotification("All history has been cleared.", "success");
-    }
+    // --- MODAL MANAGEMENT FUNCTIONS ---
     function openTelegramSendModal() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) { showNotification("No merchants selected.", "info"); return; }
-        if (!appSettings.telegramBotToken || !appSettings.telegramChatId) { showNotification("Please configure Telegram settings first.", "error"); openSettingsModal(); return; }
-        
+        if (selectedDivs.length === 0) {
+            showNotification("Please select at least one merchant to send.", "info");
+            return;
+        }
+
         const modal = document.getElementById('telegramSendModal');
-        const listEl = document.getElementById('telegram-merchant-list');
-        listEl.innerHTML = '';
-        let totalCases = 0;
-        let merchantInfoHtml = '<h4>Selected Merchants:</h4>';
-        const merchantsToSend = [];
-
-        selectedDivs.forEach((div) => {
-            const displayName = div.dataset.displayName;
-            const count = parseInt(div.dataset.count);
-            const key = div.dataset.key;
-            totalCases += count;
-            merchantInfoHtml += `<p>${displayName} (${count} cases)</p>`;
-            merchantsToSend.push({ key, displayName, count });
-        });
-
+        const listContainer = document.getElementById('telegram-merchant-list');
+        
+        const merchantsToSend = Array.from(selectedDivs).map(div => ({
+            key: div.dataset.key,
+            name: div.dataset.displayName,
+            count: parseInt(div.dataset.count, 10)
+        }));
+        
         modal.dataset.merchantsToSend = JSON.stringify(merchantsToSend);
-        listEl.innerHTML = merchantInfoHtml;
 
-        const fileInfoContainer = document.createElement('div');
-        fileInfoContainer.style.marginTop = '15px';
-        fileInfoContainer.innerHTML = `
-            <label for="telegram-file-number-single">File Number (Last: <span id="lastTelegramNumber" style="font-weight:bold;">N/A</span>):</label>
-            <div class="macos-textfield-container" style="width: 100px; margin-top: 4px; margin-bottom: 15px;">
-                <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" placeholder="#">
+        const totalCases = merchantsToSend.reduce((sum, m) => sum + m.count, 0);
+        const dateStr = getFormattedDate();
+        let filenamePart;
+        if (merchantsToSend.length === 1) {
+            filenamePart = sanitizeFilename(merchantsToSend[0].name);
+        } else {
+            filenamePart = sanitizeFilename(`${merchantsToSend[0].name}_Multi_${merchantsToSend.length}`);
+        }
+        const defaultFilename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}(${totalCases}).txt`;
+
+        let lastNumber = parseInt(localStorage.getItem(telegramNumberKey)) || 0;
+        const newNumber = lastNumber + 1;
+
+        const merchantListHtml = merchantsToSend.map(m => `<p>${m.name} (${m.count} cases)</p>`).join('');
+
+        listContainer.innerHTML = `
+            <h4>Selected Merchants:</h4>
+            ${merchantListHtml}
+            <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 12px 0;">
+            <div class="settings-group">
+                <label for="telegram-filename-edit">Filename:</label>
+                <div class="macos-textfield-container">
+                    <input type="text" id="telegram-filename-edit" class="macos-textfield" value="${defaultFilename}">
+                </div>
             </div>
-            <label for="telegram-filename-edit">Filename:</label>
-            <div class="macos-textfield-container" style="margin-top: 4px;">
-                <input type="text" id="telegram-filename-edit" class="macos-textfield">
+            <div class="settings-group">
+                <label for="telegram-file-number-single">File Number (for tracking):</label>
+                <div class="macos-textfield-container" style="width: 80px;">
+                    <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" value="${newNumber}">
+                </div>
             </div>
         `;
-        listEl.appendChild(fileInfoContainer);
 
-        const numberInput = fileInfoContainer.querySelector('#telegram-file-number-single');
-        const filenameInput = fileInfoContainer.querySelector('#telegram-filename-edit');
-        const lastNumberSpan = fileInfoContainer.querySelector('#lastTelegramNumber');
-
-        const lastNumber = parseInt(localStorage.getItem(telegramNumberKey), 10);
-        if (!isNaN(lastNumber) && lastNumber > 0) {
-            lastNumberSpan.textContent = lastNumber;
-            numberInput.value = lastNumber + 1;
-        } else {
-            lastNumberSpan.textContent = "N/A";
-            numberInput.value = 1;
-        }
-
-        function updateFilename() {
-            const userNumber = numberInput.value;
-            const filename = userNumber 
-                ? `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})_${userNumber}.txt`
-                : `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).txt`;
-            filenameInput.value = filename;
-        }
-
-        numberInput.addEventListener('input', updateFilename);
-        updateFilename(); // initial call
-        
         modal.style.display = 'flex';
     }
-    function closeTelegramSendModal() { document.getElementById('telegramSendModal').style.display = 'none'; }
+
+    function closeTelegramSendModal() {
+        document.getElementById('telegramSendModal').style.display = 'none';
+    }
+
+    function openSplitModal() {
+        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+        if (selectedDivs.length === 0) {
+            showNotification("Please select at least one merchant to split.", "info");
+            return;
+        }
+        
+        selectedMerchantDataForSplit = Array.from(selectedDivs).map(div => ({
+            key: div.dataset.key,
+            name: div.dataset.displayName,
+            count: div.dataset.count
+        }));
+        
+        const combinedText = selectedMerchantDataForSplit.map(item => item.key).join(merchantSeparator);
+        const totalCases = selectedMerchantDataForSplit.reduce((sum, item) => sum + parseInt(item.count, 10), 0);
+        const containsAmzl = combinedText.includes(amzlTemplate);
+        const containsUpsUsps = combinedText.includes(upsUspsTemplate);
+
+        const modal = document.getElementById('splitModal');
+        modal.dataset.combinedText = combinedText;
+        modal.dataset.containsAmzl = containsAmzl;
+        modal.dataset.containsUpsUsps = containsUpsUsps;
+
+        const infoDiv = document.getElementById('splitMerchantInfo');
+        const merchantNames = selectedMerchantDataForSplit.map(m => m.name).join(', ');
+        infoDiv.textContent = `Splitting ${selectedMerchantDataForSplit.length} merchant(s): ${merchantNames} (${totalCases} total cases).`;
+
+        document.getElementById('splitOrdersPerTemplate').value = 1;
+        document.getElementById('splitNumberInput').value = 100;
+        updateCalculatedTemplates();
+
+        modal.style.display = 'flex';
+    }
+
+    function closeSplitModal() {
+        document.getElementById('splitModal').style.display = 'none';
+    }
+
+    function openSettingsModal() {
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function closeSettingsModal() {
+        document.getElementById('settingsModal').style.display = 'none';
+    }
     
+    function openHistoryModal() {
+        renderHistoryModal();
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+    
+    function closeHistoryModal() {
+        document.getElementById('historyModal').style.display = 'none';
+    }
+
+    function openClearHistoryConfirmModal() {
+        document.getElementById('confirmClearHistoryModal').style.display = 'flex';
+    }
+
+    function closeClearHistoryConfirmModal() {
+        document.getElementById('confirmClearHistoryModal').style.display = 'none';
+    }
+    
+    function handleClearAllHistory() {
+        localStorage.removeItem(historyKey);
+        renderHistoryModal();
+        closeClearHistoryConfirmModal();
+        showNotification("All history cleared.", "success");
+    }
+
     // --- CASE MODE ---
     
     function toggleCaseMode() {
@@ -2271,13 +2330,25 @@
     function initStandaloneMode(payload) {
         document.body.classList.add('is-standalone-mode');
         if (payload) {
-            if (payload.data) { // New payload format
-                caseModeData = payload.data;
-                appSettings.caseTextPosition = payload.layout || 'left';
-                matchedRoIds = new Set(payload.matched || []);
-            } else { // Old format for backward compatibility
-                caseModeData = payload;
+            // New structure with a `settings` object
+            if (payload.settings) {
+                appSettings.showCopyTitleBtn = payload.settings.showCopyTitleBtn;
+                appSettings.marketplaceUrlGen = payload.settings.marketplaceUrlGen;
             }
+            
+            // data and layout could be at the root for compatibility
+            if (payload.data) {
+                caseModeData = payload.data;
+            } else {
+                // for very old format where payload is just the data array
+                caseModeData = payload; 
+            }
+            appSettings.caseTextPosition = payload.layout || 'left';
+            matchedRoIds = new Set(payload.matched || []);
+            
+            // Set initial state of UI elements from loaded settings
+            document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
+            document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
 
             if (caseModeData.length > 0) {
                 activeCaseModeTabId = caseModeData[0].id;
@@ -2285,6 +2356,7 @@
             document.getElementById('mainWrapper').style.display = 'none';
             document.getElementById('caseModeWrapper').style.display = 'flex';
             renderCaseModeUI();
+            applyCaseCardLayout();
         } else {
             alert("Error: Standalone mode initiated without data.");
         }
@@ -2309,7 +2381,11 @@
         const payload = {
             data: selectedMerchantsData,
             layout: appSettings.caseTextPosition,
-            matched: Array.from(matchedRoIds)
+            matched: Array.from(matchedRoIds),
+            settings: {
+                showCopyTitleBtn: appSettings.showCopyTitleBtn,
+                marketplaceUrlGen: appSettings.marketplaceUrlGen
+            }
         };
         
         const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
@@ -2328,7 +2404,11 @@
         const payload = {
             data: [merchant], // Pass as an array with one item
             layout: appSettings.caseTextPosition,
-            matched: Array.from(matchedRoIds)
+            matched: Array.from(matchedRoIds),
+            settings: {
+                showCopyTitleBtn: appSettings.showCopyTitleBtn,
+                marketplaceUrlGen: appSettings.marketplaceUrlGen
+            }
         };
         
         const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
@@ -2450,9 +2530,11 @@
 
             tabBtn.innerHTML = `
                 <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
-                <button class="copy-merchant-btn" title="Copy Name"><i class="fa-regular fa-copy"></i></button>
-                <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
-                ${actionButtonHtml}
+                <div class="case-mode-tab-bottom-row">
+                    <button class="copy-merchant-btn" title="Copy Name"><i class="fa-regular fa-copy"></i></button>
+                    <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
+                    ${actionButtonHtml}
+                </div>
             `;
             if (merchant.id === activeCaseModeTabId) tabBtn.classList.add('active');
             if ((filedCount === totalCount && totalCount > 0) || merchant.isCompleted) tabBtn.classList.add('done');
@@ -2468,9 +2550,12 @@
                 <div class="case-mode-tab-content-header">
                     <div class="tab-actions-left">
                        <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
-                       <button class="macos primary" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
+                       <button class="macos primary non-standalone" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
                     </div>
                     <div class="tab-actions-right">
+                        <label class="macos-checkbox-container" style="font-weight: normal; font-size: 0.85rem; margin-right: 8px;">
+                            <input type="checkbox" class="macos-checkbox exclude-non-numeric-local" onchange="syncExcludeCheckboxes(this)" checked> Exclude non-Case IDs
+                        </label>
                        <button class="macos success" data-action="copy-merchant-ids" data-merchant-id="${merchant.id}" ${filedCount === 0 ? 'disabled' : ''}>
                            <i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)
                        </button>
@@ -2489,6 +2574,8 @@
         addCaseModeEventListeners();
         updateCaseModeStats();
         updateCaseCardMatchStatus();
+        applyCopyTitleButtonVisibility();
+        syncExcludeCheckboxes(document.getElementById('excludeNonNumericGlobal'));
     }
     
     function createCaseCard(caseItem, number) {
@@ -2523,7 +2610,7 @@
                         <button class="macos success" data-action="save-case" style="width: 100%;"><i class="fa-solid fa-save"></i>Save Case ID</button>
                         <div style="height: 1px; background-color: var(--border-subtle); margin: 4px 0;"></div>
                         <button class="macos secondary" data-action="copy-text" style="width: 100%;"><i class="fa-solid fa-copy"></i>Copy Template</button>
-                        <button class="macos secondary" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
+                        <button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
                     </div>
                     <div class="filed-controls">
                         <button class="macos secondary" data-action="view-case">View</button>
@@ -2590,10 +2677,23 @@
             }
             
             const tabButton = e.target.closest('.case-mode-tab-button');
-            if (tabButton && !tabButton.classList.contains('active')) {
+             if (tabButton && !tabButton.classList.contains('active')) {
+                // Deactivate old tab
+                const oldActiveTab = document.querySelector('.case-mode-tab-button.active');
+                if (oldActiveTab) {
+                    oldActiveTab.classList.remove('active');
+                    const oldContent = document.getElementById(`case-content-${oldActiveTab.dataset.tabId}`);
+                    if (oldContent) oldContent.classList.remove('active');
+                }
+
+                // Activate new tab
+                tabButton.classList.add('active');
                 activeCaseModeTabId = tabButton.dataset.tabId;
+                const newContent = document.getElementById(`case-content-${activeCaseModeTabId}`);
+                if (newContent) newContent.classList.add('active');
+
                 saveCaseModeState();
-                renderCaseModeUI();
+                syncExcludeCheckboxes(document.getElementById('excludeNonNumericGlobal'));
             }
         });
 
@@ -2610,13 +2710,16 @@
             if (!merchant) return;
 
             const action = button.dataset.action;
+            const exclude = button.parentElement.querySelector('.exclude-non-numeric-local')?.checked || false;
+
             if (action === 'copy-merchant-ids') {
-                const header = merchant.displayName;
-                const ids = merchant.cases.map(c => c.filedId).filter(id => id !== null).join('\n');
-                const filedCases = merchant.cases.filter(c => c.filedId !== null);
-                if (filedCases.length > 0) {
-                    navigator.clipboard.writeText(`${header}\n${ids}`);
-                    showNotification(`Copied formatted IDs for ${merchant.displayName}`, 'success');
+                const filteredCases = merchant.cases.filter(c => c.filedId !== null && (!exclude || /^\d+$/.test(c.filedId)));
+                if (filteredCases.length > 0) {
+                    const ids = filteredCases.map(c => c.filedId).join('\n');
+                    navigator.clipboard.writeText(`${merchant.displayName}\n${ids}`);
+                    showNotification(`Copied ${filteredCases.length} formatted IDs for ${merchant.displayName}`, 'success');
+                } else {
+                    showNotification(`No matching IDs to copy.`, 'info');
                 }
             } else if (action === 'view-ro-ids') {
                 viewRemovalOrderIds(merchant);
@@ -2738,14 +2841,37 @@
         showNotification(`Merchant "${merchant.displayName}" deleted.`, 'success');
     }
     
+    function saveMatchedRoIds() {
+        const data = {
+            timestamp: Date.now(),
+            ids: Array.from(matchedRoIds)
+        };
+        localStorage.setItem(matchedRoIdsKey, JSON.stringify(data));
+    }
+
+    function loadMatchedRoIds() {
+        const savedData = localStorage.getItem(matchedRoIdsKey);
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                const twentyFourHours = 24 * 60 * 60 * 1000;
+                if (Date.now() - data.timestamp < twentyFourHours) {
+                    matchedRoIds = new Set(data.ids);
+                } else {
+                    localStorage.removeItem(matchedRoIdsKey); // Clear expired data
+                }
+            } catch (e) {
+                console.error("Failed to load matched RO IDs:", e);
+                localStorage.removeItem(matchedRoIdsKey);
+            }
+        }
+    }
+    
     function viewRemovalOrderIds(merchant) {
-        matchedRoIds.clear();
         const modal = document.getElementById('caseModeActionModal');
         const modalTitle = document.getElementById('caseModeActionModalTitle');
         const modalBody = document.getElementById('caseModeActionModalBody');
-        const actionBtn = document.getElementById('caseModeActionModalActionBtn');
-        const copyAllBtn = document.getElementById('caseModeActionModalCopyAllBtn');
-
+        
         if (!merchant || merchant.cases.length === 0) return;
 
         const regex = /Removal order ID:\s*(\S+)/g;
@@ -2754,11 +2880,14 @@
         modalTitle.innerHTML = `<i class="fa-solid fa-tags"></i> Match Removal Order IDs`;
         
         if (uniqueIds.length > 0) {
-            const idListHTML = uniqueIds.map(id => `
+            const idListHTML = uniqueIds.map(id => {
+                const isMatched = matchedRoIds.has(id);
+                return `
                 <div class="ro-id-item" data-id="${id}">
                     <span class="ro-id-text">${id}</span>
-                    <span class="ro-id-match-status"></span>
-                </div>`).join('');
+                    <span class="ro-id-match-status">${isMatched ? 'Matched' : ''}</span>
+                </div>`;
+            }).join('');
             
             modalBody.innerHTML = `
                 <div class="ro-id-list">${idListHTML}</div>
@@ -2770,8 +2899,6 @@
             modalBody.innerHTML = "<p>No 'Removal order ID' found in this merchant's templates.</p>";
         }
         
-        actionBtn.style.display = 'none';
-        copyAllBtn.style.display = 'none';
         modal.style.display = 'flex';
 
         const pasteArea = document.getElementById('ro-paste-area');
@@ -2793,16 +2920,16 @@
                         }
                     }
                 });
+                saveMatchedRoIds();
             });
         }
     }
 
     function updateCaseCardMatchStatus() {
-        if (!activeCaseModeTabId) return;
-        const caseCards = document.querySelectorAll(`#case-content-${activeCaseModeTabId} .case-card`);
+        const allCaseCards = document.querySelectorAll(`.case-card`);
         const roIdRegex = /Removal order ID:\s*(\S+)/;
 
-        caseCards.forEach(card => {
+        allCaseCards.forEach(card => {
             const caseItem = findCaseByUID(card.id);
             if (caseItem) {
                 const match = caseItem.text.match(roIdRegex);
@@ -2840,32 +2967,61 @@
                 tabBtn.classList.toggle('done', (filedCount === totalCount && totalCount > 0) || m.isCompleted);
             }
 
-            const copyBtn = document.querySelector(`#case-content-${m.id} [data-action="copy-merchant-ids"]`);
-            if(copyBtn) {
-                copyBtn.innerHTML = `<i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)`;
-                copyBtn.disabled = filedCount === 0;
+            const contentEl = document.getElementById(`case-content-${m.id}`);
+            if (contentEl) {
+                const copyBtn = contentEl.querySelector('[data-action="copy-merchant-ids"]');
+                if(copyBtn) {
+                    copyBtn.innerHTML = `<i class="fa-solid fa-copy"></i>Copy ${filedCount} ID(s)`;
+                    copyBtn.disabled = filedCount === 0;
+                }
             }
         });
 
         document.getElementById('caseModeGlobalStats').textContent = `Total Filed: ${globalFiled} / ${globalTotal}`;
         const copyAllBtn = document.getElementById('copyAllMerchantsBtn');
+        
         copyAllBtn.style.display = globalFiled > 0 ? 'inline-flex' : 'none';
     }
     
+    function escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    
     function copyAllMerchantsWithIds() {
-        const merchantsWithFiledCases = caseModeData.filter(m => m.cases.some(c => c.filedId !== null));
-        if (merchantsWithFiledCases.length === 0) return;
+        const exclude = document.getElementById('excludeNonNumericGlobal').checked;
+        const merchantsWithFiledCases = caseModeData.filter(m => m.cases.some(c => c.filedId !== null && (!exclude || /^\d+$/.test(c.filedId))));
+        if (merchantsWithFiledCases.length === 0) {
+            showNotification('No matching IDs to copy.', 'info');
+            return;
+        }
 
         const output = merchantsWithFiledCases.map(merchant => {
-            const header = merchant.displayName;
-            const ids = merchant.cases.map(c => c.filedId).filter(id => id !== null).join('\n');
-            const filedCases = merchant.cases.filter(c => c.filedId !== null);
-            return filedCases.length > 0 ? `${header}\n${ids}` : null;
+            const ids = merchant.cases
+                .map(c => c.filedId)
+                .filter(id => id !== null && (!exclude || /^\d+$/.test(id)))
+                .join('\n');
+            return ids ? `${merchant.displayName}\n${ids}` : null;
         }).filter(Boolean).join('\n\n');
 
         if (output) {
             navigator.clipboard.writeText(output);
-            showNotification(`Copied data for ${merchantsWithFiledCases.length} merchants!`, 'success');
+            showNotification(`Copied IDs for ${merchantsWithFiledCases.length} merchants!`, 'success');
+        }
+    }
+
+    function syncExcludeCheckboxes(source) {
+        const isChecked = source.checked;
+        const globalCheckbox = document.getElementById('excludeNonNumericGlobal');
+        if (globalCheckbox && globalCheckbox !== source) {
+            globalCheckbox.checked = isChecked;
+        }
+
+        const activeTabContent = document.querySelector('.case-mode-tab-content.active');
+        if (activeTabContent) {
+            const localCheckbox = activeTabContent.querySelector('.exclude-non-numeric-local');
+            if (localCheckbox && localCheckbox !== source) {
+                localCheckbox.checked = isChecked;
+            }
         }
     }
 
@@ -2879,10 +3035,20 @@
             icon.className = `fa-solid fa-align-${isRight ? 'right' : 'left'}`;
         }
     }
+    
+    function applyCopyTitleButtonVisibility() {
+        document.getElementById('caseModeWrapper')?.classList.toggle('show-copy-title', appSettings.showCopyTitleBtn);
+    }
 
     function toggleFilerLayout() {
         appSettings.caseTextPosition = appSettings.caseTextPosition === 'left' ? 'right' : 'left';
         applyCaseCardLayout();
+    }
+    
+    function toggleCopyTitleVisibility() {
+        appSettings.showCopyTitleBtn = !appSettings.showCopyTitleBtn;
+        applyCopyTitleButtonVisibility();
+        document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
     }
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -2892,6 +3058,7 @@
         } else {
             // Normal tool initialization
             loadSettings();
+            loadMatchedRoIds();
             autoClearOldHistory();
             const noteArea = document.getElementById('noteArea');
 
@@ -2997,24 +3164,6 @@
             document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
             document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
             
-            const marketplaceSelectUrlGen = document.getElementById('marketplaceSelectUrlGen');
-            const copyUrlBtn = document.getElementById('copyUrlBtn');
-            const openUrlBtn = document.getElementById('openUrlBtn');
-
-            marketplaceSelectUrlGen.addEventListener('change', () => {
-                appSettings.marketplaceUrlGen = marketplaceSelectUrlGen.value;
-                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-            });
-            copyUrlBtn.addEventListener('click', () => {
-                const urlToCopy = generateReportUrl();
-                navigator.clipboard.writeText(urlToCopy).then(() => {
-                    showNotification('URL Copied!', 'success');
-                }, () => {
-                    showNotification('Copy Failed!', 'error');
-                });
-            });
-            openUrlBtn.addEventListener('click', openReportUrl);
-
             document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
             document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
             document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
@@ -3060,6 +3209,7 @@
 
         // --- Common Listeners for both modes ---
         document.getElementById('btnToggleFilerLayout')?.addEventListener('click', toggleFilerLayout);
+        document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
             appSettings.theme = newTheme;
@@ -3067,6 +3217,11 @@
             setTheme(newTheme);
         });
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
+        document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
+        document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
+            appSettings.marketplaceUrlGen = e.target.value;
+        });
+
         document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
         const actionModal = document.getElementById('caseModeActionModal');
         actionModal.addEventListener('click', e => {
