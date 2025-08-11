@@ -27,6 +27,7 @@
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
+        --accent-green-manual: #28a745;
         --accent-orange: #ff9500;
         --accent-purple: #5856d6;
         --highlight-bg: #B4D7FF; 
@@ -51,6 +52,7 @@
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
+        --accent-green-manual: #2eb85c;
         --accent-orange: #ff9f0a;
         --accent-purple: #5e5ce6;
         --highlight-bg: #0052A3; 
@@ -178,13 +180,52 @@
         align-items: center;
         margin: -5px 0 10px 0;
         flex-shrink: 0;
+        flex-wrap: wrap;
+        gap: 10px;
     }
     .tool-card-title {
         display: flex;
         align-items: center;
         font-size: 1.1em; font-weight: 600; color: var(--text-primary);
         margin: 0;
+        margin-right: auto;
     }
+    .ro-match-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .ro-match-controls .macos-textfield-container {
+        width: 300px;
+        position: relative;
+    }
+    #roMatchInput.macos-textfield {
+        height: 28px;
+        padding: 0 30px 0 10px;
+        font-size: 13px;
+    }
+    #roMatchCounter {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        display: none; /* Hidden by default */
+    }
+    #btnClearRoInput {
+        position: absolute;
+        right: 4px; top: 50%;
+        transform: translateY(-50%);
+        width: 20px; height: 20px;
+        color: var(--text-secondary);
+        background-color: var(--bg-hover);
+        font-size: 10px;
+    }
+    #btnClearRoInput:hover {
+        background-color: var(--accent-red);
+        color: white;
+    }
+
+
     .tool-card-title > i.fa-solid { margin-right: 8px; font-size: 0.9em; }
     
     .main-wrapper.layout-side-by-side { flex-direction: row; padding: 24px; gap: 24px; align-items: stretch; overflow: hidden; }
@@ -267,6 +308,8 @@
     .macos-icon-button.success:hover:not(:disabled) { filter: brightness(1.1); }
     .macos-icon-button:disabled { color: var(--text-placeholder); background: transparent; cursor: not-allowed; }
     .macos-icon-button:disabled:hover { background: transparent; }
+    .macos-icon-button.danger:hover { background-color: var(--accent-red); color: white; }
+
 
     textarea, input[type="text"], input[type="number"], input[type="file"] { all: unset; box-sizing: border-box; }
     .macos-textfield-container {
@@ -306,7 +349,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
         margin-bottom: auto;
     }
-    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content, #pasteTextModal .modal-content {max-width: 520px;}
+    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content {max-width: 520px;}
     #preSendConfirmModal .modal-content { max-width: 600px; }
     #historyModal .modal-content { max-width: 800px; }
     #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
@@ -411,7 +454,7 @@
         flex-grow: 1;
         min-height: 0;
     }
-    #shipmentInput, #upsUspsOutputArea, #noteArea, #paste-textarea { height: 100%; }
+    #shipmentInput, #upsUspsOutputArea, #noteArea { height: 100%; }
     .parser-controls label.parser-control-row { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
     .controls-and-stats { margin-top: 16px; } 
     .controls-and-stats > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -514,7 +557,7 @@
     .case-card.editing { border-color: var(--accent-orange); }
     .card-content { display: flex; gap: 1rem; padding: 10px 16px; align-items: stretch; }
     .case-card:not(.unfiled) .card-content { align-items: center; }
-    .left-pane { flex-grow: 1; display: flex; gap: 1rem; align-items: flex-start; }
+    .left-pane { flex-grow: 1; display: flex; gap: 1rem; align-items: flex-start; min-width: 0; }
     .case-card:not(.unfiled) .left-pane { align-items: center; }
     .case-number { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); width: 30px; text-align: center; flex-shrink: 0; padding-top: 4px; }
     .case-card:not(.unfiled) .case-number { padding-top: 0; }
@@ -526,15 +569,15 @@
         color: var(--accent-green);
     }
     .case-card.ro-matched .ro-match-indicator { display: inline-block; }
-    .main-content { flex-grow: 1; }
+    .main-content { flex-grow: 1; min-width: 0; }
     .case-text { white-space: pre-wrap; font-family: var(--mono-font); max-height: 150px; overflow-y: auto; font-size: 0.85rem; background: var(--bg-primary); padding: 8px; border-radius: 8px; }
     .filed-info { display: none; }
     .case-id-display { font-weight: 600; font-family: var(--mono-font); color: var(--accent-green); font-size: 1.1rem; }
     .editing-info { display: none; align-items: center; gap: 0.5rem; width: 100%;}
     .editing-info .macos-textfield-container { flex-grow: 1; }
     .case-card.editing .editing-info { display: flex; }
-    .right-pane { flex-shrink: 0; width: 200px; display: flex; }
-    .case-card:not(.unfiled) .right-pane { align-items: center; justify-content: flex-end; }
+    .right-pane { flex-shrink: 0; width: 220px; display: flex; flex-direction: column;}
+    .case-card:not(.unfiled) .right-pane { align-items: flex-end; justify-content: center; }
     .unfiled-controls { display: flex; flex-direction: column; width: 100%; gap: 8px; align-items: stretch; }
     .unfiled-controls .case-id-input-group { display: flex; gap: 8px; align-items: center; }
     .unfiled-controls .case-id-input-group .macos-textfield-container { flex-grow: 1; }
@@ -549,19 +592,24 @@
     .case-card.filed .case-text, .case-card.editing .case-text { display: none; }
     .case-card.filed .filed-info { display: block; }
     #caseTextModal .modal-content pre { white-space: pre-wrap; font-family: var(--mono-font); background-color: var(--bg-input); padding: 12px; border-radius: 12px; max-height: 60vh; overflow-y: auto; font-size: 0.9rem; border: 1px solid var(--border-subtle); }
-    #paste-textarea, #ro-paste-area { height: 40vh; resize: vertical; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--bg-input); color: var(--text-primary); font-family: var(--mono-font); }
     #ro-paste-area { height: 20vh; min-height: 120px; }
     .ro-id-list, .history-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .ro-id-item { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.5rem; background-color: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-subtle); }
     .ro-id-text, .history-text { font-family: var(--mono-font); font-weight: 600; flex-grow: 1; }
     .ro-id-match-status {
         font-weight: 600;
-        font-size: 0.9em;
+        font-size: 0.8em;
         padding: 2px 8px;
         border-radius: 6px;
+        margin-left: 1rem;
+    }
+    .ro-id-match-status.auto {
         background-color: color-mix(in srgb, var(--accent-green) 15%, transparent);
         color: var(--accent-green);
-        margin-left: 1rem;
+    }
+    .ro-id-match-status.manual {
+        background-color: color-mix(in srgb, var(--accent-green-manual) 15%, transparent);
+        color: var(--accent-green-manual);
     }
     .history-merchant-name { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin-left: 1rem; }
     .history-timestamp { color: var(--text-secondary); }
@@ -571,6 +619,15 @@
     .tab-layout-h-scroll #caseModeTabContainer {
         flex-wrap: nowrap;
         overflow-x: auto;
+    }
+    @media (max-width: 600px) {
+        .card-content {
+            flex-direction: column;
+        }
+        .right-pane {
+            width: 100%;
+            margin-top: 1rem;
+        }
     }
 </style>
 </head>
@@ -626,6 +683,7 @@
             <div class="toolbar-icon-group standalone-only">
                  <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
                  <button id="btnToggleCopyTitle" class="macos-icon-button" title="Toggle 'Copy Case Title' Button"><i class="fa-solid fa-heading"></i></button>
+                 <button id="btnReExportFilerView" class="macos-icon-button" title="Save & Re-export Filer View"><i class="fa-solid fa-save"></i></button>
             </div>
             <div class="toolbar-icon-group standalone-only">
                 <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
@@ -694,6 +752,13 @@
         <div class="tool-container note-taker-tool">
              <div class="tool-card-title-bar">
                 <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
+                <div class="ro-match-controls non-standalone">
+                     <div class="macos-textfield-container">
+                        <input type="text" id="roMatchInput" class="macos-textfield" placeholder="Paste RO data for matching...">
+                        <button id="btnClearRoInput" class="macos-icon-button danger" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                    <span id="roMatchCounter">0/0</span>
+                </div>
                 <div class="toolbar-icon-group" style="border:none; padding: 0;">
                      <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
                      <button id="btnRedoNote" class="macos-icon-button" title="Redo"><i class="fa-solid fa-redo"></i></button>
@@ -931,10 +996,11 @@
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
     const merchantCompletionKey = 'outboundToolMerchantCompletionState';
-    const matchedRoIdsKey = 'outboundToolMatchedRoIds_v1';
+    const matchedRoIdsKey = 'outboundToolMatchedRoIds_v3'; 
     const caseModeActiveKey = 'outboundToolCaseModeActive';
     const filerViewStateKey = 'outboundToolFilerViewState';
     const accountIssueKey = 'outboundToolAccountIssues';
+    const roMatchDataKey = 'outboundToolRoMatchData';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -973,7 +1039,7 @@
     // --- CASE MODE VARIABLES ---
     let caseModeData = [];
     let activeCaseModeTabId = null;
-    let matchedRoIds = new Set();
+    let matchedRoIds = new Map();
 
 
     function escapeRegExp(string) {
@@ -1647,7 +1713,7 @@
         a.remove();
     }
 
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
+    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameFromFirstLine) {
         const editableSpan = event.target;
         const newName = editableSpan.textContent.trim();
         if (!newName || newName === originalDisplayName) {
@@ -1657,7 +1723,7 @@
         const noteArea = document.getElementById('noteArea');
         const currentNotes = noteArea.value;
         let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
+        if (isNameFromFirstLine) {
             const lines = originalSectionKey.split('\n');
             newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
         } else {
@@ -1818,6 +1884,7 @@
                 selectAllIcon.className = 'fa-regular fa-square-check';
             }
         }
+        updateRoMatchCounter();
     }
     
     function downloadSelectedMerchants() {
@@ -1961,7 +2028,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -2119,6 +2186,13 @@
             localStorage.setItem(scrollPosKeys.shipmentInput, shipmentInput.scrollTop);
         }
     }
+    
+    function saveRoMatchInput() {
+        const roMatchInput = document.getElementById('roMatchInput');
+        if(roMatchInput) {
+            localStorage.setItem(roMatchDataKey, roMatchInput.value);
+        }
+    }
 
     function saveUpsUspsContextToLocalStorage() {
         try {
@@ -2132,6 +2206,7 @@
         const shipmentInputEl = document.getElementById('shipmentInput');
         const upsUspsOutputAreaEl = document.getElementById('upsUspsOutputArea');
         const noteAreaEl = document.getElementById('noteArea');
+
         if (shipmentInputEl) shipmentInputEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.shipmentInput)) || 0;
         if (upsUspsOutputAreaEl) upsUspsOutputAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.upsUspsOutputArea)) || 0;
         if (noteAreaEl) noteAreaEl.scrollTop = parseInt(localStorage.getItem(scrollPosKeys.noteArea)) || 0;
@@ -2141,6 +2216,7 @@
         saveShipmentInputScroll();
         saveUpsUspsOutputToLocalStorage();
         saveNotesToLocalStorage();
+        saveRoMatchInput();
     }
     
     function initDraggableWindows() {
@@ -2437,7 +2513,7 @@
         }
         caseModeData = payload.data || (Array.isArray(payload) ? payload : []);
         appSettings.caseTextPosition = payload.layout || 'left';
-        matchedRoIds = new Set(payload.matched || []);
+        matchedRoIds = new Map(payload.matched || []);
         
         // Check for persistent state and override
         const savedStateJSON = localStorage.getItem(filerViewStateKey);
@@ -2500,7 +2576,7 @@
         const payload = {
             data: selectedMerchantsData,
             layout: appSettings.caseTextPosition,
-            matched: Array.from(matchedRoIds),
+            matched: Array.from(matchedRoIds.entries()),
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
                 marketplaceUrlGen: appSettings.marketplaceUrlGen,
@@ -2517,6 +2593,42 @@
         showNotification("Filer View HTML file has been downloaded.", "success");
     }
 
+    function reExportFilerView() {
+        if (!document.body.classList.contains('is-standalone-mode')) return;
+
+        // Construct the new payload with the current, updated data
+        const newPayload = {
+            data: caseModeData, // This contains all the latest changes
+            layout: appSettings.caseTextPosition,
+            matched: Array.from(matchedRoIds.entries()),
+            settings: {
+                showCopyTitleBtn: appSettings.showCopyTitleBtn,
+                marketplaceUrlGen: appSettings.marketplaceUrlGen,
+                tabLayout: appSettings.tabLayout
+            }
+        };
+        const newPayloadString = `const standalonePayload = ${JSON.stringify(newPayload)};`;
+
+        // Get the current page's HTML and replace the old payload with the new one
+        const currentHtml = document.documentElement.outerHTML;
+        const newHtml = currentHtml.replace(/const standalonePayload = .*?;/s, newPayloadString);
+        
+        // Generate a new filename
+        const totalCases = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
+        let filenamePart;
+        if (caseModeData.length === 1) {
+            filenamePart = sanitizeFilename(caseModeData[0].displayName);
+        } else if (caseModeData.length > 1) {
+            filenamePart = sanitizeFilename(`${caseModeData[0].displayName}_Multi`);
+        } else {
+            filenamePart = 'FilerView';
+        }
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView_updated.html`;
+
+        downloadFile(newHtml, filename, 'text/html;charset=utf-8');
+        showNotification("Filer View re-exported with changes saved!", "success");
+    }
+
     function exportSingleMerchantFilerView(merchant) {
         if (!merchant) return;
 
@@ -2527,7 +2639,7 @@
         const payload = {
             data: [merchant], // Pass as an array with one item
             layout: appSettings.caseTextPosition,
-            matched: Array.from(matchedRoIds),
+            matched: Array.from(matchedRoIds.entries()),
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
                 marketplaceUrlGen: appSettings.marketplaceUrlGen,
@@ -2679,7 +2791,7 @@
             tabContent.innerHTML = `
                 <div class="case-mode-tab-content-header">
                     <div class="tab-actions-left">
-                       <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
+                       <button class="macos secondary" data-action="view-ro-ids"><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
                        <button class="macos secondary" data-action="open-report-url"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Report URL</button>
                        <button class="macos secondary ${merchant.isAccountIssue ? 'purple' : ''}" data-action="tag-account-issue"><i class="fa-solid fa-user-slash"></i> Tag Account Issue</button>
                        <button class="macos primary non-standalone" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
@@ -2868,7 +2980,7 @@
                     showNotification(`No matching IDs to copy.`, 'info');
                 }
             } else if (action === 'view-ro-ids') {
-                viewRemovalOrderIds(merchant);
+                 openGlobalRoChecklistModal(merchant);
             } else if (action === 'open-report-url') {
                 openReportUrl();
             } else if (action === 'tag-account-issue') {
@@ -3026,83 +3138,86 @@
     }
     
     function saveMatchedRoIds() {
-        const data = {
-            timestamp: Date.now(),
-            ids: Array.from(matchedRoIds)
-        };
-        localStorage.setItem(matchedRoIdsKey, JSON.stringify(data));
+        localStorage.setItem(matchedRoIdsKey, JSON.stringify(Array.from(matchedRoIds.entries())));
     }
 
     function loadMatchedRoIds() {
         const savedData = localStorage.getItem(matchedRoIdsKey);
-        if (savedData) {
+        if(savedData) {
             try {
-                const data = JSON.parse(savedData);
-                const twentyFourHours = 24 * 60 * 60 * 1000;
-                if (Date.now() - data.timestamp < twentyFourHours) {
-                    matchedRoIds = new Set(data.ids);
-                } else {
-                    localStorage.removeItem(matchedRoIdsKey); // Clear expired data
-                }
-            } catch (e) {
+                matchedRoIds = new Map(JSON.parse(savedData));
+            } catch(e) {
                 console.error("Failed to load matched RO IDs:", e);
-                localStorage.removeItem(matchedRoIdsKey);
+                matchedRoIds = new Map();
             }
         }
     }
     
-    function viewRemovalOrderIds(merchant) {
+    function openGlobalRoChecklistModal(specificMerchant = null) {
+        parseNotesForCaseMode();
         const modal = document.getElementById('caseModeActionModal');
         const modalTitle = document.getElementById('caseModeActionModalTitle');
         const modalBody = document.getElementById('caseModeActionModalBody');
+        const dataSource = specificMerchant ? [specificMerchant] : caseModeData;
         
-        if (!merchant || merchant.cases.length === 0) return;
-
         const regex = /Removal order ID:\s*(\S+)/g;
-        const uniqueIds = [...new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])))];
-
-        modalTitle.innerHTML = `<i class="fa-solid fa-tags"></i> Match Removal Order IDs`;
+        const allUniqueIds = [...new Set(dataSource.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))))];
         
-        if (uniqueIds.length > 0) {
-            const idListHTML = uniqueIds.map((id, index) => {
+        modalTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> Match RO IDs` + (specificMerchant ? ` for ${specificMerchant.displayName}` : '');
+
+        if (allUniqueIds.length > 0) {
+            const idListHTML = allUniqueIds.sort().map((id, index) => {
                 const isMatched = matchedRoIds.has(id);
-                const uniqueId = `ro-check-${merchant.id}-${index}`; // Create a unique ID for the label/input pair
+                const matchType = isMatched ? matchedRoIds.get(id) : '';
+                const uniqueId = `ro-check-global-${index}`;
+                
+                let statusHTML = '';
+                if(isMatched) {
+                    statusHTML = `<span class="ro-id-match-status ${matchType}">${matchType.toUpperCase()} MATCHED</span>`;
+                }
+
                 return `
-                <label class="ro-id-item macos-checkbox-container" for="${uniqueId}">
-                    <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox" data-id="${id}" ${isMatched ? 'checked' : ''}>
-                    <span class="ro-id-text">${id}</span>
-                </label>`;
+                <div class="ro-id-item">
+                    <label class="macos-checkbox-container" for="${uniqueId}" style="flex-grow:1;">
+                        <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox" data-id="${id}" ${isMatched ? 'checked' : ''}>
+                        <span class="ro-id-text">${id}</span>
+                    </label>
+                    ${statusHTML}
+                </div>`;
             }).join('');
             
             modalBody.innerHTML = `
-                <p style="font-size: 0.9em; color: var(--text-secondary); margin: 0 0 10px;">Manually mark RO IDs as matched to enable case filing controls.</p>
+                <p style="font-size: 0.9em; color: var(--text-secondary); margin: 0 0 10px;">Manually check/uncheck RO IDs or paste raw data below to auto-match.</p>
                 <div class="ro-id-list">${idListHTML}</div>
-                <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 12px 0;">
-                <p style="font-size: 0.9em; color: var(--text-secondary); margin: 0 0 10px;">Or, paste removal report data here to auto-match.</p>
+                 <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 12px 0;">
                 <div class="macos-textfield-container">
-                    <textarea id="ro-paste-area" class="macos-textfield" placeholder="Paste removal report data here..."></textarea>
-                </div>
-            `;
+                    <textarea id="ro-paste-area" class="macos-textfield" placeholder="Paste raw removal report data here..."></textarea>
+                </div>`;
         } else {
-            modalBody.innerHTML = "<p>No 'Removal order ID' found in this merchant's templates.</p>";
+             modalBody.innerHTML = "<p>No 'Removal order ID' found in any templates.</p>";
+        }
+
+        modal.style.display = 'flex';
+        
+        const checklist = modalBody.querySelector('.ro-id-list');
+        if(checklist) {
+            checklist.onchange = (e) => { // Use event delegation
+                if (e.target.classList.contains('ro-match-checkbox')) {
+                    const id = e.target.dataset.id;
+                    if (e.target.checked) {
+                        matchedRoIds.set(id, 'manual');
+                    } else {
+                        matchedRoIds.delete(id);
+                    }
+                    saveMatchedRoIds();
+                    updateCaseCardMatchStatus();
+                    
+                    openGlobalRoChecklistModal(specificMerchant); // Re-render modal to update status
+                }
+            };
         }
         
-        modal.style.display = 'flex';
-
-        modalBody.addEventListener('change', e => {
-            if (e.target.classList.contains('ro-match-checkbox')) {
-                const id = e.target.dataset.id;
-                if (e.target.checked) {
-                    matchedRoIds.add(id);
-                } else {
-                    matchedRoIds.delete(id);
-                }
-                saveMatchedRoIds();
-                updateCaseCardMatchStatus(); // Update main UI in real-time
-            }
-        });
-
-        const pasteArea = document.getElementById('ro-paste-area');
+        const pasteArea = modalBody.querySelector('#ro-paste-area');
         if (pasteArea) {
             pasteArea.addEventListener('input', (event) => {
                 const pastedText = event.target.value;
@@ -3110,16 +3225,85 @@
                 
                 modalBody.querySelectorAll('.ro-match-checkbox').forEach(checkbox => {
                     const id = checkbox.dataset.id;
-                    if (foundIdsInPaste.has(id)) {
+                    if (foundIdsInPaste.has(id) && !matchedRoIds.has(id)) { // only auto-match if not already matched
                         checkbox.checked = true;
-                        matchedRoIds.add(id);
+                        matchedRoIds.set(id, 'auto');
                     }
                 });
                 saveMatchedRoIds();
                 updateCaseCardMatchStatus();
+                openGlobalRoChecklistModal(specificMerchant); // Re-render modal
             });
         }
     }
+    
+    function updateMatchedRoIdsFromInput() {
+        const roMatchInput = document.getElementById('roMatchInput');
+        if (!roMatchInput) return;
+
+        const rawText = roMatchInput.value;
+        const idsFromPaste = new Set(rawText.split(/[\s,;\t\n]+/).filter(Boolean));
+        
+        const manuallyMatched = new Map();
+        for (const [id, type] of matchedRoIds.entries()) {
+            if (type === 'manual') {
+                manuallyMatched.set(id, 'manual');
+            }
+        }
+        
+        matchedRoIds.clear();
+        let autoMatchedCount = 0;
+        idsFromPaste.forEach(id => {
+            if (!manuallyMatched.has(id)) {
+                 matchedRoIds.set(id, 'auto');
+                 autoMatchedCount++;
+            }
+        });
+
+        for (const [id, type] of manuallyMatched.entries()) {
+            matchedRoIds.set(id, type);
+        }
+        
+        saveMatchedRoIds();
+        updateCaseCardMatchStatus();
+        updateRoMatchCounter();
+
+        if (roMatchInput.value.trim()){
+             parseNotesForCaseMode();
+             const regex = /Removal order ID:\s*(\S+)/g;
+             const allTemplateIds = new Set(caseModeData.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))));
+             const totalMatched = [...allTemplateIds].filter(id => matchedRoIds.has(id)).length;
+             if (autoMatchedCount > 0) {
+                 showNotification(`Auto-matched ${autoMatchedCount} ROs. Total matched: ${totalMatched} / ${allTemplateIds.size}`, 'success');
+             }
+        }
+    }
+
+    function updateRoMatchCounter() {
+        const counter = document.getElementById('roMatchCounter');
+        const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
+        if (!counter) return;
+
+        if (!selectedDiv) {
+            counter.style.display = 'none';
+            return;
+        }
+
+        parseNotesForCaseMode();
+        const merchant = caseModeData.find(m => m.originalText === selectedDiv.dataset.key);
+        if (!merchant) {
+            counter.style.display = 'none';
+            return;
+        }
+
+        const regex = /Removal order ID:\s*(\S+)/g;
+        const merchantRoIds = new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])));
+        const matchedCount = [...merchantRoIds].filter(id => matchedRoIds.has(id)).length;
+        
+        counter.textContent = `${matchedCount}/${merchantRoIds.size}`;
+        counter.style.display = 'inline';
+    }
+
 
     function updateCaseCardMatchStatus() {
         const allCaseCards = document.querySelectorAll(`.case-card`);
@@ -3127,6 +3311,7 @@
 
         allCaseCards.forEach(card => {
             const caseItem = findCaseByUID(card.id);
+
             if (caseItem) {
                 const match = caseItem.text.match(roIdRegex);
                 const roId = match ? match[1] : null;
@@ -3145,6 +3330,7 @@
                 }
             }
         });
+        updateRoMatchCounter();
     }
     
     function updateFileInfo(fileNames = []) {
@@ -3317,6 +3503,19 @@
                 const saved = localStorage.getItem(upsUspsOutputKey); if (saved) upsUspsOutputArea.value = saved;
                 upsUspsOutputArea.addEventListener('scroll', saveUpsUspsOutputToLocalStorage);
             }
+            const roMatchInput = document.getElementById('roMatchInput');
+            if (roMatchInput) {
+                roMatchInput.value = localStorage.getItem(roMatchDataKey) || '';
+                let roMatchTimer;
+                roMatchInput.addEventListener('input', () => {
+                    clearTimeout(roMatchTimer);
+                    roMatchTimer = setTimeout(() => {
+                        updateMatchedRoIdsFromInput();
+                        saveRoMatchInput();
+                    }, 300);
+                });
+                updateMatchedRoIdsFromInput(); // Initial match on load
+            }
             try { const savedCtx = localStorage.getItem(upsUspsContextKey); if (savedCtx) tempUpsUspsData = JSON.parse(savedCtx) || {}; }
             catch (e) { tempUpsUspsData = {}; }
             restoreScrollPositions();
@@ -3340,23 +3539,31 @@
             document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
             document.getElementById('btnExportCaseTracker')?.addEventListener('click', exportCaseTrackerFile);
             document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
+            document.getElementById('btnViewGlobalRo')?.addEventListener('click', ()=> openGlobalRoChecklistModal());
+            document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
+                parseNotesForCaseMode();
+                const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
+                if (selectedDiv) {
+                    const merchant = caseModeData.find(m => m.originalText === selectedDiv.dataset.key);
+                    if (merchant) {
+                        openGlobalRoChecklistModal(merchant);
+                    }
+                }
+            });
+            document.getElementById('btnClearRoInput')?.addEventListener('click', () => {
+                const roInput = document.getElementById('roMatchInput');
+                roInput.value = '';
+                updateMatchedRoIdsFromInput();
+                saveRoMatchInput();
+            });
+
 
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
             document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
-            document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
-                parseNotesForCaseMode(); // Ensure data is fresh
-                const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
-                if (selectedDiv) {
-                    const merchantKey = selectedDiv.dataset.key;
-                    const merchant = caseModeData.find(m => m.originalText === merchantKey);
-                    if (merchant) {
-                        viewRemovalOrderIds(merchant);
-                    }
-                }
-            });
+            
 
             const btnSelectAll = document.getElementById('btnSelectAll');
             if (btnSelectAll) {
@@ -3436,6 +3643,7 @@
         }
 
         // --- Common Listeners for both modes ---
+        document.getElementById('btnReExportFilerView')?.addEventListener('click', reExportFilerView);
         document.getElementById('btnToggleFilerLayout')?.addEventListener('click', toggleFilerLayout);
         document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
         document.getElementById('btnTabLayoutWrap')?.addEventListener('click', () => setTabLayout('wrap'));
@@ -3477,6 +3685,8 @@
              actionModal.style.display = 'none';
              updateCaseCardMatchStatus(); // Update UI when modal is closed
         });
+        
+
     });
 </script>
 </body>
