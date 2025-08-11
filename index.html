@@ -28,6 +28,7 @@
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
         --accent-orange: #ff9500;
+        --accent-purple: #5856d6;
         --highlight-bg: #B4D7FF; 
         --highlight-text: #000000; 
         --top-bar-height: 50px;
@@ -51,6 +52,7 @@
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
         --accent-orange: #ff9f0a;
+        --accent-purple: #5e5ce6;
         --highlight-bg: #0052A3; 
         --highlight-text: #FFFFFF; 
         color-scheme: dark;
@@ -243,6 +245,14 @@
     button.macos.danger:hover { background-color: var(--accent-red-hover); }
     button.macos.success { background-color: var(--accent-green); color: white; }
     button.macos.warning { background-color: var(--accent-orange); color: white; }
+    button.macos.purple, button.macos.purple:active {
+        background-image: none;
+        background-color: var(--accent-purple);
+        color: white;
+        border: none;
+        box-shadow: 0 0.5px 1px rgba(0,0,0,0.1);
+    }
+    button.macos.purple:hover { filter: brightness(1.1); }
 
 
     .macos-icon-button {
@@ -454,11 +464,34 @@
     .case-mode-tab-button.active .case-mode-tab-meta, .case-mode-tab-button.active .copy-merchant-btn, .case-mode-tab-button.active .tab-action-btn { background-color: rgba(255,255,255,0.2); color: white; }
     .case-mode-tab-button.active .copy-merchant-btn:hover { background-color: rgba(255,255,255,0.3); }
 
+    .case-mode-tab-button.account-issue {
+        background-color: color-mix(in srgb, var(--accent-purple) 15%, var(--bg-primary));
+        color: color-mix(in srgb, var(--accent-purple) 85%, #000);
+        border: 1px solid color-mix(in srgb, var(--accent-purple) 30%, transparent);
+    }
+    .case-mode-tab-button.account-issue:hover:not(.active) {
+        background-color: color-mix(in srgb, var(--accent-purple) 25%, var(--bg-primary));
+    }
+    .case-mode-tab-button.account-issue.active {
+        background-color: var(--accent-purple);
+        color: white;
+        border-color: color-mix(in srgb, var(--accent-purple) 85%, black);
+    }
+    html[data-theme="dark"] .case-mode-tab-button.account-issue:not(.active) { color: var(--accent-purple); }
+
     .case-mode-merchant-name { flex-grow: 1; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; width: 100%; margin-bottom: 4px; font-weight: 600; }
     .case-mode-tab-bottom-row { display: flex; width: 100%; align-items: center; }
     .copy-merchant-btn { all: unset; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--text-secondary); cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; }
     .copy-merchant-btn:hover { background-color: var(--bg-hover); color: var(--text-primary); }
     .case-mode-tab-meta { font-weight: 600; background-color: var(--bg-window); padding: 4px 10px; border-radius: 8px; margin: 0 auto 0 8px;}
+    .case-mode-tab-button.account-issue .case-mode-tab-meta {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .case-mode-tab-button.account-issue.active .case-mode-tab-meta {
+        background-color: rgba(255,255,255,0.2);
+        color: white;
+    }
     
     .case-mode-tab-button .tab-action-btn {
         background: var(--bg-window); border: none; color: var(--text-secondary); width: 22px; height: 22px;
@@ -539,36 +572,6 @@
         flex-wrap: nowrap;
         overflow-x: auto;
     }
-    
-    /* Vertical Tab Layout */
-    .tab-layout-vertical {
-        display: grid;
-        grid-template-columns: 1fr 260px;
-        grid-template-rows: auto 1fr;
-        grid-template-areas:
-            "header sidebar"
-            "content sidebar";
-        height: calc(100vh - var(--top-bar-height));
-        padding: 0;
-        overflow: hidden;
-    }
-    .tab-layout-vertical .case-mode-header { grid-area: header; }
-    .tab-layout-vertical #caseModeTabContainer {
-        grid-area: sidebar;
-        flex-direction: column;
-        border-left: 1px solid var(--border-subtle);
-        border-bottom: none;
-        overflow-y: auto;
-        height: auto; /* Let grid handle height */
-        padding: 1rem;
-        align-items: stretch;
-        gap: 12px;
-        background-color: var(--bg-window);
-    }
-    html[data-theme="dark"] .tab-layout-vertical #caseModeTabContainer { background-color: var(--bg-primary); }
-    .tab-layout-vertical #caseModeTabContents { grid-area: content; padding: 0 1.5rem; }
-    .tab-layout-vertical .case-mode-tab-button { min-width: 0; width: 100%; }
-
 </style>
 </head>
 <body>
@@ -627,7 +630,6 @@
             <div class="toolbar-icon-group standalone-only">
                 <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
-                <button id="btnTabLayoutVertical" class="macos-icon-button" title="Vertical Tabs"><i class="fa-solid fa-columns"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
@@ -785,7 +787,6 @@
                         <div class="radio-group">
                             <label><input type="radio" name="tabLayout" value="wrap"> Wrap</label>
                             <label><input type="radio" name="tabLayout" value="h-scroll"> Horizontal Scroll</label>
-                            <label><input type="radio" name="tabLayout" value="vertical"> Vertical</label>
                         </div>
                     </div>
                     <div class="settings-group inline">
@@ -933,6 +934,7 @@
     const matchedRoIdsKey = 'outboundToolMatchedRoIds_v1';
     const caseModeActiveKey = 'outboundToolCaseModeActive';
     const filerViewStateKey = 'outboundToolFilerViewState';
+    const accountIssueKey = 'outboundToolAccountIssues';
     const scrollPosKeys = {
         shipmentInput: 'scrollPos_shipmentInput_amzlTool',
         upsUspsOutputArea: 'scrollPos_upsUspsOutputArea_amzlTool',
@@ -1035,6 +1037,12 @@
                 console.error("Error parsing settings:", e);
             }
         }
+        
+        // Sanitize tab layout setting
+        if (appSettings.tabLayout === 'vertical') {
+            appSettings.tabLayout = 'wrap';
+        }
+
         setPrefix(appSettings.prefixOption);
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
@@ -2081,6 +2089,7 @@
         localStorage.removeItem(caseModeStateKey);
         localStorage.removeItem(merchantCompletionKey);
         localStorage.removeItem(matchedRoIdsKey);
+        localStorage.removeItem(accountIssueKey);
         Object.keys(localStorage).filter(key => key.startsWith('case-')).forEach(key => localStorage.removeItem(key));
 
         countTemplatesNoteTaker();
@@ -2436,7 +2445,7 @@
             try {
                 const savedState = JSON.parse(savedStateJSON);
                 // Simple check to see if the saved data might match the payload data
-                if (savedState.caseModeData && savedState.caseModeData[0]?.id === caseModeData[0]?.id) {
+                if (savedState.caseModeData && caseModeData.length > 0 && savedState.caseModeData[0]?.id === caseModeData[0]?.id) {
                     caseModeData = savedState.caseModeData;
                     if (savedState.appSettings) {
                         appSettings.caseTextPosition = savedState.appSettings.caseTextPosition;
@@ -2551,6 +2560,7 @@
         if (!noteArea || document.body.classList.contains('is-standalone-mode')) return; // Don't re-parse in standalone
         const fullText = noteArea.value;
         const completionState = getCompletionState();
+        const accountIssues = JSON.parse(localStorage.getItem(accountIssueKey)) || {};
         caseModeData = [];
         let merchantIndex = 0;
         const merchantBlocks = fullText.split(merchantSeparatorRegex).filter(b => b.trim());
@@ -2570,6 +2580,7 @@
                 displayName: merchantName,
                 originalText: block,
                 isCompleted: completionState[merchantId] || false,
+                isAccountIssue: accountIssues[merchantId] || false,
                 cases: []
             };
             
@@ -2633,6 +2644,7 @@
         caseModeData.forEach(merchant => {
             const filedCount = merchant.cases.filter(c => c.filedId !== null).length;
             const totalCount = merchant.cases.length;
+            const metaContent = merchant.isAccountIssue ? 'ISSUE' : `${filedCount}/${totalCount}`;
             
             const tabBtn = document.createElement('div');
             tabBtn.className = 'case-mode-tab-button';
@@ -2649,12 +2661,13 @@
                 <span class="case-mode-merchant-name" title="${merchant.displayName}">${merchant.displayName}</span>
                 <div class="case-mode-tab-bottom-row">
                     <button class="copy-merchant-btn" title="Copy Name"><i class="fa-regular fa-copy"></i></button>
-                    <span class="case-mode-tab-meta">${filedCount}/${totalCount}</span>
+                    <span class="case-mode-tab-meta">${metaContent}</span>
                     ${actionButtonHtml}
                 </div>
             `;
             if (merchant.id === activeCaseModeTabId) tabBtn.classList.add('active');
             if ((filedCount === totalCount && totalCount > 0) || merchant.isCompleted) tabBtn.classList.add('done');
+            if (merchant.isAccountIssue) tabBtn.classList.add('account-issue');
             
             tabContainer.appendChild(tabBtn);
 
@@ -2668,6 +2681,7 @@
                     <div class="tab-actions-left">
                        <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
                        <button class="macos secondary" data-action="open-report-url"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Report URL</button>
+                       <button class="macos secondary ${merchant.isAccountIssue ? 'purple' : ''}" data-action="tag-account-issue"><i class="fa-solid fa-user-slash"></i> Tag Account Issue</button>
                        <button class="macos primary non-standalone" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
                     </div>
                     <div class="tab-actions-right">
@@ -2682,6 +2696,9 @@
             `;
             
             const casesList = document.createElement('div');
+            if (merchant.isAccountIssue) {
+                casesList.style.display = 'none';
+            }
             merchant.cases.forEach((caseItem, index) => {
                 casesList.appendChild(createCaseCard(caseItem, index + 1));
             });
@@ -2766,45 +2783,46 @@
         const contentContainer = document.getElementById('caseModeTabContents');
         
         tabContainer.addEventListener('click', e => {
-            const copyBtn = e.target.closest('.copy-merchant-btn');
-            if (copyBtn) {
-                e.stopPropagation();
-                const merchantId = copyBtn.closest('.case-mode-tab-button').dataset.tabId;
-                const merchant = caseModeData.find(m => m.id === merchantId);
-                if (merchant) {
-                    navigator.clipboard.writeText(merchant.displayName);
-                    showNotification(`Copied: ${merchant.displayName}`, 'success');
-                }
-                return;
-            }
+            const targetButton = e.target.closest('button');
 
-            const deleteBtn = e.target.closest('.delete-merchant-btn');
-            if (deleteBtn) {
-                e.stopPropagation();
-                const merchantId = deleteBtn.closest('.case-mode-tab-button').dataset.tabId;
-                handleDeleteMerchant(merchantId);
-                return;
-            }
-
-            const completeBtn = e.target.closest('.toggle-complete-btn');
-            if (completeBtn) {
-                e.stopPropagation();
-                const tabButton = completeBtn.closest('.case-mode-tab-button');
-                const merchantId = tabButton.dataset.tabId;
-                const merchant = caseModeData.find(m => m.id === merchantId);
-                if(merchant) {
-                    merchant.isCompleted = !merchant.isCompleted;
-                    tabButton.classList.toggle('done', merchant.isCompleted);
-                    completeBtn.querySelector('i').className = merchant.isCompleted ? `fa-solid fa-check-circle` : `fa-regular fa-circle`;
-                    if (!document.body.classList.contains('is-standalone-mode')) {
-                        const completionState = getCompletionState();
-                        completionState[merchantId] = merchant.isCompleted;
-                        saveCompletionState(completionState);
+            // Handle specific buttons within the tab first
+            if (targetButton) {
+                if (targetButton.classList.contains('copy-merchant-btn')) {
+                    e.stopPropagation();
+                    const merchantId = targetButton.closest('.case-mode-tab-button').dataset.tabId;
+                    const merchant = caseModeData.find(m => m.id === merchantId);
+                    if (merchant) {
+                        navigator.clipboard.writeText(merchant.displayName);
+                        showNotification(`Copied: ${merchant.displayName}`, 'success');
                     }
+                    return;
                 }
-                return;
+                if (targetButton.classList.contains('delete-merchant-btn')) {
+                    e.stopPropagation();
+                    const merchantId = targetButton.closest('.case-mode-tab-button').dataset.tabId;
+                    handleDeleteMerchant(merchantId);
+                    return;
+                }
+                if (targetButton.classList.contains('toggle-complete-btn')) {
+                    e.stopPropagation();
+                    const tabButton = targetButton.closest('.case-mode-tab-button');
+                    const merchantId = tabButton.dataset.tabId;
+                    const merchant = caseModeData.find(m => m.id === merchantId);
+                    if(merchant) {
+                        merchant.isCompleted = !merchant.isCompleted;
+                        tabButton.classList.toggle('done', merchant.isCompleted);
+                        targetButton.querySelector('i').className = merchant.isCompleted ? `fa-solid fa-check-circle` : `fa-regular fa-circle`;
+                        if (!document.body.classList.contains('is-standalone-mode')) {
+                            const completionState = getCompletionState();
+                            completionState[merchantId] = merchant.isCompleted;
+                            saveCompletionState(completionState);
+                        }
+                    }
+                    return;
+                }
             }
             
+            // Handle tab switching
             const tabButton = e.target.closest('.case-mode-tab-button');
              if (tabButton && !tabButton.classList.contains('active')) {
                 // Deactivate old tab
@@ -2853,6 +2871,40 @@
                 viewRemovalOrderIds(merchant);
             } else if (action === 'open-report-url') {
                 openReportUrl();
+            } else if (action === 'tag-account-issue') {
+                merchant.isAccountIssue = !merchant.isAccountIssue;
+                
+                if (!document.body.classList.contains('is-standalone-mode')) {
+                    const accountIssues = JSON.parse(localStorage.getItem(accountIssueKey)) || {};
+                    if (merchant.isAccountIssue) {
+                        accountIssues[merchant.id] = true;
+                    } else {
+                        delete accountIssues[merchant.id];
+                    }
+                    localStorage.setItem(accountIssueKey, JSON.stringify(accountIssues));
+                } else {
+                    saveFilerViewState();
+                }
+
+                button.classList.toggle('purple', merchant.isAccountIssue);
+                const casesList = button.closest('.case-mode-tab-content').querySelector('.case-card')?.parentElement;
+                if(casesList) {
+                    casesList.style.display = merchant.isAccountIssue ? 'none' : 'block';
+                }
+                const tabButton = document.querySelector(`.case-mode-tab-button[data-tab-id="${merchant.id}"]`);
+                if(tabButton) {
+                    tabButton.classList.toggle('account-issue', merchant.isAccountIssue);
+                    const metaSpan = tabButton.querySelector('.case-mode-tab-meta');
+                    if (merchant.isAccountIssue) {
+                        metaSpan.textContent = 'ISSUE';
+                    } else {
+                        const filedCount = merchant.cases.filter(c => c.filedId !== null).length;
+                        const totalCount = merchant.cases.length;
+                        metaSpan.textContent = `${filedCount}/${totalCount}`;
+                    }
+                }
+                showNotification(`Account issue tagged ${merchant.isAccountIssue ? 'ON' : 'OFF'}.`, 'info');
+
             } else if (action === 'export-filer-view') {
                 const merchantId = button.dataset.merchantId;
                 const merchantToExport = caseModeData.find(m => m.id === merchantId);
@@ -3119,7 +3171,10 @@
             
             const tabBtn = document.querySelector(`.case-mode-tab-button[data-tab-id="${m.id}"]`);
             if(tabBtn) {
-                tabBtn.querySelector('.case-mode-tab-meta').textContent = `${filedCount}/${totalCount}`;
+                const metaSpan = tabBtn.querySelector('.case-mode-tab-meta');
+                if (metaSpan) {
+                    metaSpan.textContent = m.isAccountIssue ? 'ISSUE' : `${filedCount}/${totalCount}`;
+                }
                 tabBtn.classList.toggle('done', (filedCount === totalCount && totalCount > 0) || m.isCompleted);
             }
 
@@ -3206,7 +3261,6 @@
         // Update active state of toggle buttons in standalone mode
         document.getElementById('btnTabLayoutWrap')?.classList.toggle('active', layout === 'wrap');
         document.getElementById('btnTabLayoutHScroll')?.classList.toggle('active', layout === 'h-scroll');
-        document.getElementById('btnTabLayoutVertical')?.classList.toggle('active', layout === 'vertical');
     }
 
     function toggleFilerLayout() {
@@ -3386,7 +3440,6 @@
         document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
         document.getElementById('btnTabLayoutWrap')?.addEventListener('click', () => setTabLayout('wrap'));
         document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
-        document.getElementById('btnTabLayoutVertical')?.addEventListener('click', () => setTabLayout('vertical'));
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
             appSettings.theme = newTheme;
