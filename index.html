@@ -543,11 +543,11 @@
     /* Vertical Tab Layout */
     .tab-layout-vertical {
         display: grid;
-        grid-template-columns: 260px 1fr;
+        grid-template-columns: 1fr 260px;
         grid-template-rows: auto 1fr;
         grid-template-areas:
-            "sidebar header"
-            "sidebar content";
+            "header sidebar"
+            "content sidebar";
         height: calc(100vh - var(--top-bar-height));
         padding: 0;
         overflow: hidden;
@@ -556,7 +556,7 @@
     .tab-layout-vertical #caseModeTabContainer {
         grid-area: sidebar;
         flex-direction: column;
-        border-right: 1px solid var(--border-subtle);
+        border-left: 1px solid var(--border-subtle);
         border-bottom: none;
         overflow-y: auto;
         height: auto; /* Let grid handle height */
@@ -566,7 +566,7 @@
         background-color: var(--bg-window);
     }
     html[data-theme="dark"] .tab-layout-vertical #caseModeTabContainer { background-color: var(--bg-primary); }
-    .tab-layout-vertical #caseModeTabContents { grid-area: content; }
+    .tab-layout-vertical #caseModeTabContents { grid-area: content; padding: 0 1.5rem; }
     .tab-layout-vertical .case-mode-tab-button { min-width: 0; width: 100%; }
 
 </style>
@@ -605,7 +605,7 @@
         <h1 class="top-bar-title">Lost Outbound</h1>
         <div class="toolbar-right">
             <div class="url-generator-group">
-                <button id="copyUrlBtn" class="macos-icon-button non-standalone" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
+                <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
                 <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -623,6 +623,11 @@
             <div class="toolbar-icon-group standalone-only">
                  <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
                  <button id="btnToggleCopyTitle" class="macos-icon-button" title="Toggle 'Copy Case Title' Button"><i class="fa-solid fa-heading"></i></button>
+            </div>
+            <div class="toolbar-icon-group standalone-only">
+                <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
+                <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
+                <button id="btnTabLayoutVertical" class="macos-icon-button" title="Vertical Tabs"><i class="fa-solid fa-columns"></i></button>
             </div>
             <div class="toolbar-icon-group">
                 <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
@@ -924,6 +929,7 @@
     const parserStateKey = 'outboundToolParserState';
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
+    const merchantCompletionKey = 'outboundToolMerchantCompletionState';
     const matchedRoIdsKey = 'outboundToolMatchedRoIds_v1';
     const caseModeActiveKey = 'outboundToolCaseModeActive';
     const filerViewStateKey = 'outboundToolFilerViewState';
@@ -2073,6 +2079,7 @@
         }
         noteArea.value = '';
         localStorage.removeItem(caseModeStateKey);
+        localStorage.removeItem(merchantCompletionKey);
         localStorage.removeItem(matchedRoIdsKey);
         Object.keys(localStorage).filter(key => key.startsWith('case-')).forEach(key => localStorage.removeItem(key));
 
@@ -2357,6 +2364,19 @@
     }
 
     // --- CASE MODE ---
+    function getCompletionState() {
+        try {
+            const state = localStorage.getItem(merchantCompletionKey);
+            return state ? JSON.parse(state) : {};
+        } catch (e) {
+            console.error("Failed to parse completion state:", e);
+            return {};
+        }
+    }
+
+    function saveCompletionState(state) {
+        localStorage.setItem(merchantCompletionKey, JSON.stringify(state));
+    }
     
     function toggleCaseMode() {
         const mainWrapper = document.getElementById('mainWrapper');
@@ -2404,6 +2424,7 @@
         if (payload.settings) {
             appSettings.showCopyTitleBtn = payload.settings.showCopyTitleBtn;
             appSettings.marketplaceUrlGen = payload.settings.marketplaceUrlGen;
+            appSettings.tabLayout = payload.settings.tabLayout || 'wrap';
         }
         caseModeData = payload.data || (Array.isArray(payload) ? payload : []);
         appSettings.caseTextPosition = payload.layout || 'left';
@@ -2473,7 +2494,8 @@
             matched: Array.from(matchedRoIds),
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
-                marketplaceUrlGen: appSettings.marketplaceUrlGen
+                marketplaceUrlGen: appSettings.marketplaceUrlGen,
+                tabLayout: appSettings.tabLayout
             }
         };
         
@@ -2499,7 +2521,8 @@
             matched: Array.from(matchedRoIds),
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
-                marketplaceUrlGen: appSettings.marketplaceUrlGen
+                marketplaceUrlGen: appSettings.marketplaceUrlGen,
+                tabLayout: appSettings.tabLayout
             }
         };
         
@@ -2527,6 +2550,7 @@
         const noteArea = document.getElementById('noteArea');
         if (!noteArea || document.body.classList.contains('is-standalone-mode')) return; // Don't re-parse in standalone
         const fullText = noteArea.value;
+        const completionState = getCompletionState();
         caseModeData = [];
         let merchantIndex = 0;
         const merchantBlocks = fullText.split(merchantSeparatorRegex).filter(b => b.trim());
@@ -2545,7 +2569,7 @@
                 id: merchantId,
                 displayName: merchantName,
                 originalText: block,
-                isCompleted: false, // For Filer View toggling
+                isCompleted: completionState[merchantId] || false,
                 cases: []
             };
             
@@ -2614,8 +2638,9 @@
             tabBtn.className = 'case-mode-tab-button';
             tabBtn.dataset.tabId = merchant.id;
             
+            const completeIcon = merchant.isCompleted ? 'fa-solid fa-check-circle' : 'fa-regular fa-circle';
             const actionButtonHtml = `
-                <button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="fa-regular fa-circle"></i></button>
+                <button class="tab-action-btn toggle-complete-btn" title="Toggle Completion Status"><i class="${completeIcon}"></i></button>
                 <button class="tab-action-btn delete-merchant-btn non-standalone" title="Delete Merchant"><i class="fa-solid fa-times"></i></button>
             `;
 
@@ -2770,9 +2795,13 @@
                 if(merchant) {
                     merchant.isCompleted = !merchant.isCompleted;
                     tabButton.classList.toggle('done', merchant.isCompleted);
-                    completeBtn.innerHTML = merchant.isCompleted ? `<i class="fa-solid fa-check-circle"></i>` : `<i class="fa-regular fa-circle"></i>`;
+                    completeBtn.querySelector('i').className = merchant.isCompleted ? `fa-solid fa-check-circle` : `fa-regular fa-circle`;
+                    if (!document.body.classList.contains('is-standalone-mode')) {
+                        const completionState = getCompletionState();
+                        completionState[merchantId] = merchant.isCompleted;
+                        saveCompletionState(completionState);
+                    }
                 }
-                saveFilerViewState();
                 return;
             }
             
@@ -3025,7 +3054,7 @@
         if (pasteArea) {
             pasteArea.addEventListener('input', (event) => {
                 const pastedText = event.target.value;
-                const foundIdsInPaste = new Set(pastedText.split(/\s+/).filter(Boolean));
+                const foundIdsInPaste = new Set(pastedText.split(/[\s,;\t\n]+/).filter(Boolean));
                 
                 modalBody.querySelectorAll('.ro-match-checkbox').forEach(checkbox => {
                     const id = checkbox.dataset.id;
@@ -3157,11 +3186,27 @@
         document.getElementById('caseModeWrapper')?.classList.toggle('show-copy-title', appSettings.showCopyTitleBtn);
     }
     
+    function setTabLayout(layout) {
+        appSettings.tabLayout = layout;
+        applyTabLayout();
+        // In standalone/filer mode, we don't save this to persistent settings
+        if (!document.body.classList.contains('is-standalone-mode')) {
+             const radioToSelect = document.querySelector(`input[name="tabLayout"][value="${layout}"]`);
+             if(radioToSelect) radioToSelect.checked = true;
+        }
+    }
+
     function applyTabLayout() {
         const wrapper = document.getElementById('caseModeWrapper');
         if (!wrapper) return;
+        const layout = appSettings.tabLayout || 'wrap';
         wrapper.classList.remove('tab-layout-wrap', 'tab-layout-h-scroll', 'tab-layout-vertical');
-        wrapper.classList.add(`tab-layout-${appSettings.tabLayout || 'wrap'}`);
+        wrapper.classList.add(`tab-layout-${layout}`);
+
+        // Update active state of toggle buttons in standalone mode
+        document.getElementById('btnTabLayoutWrap')?.classList.toggle('active', layout === 'wrap');
+        document.getElementById('btnTabLayoutHScroll')?.classList.toggle('active', layout === 'h-scroll');
+        document.getElementById('btnTabLayoutVertical')?.classList.toggle('active', layout === 'vertical');
     }
 
     function toggleFilerLayout() {
@@ -3339,11 +3384,16 @@
         // --- Common Listeners for both modes ---
         document.getElementById('btnToggleFilerLayout')?.addEventListener('click', toggleFilerLayout);
         document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
+        document.getElementById('btnTabLayoutWrap')?.addEventListener('click', () => setTabLayout('wrap'));
+        document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
+        document.getElementById('btnTabLayoutVertical')?.addEventListener('click', () => setTabLayout('vertical'));
         document.getElementById('themeToggle')?.addEventListener('click', () => {
             const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
             appSettings.theme = newTheme;
-            localStorage.setItem(settingsKey, JSON.stringify(appSettings));
             setTheme(newTheme);
+            if (!document.body.classList.contains('is-standalone-mode')) {
+                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+            }
         });
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
@@ -3357,6 +3407,9 @@
         });
         document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
             appSettings.marketplaceUrlGen = e.target.value;
+            if (!document.body.classList.contains('is-standalone-mode')) {
+                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+            }
         });
 
         document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
