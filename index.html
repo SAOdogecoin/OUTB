@@ -253,6 +253,8 @@
     }
     .macos-icon-button:hover:not(:disabled) { background-color: var(--bg-hover); color: var(--text-primary); }
     .macos-icon-button.active { background-color: var(--accent-blue); color: white; }
+    .macos-icon-button.success { background-color: var(--accent-green); color: white; }
+    .macos-icon-button.success:hover:not(:disabled) { filter: brightness(1.1); }
     .macos-icon-button:disabled { color: var(--text-placeholder); background: transparent; cursor: not-allowed; }
     .macos-icon-button:disabled:hover { background: transparent; }
 
@@ -325,10 +327,12 @@
         display: block; opacity: 1; top: 30px; transform: translateX(-50%) scale(1);
     }
 
-    .left-column-wrapper, #merchantList, #noteArea, #historyList, #preSendFileList { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar, #preSendFileList::-webkit-scrollbar { width: 9px; }
-    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb, #preSendFileList::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
-    
+    .left-column-wrapper, #merchantList, #noteArea, #historyList, #preSendFileList, #caseModeTabContainer { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
+    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar, #preSendFileList::-webkit-scrollbar, #caseModeTabContainer::-webkit-scrollbar { width: 9px; }
+    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb, #preSendFileList::-webkit-scrollbar-thumb, #caseModeTabContainer::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+    #caseModeTabContainer::-webkit-scrollbar { height: 9px; }
+
+
     #merchantList {
         min-height: 100px; max-height: 70vh; overflow-y: auto; overflow-x: hidden; 
         margin-top: 16px; padding: 0; border: none;
@@ -435,12 +439,12 @@
     /* --- CASE MODE STYLES --- */
     .standalone-only { display: none; }
     body.is-standalone-mode .standalone-only { display: flex; }
-    .case-mode-wrapper { width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-    .case-mode-header { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .case-mode-wrapper { width: 100%; max-width: 100%; /* Use full width */ margin: 0 auto; display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+    .case-mode-header { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
     .case-mode-title-group { display: flex; align-items: center; gap: 1rem; }
     .case-mode-title { font-size: 1.5rem; font-weight: 700; margin: 0; color: var(--text-primary); }
     #caseModeGlobalStats { font-weight: 600; color: var(--text-secondary); background-color: var(--bg-hover); padding: 6px 12px; border-radius: 8px; font-size: 0.95rem; white-space: nowrap; }
-    .case-mode-tab-container { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .case-mode-tab-container { z-index: 100; flex-shrink:0; background-color: var(--bg-primary); display: flex; flex-wrap: wrap; gap: 8px; padding: 0 1.5rem 1.5rem 1.5rem; border-bottom: 1px solid var(--border-subtle); }
     .case-mode-tab-button { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 10px; background-color: var(--bg-hover); color: var(--text-secondary); border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; min-width: 180px; }
     .case-mode-tab-button:hover:not(.active) { background-color: color-mix(in srgb, var(--text-secondary) 15%, transparent); color: var(--text-primary); }
     .case-mode-tab-button.active { background-color: var(--accent-blue); color: white; border-color: var(--accent-blue-dark); font-weight: 600; }
@@ -468,7 +472,7 @@
         flex-direction: row-reverse;
     }
     
-    #caseModeTabContents { flex-grow: 1; overflow-y: auto; }
+    #caseModeTabContents { flex-grow: 1; overflow-y: auto; padding: 0 1.5rem; }
     .case-mode-tab-content { display: none; }
     .case-mode-tab-content.active { display: block; }
     .case-mode-tab-content-header { position: sticky; top: 0; z-index: 99; background-color: var(--bg-primary); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); }
@@ -529,6 +533,41 @@
     .history-merchant-name { color: var(--text-secondary); font-size: 0.85rem; font-style: italic; margin-left: 1rem; }
     .history-timestamp { color: var(--text-secondary); }
     #caseModeActionModalBody .macos-textfield-container { margin-top: 1rem; }
+    
+    /* Horizontal Scroll Tab Layout */
+    .tab-layout-h-scroll #caseModeTabContainer {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+    
+    /* Vertical Tab Layout */
+    .tab-layout-vertical {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "sidebar header"
+            "sidebar content";
+        height: calc(100vh - var(--top-bar-height));
+        padding: 0;
+        overflow: hidden;
+    }
+    .tab-layout-vertical .case-mode-header { grid-area: header; }
+    .tab-layout-vertical #caseModeTabContainer {
+        grid-area: sidebar;
+        flex-direction: column;
+        border-right: 1px solid var(--border-subtle);
+        border-bottom: none;
+        overflow-y: auto;
+        height: auto; /* Let grid handle height */
+        padding: 1rem;
+        align-items: stretch;
+        gap: 12px;
+        background-color: var(--bg-window);
+    }
+    html[data-theme="dark"] .tab-layout-vertical #caseModeTabContainer { background-color: var(--bg-primary); }
+    .tab-layout-vertical #caseModeTabContents { grid-area: content; }
+    .tab-layout-vertical .case-mode-tab-button { min-width: 0; width: 100%; }
 
 </style>
 </head>
@@ -736,6 +775,14 @@
                             <label><input type="radio" name="caseTextPosition" value="right" id="caseTextPosRight"> Right</label>
                         </div>
                     </div>
+                     <div class="settings-group">
+                        <label>Case Filer Tab Layout:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="tabLayout" value="wrap"> Wrap</label>
+                            <label><input type="radio" name="tabLayout" value="h-scroll"> Horizontal Scroll</label>
+                            <label><input type="radio" name="tabLayout" value="vertical"> Vertical</label>
+                        </div>
+                    </div>
                     <div class="settings-group inline">
                         <label>Show Merchant Search Bar</label>
                         <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
@@ -899,6 +946,7 @@
         marketplaceUrlGen: 'com',
         caseTextPosition: 'left',
         showCopyTitleBtn: false,
+        tabLayout: 'wrap',
     };
     let regexPatterns = {
         amzlSource: null,
@@ -994,6 +1042,9 @@
         if (counterPosRadio) counterPosRadio.checked = true;
         const caseTextPosRadio = document.querySelector(`input[name="caseTextPosition"][value="${appSettings.caseTextPosition}"]`);
         if (caseTextPosRadio) caseTextPosRadio.checked = true;
+        const tabLayoutRadio = document.querySelector(`input[name="tabLayout"][value="${appSettings.tabLayout}"]`);
+        if (tabLayoutRadio) tabLayoutRadio.checked = true;
+
         initializeRegexPatterns();
         applyAppSettings();
         setTheme(appSettings.theme);
@@ -1014,6 +1065,8 @@
         if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
         const selectedCaseTextPos = document.querySelector('input[name="caseTextPosition"]:checked');
         if (selectedCaseTextPos) appSettings.caseTextPosition = selectedCaseTextPos.value;
+        const selectedTabLayout = document.querySelector('input[name="tabLayout"]:checked');
+        if (selectedTabLayout) appSettings.tabLayout = selectedTabLayout.value;
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns();
@@ -1026,6 +1079,7 @@
         updateCounterPillLocation();
         applyCaseCardLayout();
         applyCopyTitleButtonVisibility();
+        applyTabLayout();
     }
 
     function getHistory() {
@@ -1893,7 +1947,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -2327,6 +2381,7 @@
     function initCaseMode() {
         parseNotesForCaseMode();
         renderCaseModeUI();
+        applyTabLayout();
     }
     
     function saveFilerViewState() {
@@ -2381,6 +2436,7 @@
         document.getElementById('caseModeWrapper').style.display = 'flex';
         renderCaseModeUI();
         applyCaseCardLayout();
+        applyTabLayout();
     }
     
     function exportCaseTrackerFile() {
@@ -2586,6 +2642,7 @@
                 <div class="case-mode-tab-content-header">
                     <div class="tab-actions-left">
                        <button class="macos secondary" data-action="view-ro-ids" ${totalCount === 0 ? 'disabled' : ''}><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
+                       <button class="macos secondary" data-action="open-report-url"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Report URL</button>
                        <button class="macos primary non-standalone" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
                     </div>
                     <div class="tab-actions-right">
@@ -2648,9 +2705,10 @@
                             <div class="macos-textfield-container">
                                  <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID..." ${controlsDisabled}>
                             </div>
-                            <button class="macos-icon-button active" data-action="save-case" title="Save Case ID" ${controlsDisabled}><i class="fa-solid fa-save"></i></button>
+                            <button class="macos-icon-button success" data-action="save-case" title="Save Case ID" ${controlsDisabled}><i class="fa-solid fa-save"></i></button>
                         </div>
-                        <button class="macos primary" data-action="copy-text" style="padding-top: 8px; padding-bottom: 8px;" ${controlsDisabled}><i class="fa-solid fa-copy"></i>Copy Template</button>
+                        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 8px 0;" />
+                        <button class="macos primary" data-action="copy-text" style="padding-top: 8px; padding-bottom: 8px; margin-top: 8px;" ${controlsDisabled}><i class="fa-solid fa-copy"></i>Copy Template</button>
                         <button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
                     </div>
                     <div class="filed-controls">
@@ -2764,6 +2822,8 @@
                 }
             } else if (action === 'view-ro-ids') {
                 viewRemovalOrderIds(merchant);
+            } else if (action === 'open-report-url') {
+                openReportUrl();
             } else if (action === 'export-filer-view') {
                 const merchantId = button.dataset.merchantId;
                 const merchantToExport = caseModeData.find(m => m.id === merchantId);
@@ -2923,9 +2983,9 @@
         modalTitle.innerHTML = `<i class="fa-solid fa-tags"></i> Match Removal Order IDs`;
         
         if (uniqueIds.length > 0) {
-            const idListHTML = uniqueIds.map(id => {
+            const idListHTML = uniqueIds.map((id, index) => {
                 const isMatched = matchedRoIds.has(id);
-                const uniqueId = `ro-check-${id.replace(/\W/g, '')}`;
+                const uniqueId = `ro-check-${merchant.id}-${index}`; // Create a unique ID for the label/input pair
                 return `
                 <label class="ro-id-item macos-checkbox-container" for="${uniqueId}">
                     <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox" data-id="${id}" ${isMatched ? 'checked' : ''}>
@@ -2965,7 +3025,7 @@
         if (pasteArea) {
             pasteArea.addEventListener('input', (event) => {
                 const pastedText = event.target.value;
-                const foundIdsInPaste = new Set(pastedText.match(/\b[a-zA-Z0-9/]{8,}\b/g) || []);
+                const foundIdsInPaste = new Set(pastedText.split(/\s+/).filter(Boolean));
                 
                 modalBody.querySelectorAll('.ro-match-checkbox').forEach(checkbox => {
                     const id = checkbox.dataset.id;
@@ -3095,6 +3155,13 @@
     
     function applyCopyTitleButtonVisibility() {
         document.getElementById('caseModeWrapper')?.classList.toggle('show-copy-title', appSettings.showCopyTitleBtn);
+    }
+    
+    function applyTabLayout() {
+        const wrapper = document.getElementById('caseModeWrapper');
+        if (!wrapper) return;
+        wrapper.classList.remove('tab-layout-wrap', 'tab-layout-h-scroll', 'tab-layout-vertical');
+        wrapper.classList.add(`tab-layout-${appSettings.tabLayout || 'wrap'}`);
     }
 
     function toggleFilerLayout() {
@@ -3280,6 +3347,14 @@
         });
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
+        document.getElementById('copyUrlBtn').addEventListener('click', () => {
+            const url = generateReportUrl();
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification('Report URL copied!', 'success');
+            }, () => {
+                showNotification('Failed to copy URL.', 'error');
+            });
+        });
         document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
             appSettings.marketplaceUrlGen = e.target.value;
         });
