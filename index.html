@@ -375,7 +375,7 @@
         display: none; position: fixed; z-index: 1000; left: 0; top: 0;
         width: 100%; height: 100%; justify-content: center; align-items: center; /* Centered */
         background-color: transparent; 
-        padding: 20px; 
+        padding: 8vh 20px; 
         overflow-y: auto;
     }
     .modal-content {
@@ -2090,10 +2090,8 @@
     }
     
     function downloadSelectedMerchants(asHtml = false) {
-        // This is the action for the "Download Selected" button
-        // First, ensure `caseModeData` is perfectly synced with the notes content.
-        parseNotesForCaseMode(); 
-        
+        // This is the action for the "Download Selected" button.
+        // `caseModeData` is assumed to be up-to-date from the last note edit.
         if (asHtml) {
             exportCaseTrackerFile(false); // Call the main export function for selected.
         } else { // TXT Download Logic
@@ -2101,7 +2099,7 @@
             if (selectedDivs.length === 0) return;
 
             const selectedMerchantsData = Array.from(selectedDivs).map(div => {
-                // Find the corresponding object in the freshly parsed caseModeData
+                // Find the corresponding object in caseModeData to get all details
                 return caseModeData.find(m => m.originalText === div.dataset.key);
             }).filter(Boolean);
 
@@ -2120,8 +2118,6 @@
     }
 
     function downloadAll(asHtml = false){
-        // Ensure `caseModeData` is perfectly synced before any download
-        parseNotesForCaseMode(); 
         if (asHtml) {
             exportCaseTrackerFile(true); // Call main export function for all.
         } else {
@@ -2708,7 +2704,6 @@
     function toggleCaseMode() {
         const mainWrapper = document.getElementById('mainWrapper');
         const caseModeWrapper = document.getElementById('caseModeWrapper');
-        const toggleGroup = document.getElementById('caseModeToggleGroup');
         const caseModeText = document.getElementById('caseModeText');
         const caseModeIcon = document.querySelector('#btnCaseMode i');
         const isActivating = caseModeWrapper.style.display === 'none';
@@ -2716,19 +2711,15 @@
         if (isActivating) {
             mainWrapper.style.display = 'none';
             caseModeWrapper.style.display = 'flex';
-            if (toggleGroup) {
-                 caseModeIcon.className = 'fa-solid fa-folder-open';
-                 caseModeText.textContent = 'Audit Cases';
-            }
+            caseModeIcon.className = 'fa-solid fa-folder-open';
+            caseModeText.textContent = 'Audit Cases';
             localStorage.setItem(caseModeActiveKey, 'true');
             initCaseMode();
         } else if (!document.body.classList.contains('is-standalone-mode')) {
             mainWrapper.style.display = 'flex';
             caseModeWrapper.style.display = 'none';
-            if (toggleGroup) {
-                caseModeIcon.className = 'fa-solid fa-briefcase';
-                caseModeText.textContent = 'File Cases';
-            }
+            caseModeIcon.className = 'fa-solid fa-briefcase';
+            caseModeText.textContent = 'File Cases';
             localStorage.removeItem(caseModeActiveKey);
         }
     }
@@ -2808,7 +2799,6 @@
                 return;
             }
             const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
-            // Crucially, filter the up-to-date `caseModeData`
             merchantsToExport = caseModeData.filter(m => selectedKeys.has(m.originalText));
     
             if (merchantsToExport.length === 0) {
