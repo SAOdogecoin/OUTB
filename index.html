@@ -913,6 +913,15 @@
                     <button id="btnSendToTelegram" class="macos secondary" disabled><i class="fa-solid fa-paper-plane"></i>Send to TG</button>
                     <button id="btnSelectAll" class="macos secondary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
+                    <div class="dropdown" data-align="left">
+                        <button id="btnAddNewMerchant" class="macos secondary"><i class="fa-solid fa-plus"></i>New Merchant</button>
+                        <div id="newMerchantDropdown" class="dropdown-content" style="padding: 12px; min-width: 250px;">
+                            <label for="newMerchantInput" style="font-weight: 500; display: block; margin-bottom: 8px;">Enter New Merchant Name:</label>
+                            <div class="macos-textfield-container">
+                                <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
+                            </div>
+                        </div>
+                    </div>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                 </div>
                  <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative; flex-shrink:0;">
@@ -937,7 +946,6 @@
                     </div>
                     <span id="roMatchCounter">0/0</span>
                     <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
-                    <button id="ro-not-found-btn" class="macos-icon-button" title="ROs not found in notes"><i class="fa-solid fa-triangle-exclamation"></i></button>
                 </div>
             </div>
             <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
@@ -1206,6 +1214,7 @@
     let noteHistoryIndex = -1;
     let isUndoRedoAction = false;
     let noteChangeTimeout;
+    let merchantToSelectAfterUpdate = null;
 
     // --- CASE MODE VARIABLES ---
     let caseModeData = [];
@@ -2004,14 +2013,29 @@
             merchantListDiv.appendChild(merchantDiv);
         });
         
-        // Restore selection after rebuilding the list
-        if (selectedKeys.size > 0) {
+        // Restore selection after rebuilding the list, unless a new merchant was just added
+        if (selectedKeys.size > 0 && !merchantToSelectAfterUpdate) {
             merchantListDiv.querySelectorAll('.merchant-item').forEach(item => {
                 if (selectedKeys.has(item.dataset.key)) {
                     const checkbox = item.querySelector('.macos-checkbox');
                     if (checkbox) checkbox.checked = true;
                 }
             });
+        }
+
+        // Auto-select a newly added merchant
+        if (merchantToSelectAfterUpdate) {
+            const newItem = Array.from(merchantListDiv.querySelectorAll('.merchant-item'))
+                                 .find(div => div.dataset.key === merchantToSelectAfterUpdate);
+            if (newItem) {
+                document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => cb.checked = false);
+                const checkbox = newItem.querySelector('.macos-checkbox');
+                if (checkbox) {
+                    checkbox.checked = true;
+                    newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            merchantToSelectAfterUpdate = null;
         }
         
         filterMerchants();
@@ -2360,6 +2384,18 @@
         ta.focus();
         countTemplatesNoteTaker();
         recordNoteChange();
+    }
+
+    function addNewMerchant(name) {
+        const noteArea = document.getElementById('noteArea');
+        const currentNoteTrimmed = noteArea.value.trimEnd();
+        noteArea.value = currentNoteTrimmed + (currentNoteTrimmed ? merchantSeparator : '') + name;
+        
+        merchantToSelectAfterUpdate = name;
+        
+        countTemplatesNoteTaker();
+        recordNoteChange();
+        showNotification(`Added merchant: ${name}`, 'success');
     }
 
     function confirmAndClearAllNotes() {
@@ -2812,7 +2848,11 @@
     
         const filename = `${filenameBase}.html`;
         const payload = { data: merchantsToExport, layout: appSettings.caseTextPosition, matched: Array.from(matchedRoIds.entries()), settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout } };
-        const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        
+        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        // FIX: Escape the closing script tag to prevent premature script termination in the generated file.
+        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
+        
         let fileContent = document.documentElement.outerHTML.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
     
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
@@ -2833,7 +2873,9 @@
                 tabLayout: appSettings.tabLayout
             }
         };
-        const newPayloadString = `const standalonePayload = ${JSON.stringify(newPayload)};`;
+        let newPayloadString = `const standalonePayload = ${JSON.stringify(newPayload)};`;
+        // FIX: Escape the closing script tag.
+        newPayloadString = newPayloadString.replace(/<\/script>/gi, '<\\/script>');
 
         // Get the current page's HTML and replace the old payload with the new one
         const currentHtml = document.documentElement.outerHTML;
@@ -2864,7 +2906,9 @@
             }
         };
         
-        const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        // FIX: Escape the closing script tag.
+        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
         
         let fileContent = document.documentElement.outerHTML;
         fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
@@ -3471,22 +3515,8 @@
              const allTemplateIds = new Set(caseModeData.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))));
              const notFoundIds = [...idsFromPaste].filter(id => !allTemplateIds.has(id));
              
-             const notFoundBtn = document.getElementById('ro-not-found-btn');
-             if(notFoundBtn) {
-                if(notFoundIds.length > 0) {
-                    notFoundBtn.style.display = 'inline-flex';
-                    notFoundBtn.title = `${notFoundIds.length} RO IDs from your paste were not found in any templates:\n${notFoundIds.join('\n')}`;
-                    notFoundBtn.querySelector('.fa-solid').textContent = ` ${notFoundIds.length}`;
-                } else {
-                    notFoundBtn.style.display = 'none';
-                }
-             }
-
              const totalMatched = [...allTemplateIds].filter(id => matchedRoIds.has(id)).length;
              showNotification(`Auto-matched ${newlyMatchedCount} new ROs. Total matched: ${totalMatched} / ${allTemplateIds.size}`, 'success');
-        } else {
-            const notFoundBtn = document.getElementById('ro-not-found-btn');
-            if(notFoundBtn) notFoundBtn.style.display = 'none';
         }
     }
 
@@ -3890,6 +3920,34 @@
             handleAutoLayout();
             if (localStorage.getItem(caseModeActiveKey) === 'true') {
                 toggleCaseMode();
+            }
+
+            const newMerchantInput = document.getElementById('newMerchantInput');
+            if (newMerchantInput) {
+                const handleNewMerchantAdd = (name) => {
+                    const newName = name.trim();
+                    if (newName) {
+                        addNewMerchant(newName);
+                        newMerchantInput.value = '';
+                        const dropdown = newMerchantInput.closest('.dropdown-content');
+                        if (dropdown) dropdown.classList.remove('show');
+                    }
+                };
+
+                // Keep the 'Enter' key functionality for manual typing
+                newMerchantInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleNewMerchantAdd(newMerchantInput.value);
+                    }
+                });
+
+                // Add the new 'paste' functionality
+                newMerchantInput.addEventListener('paste', (e) => {
+                    e.preventDefault(); // Prevent the text from being pasted into the input
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    handleNewMerchantAdd(pastedText);
+                });
             }
         }
 
