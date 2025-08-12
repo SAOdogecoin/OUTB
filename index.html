@@ -414,9 +414,7 @@
     .merchant-item .merchant-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
     .merchant-item .edit-merchant-btn {
         width: 24px; height: 24px; font-size: 12px;
-        opacity: 0; transition: opacity 0.2s ease;
     }
-    .merchant-item:hover .edit-merchant-btn, .merchant-item.selected .edit-merchant-btn { opacity: 1; }
     .merchant-item.selected .edit-merchant-btn { background-color: rgba(255,255,255,0.2); color: white; }
     .merchant-item.selected .edit-merchant-btn:hover { background-color: rgba(255,255,255,0.3); }
 
@@ -716,7 +714,7 @@
     </div>
 
     <div class="top-bar">
-        <h1 class="top-bar-title">Lost Outbound</h1>
+        <h1 class="top-bar-title">OUTB</h1>
         <div class="toolbar-right">
             <div class="url-generator-group">
                 <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
@@ -813,7 +811,6 @@
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
                     <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                     <button id="btnExportCaseTracker" class="macos primary" disabled><i class="fa-solid fa-file-export"></i>Export Filer View</button>
-                    <button id="btnViewRoIdsMain" class="macos secondary" disabled><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
                     <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
                     <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
@@ -841,6 +838,7 @@
                         <button id="btnClearRoInput" class="macos-icon-button danger" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                     <span id="roMatchCounter">0/0</span>
+                    <button id="btnViewRoIdsMain" class="macos secondary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
                 </div>
                 <div class="toolbar-icon-group" style="border:none; padding: 0;">
                      <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
@@ -1131,10 +1129,6 @@
 
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
-        const themeIcon = document.querySelector('#themeToggle i');
-        if (themeIcon) {
-            themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
-        }
         document.getElementById('dropdownThemeToggle').checked = (theme === 'dark');
     }
     
@@ -1186,6 +1180,18 @@
         appSettings.showCopyTitleBtn = document.getElementById('dropdownCopyTitleToggle').checked;
 
         appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
+
+        // Also save settings from the modal if it's open
+        const settingsModal = document.getElementById('settingsModal');
+        if (settingsModal.style.display === 'flex') {
+            const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
+            appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
+            const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
+            appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
+            appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
+            appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
+            appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+        }
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns();
@@ -1764,7 +1770,7 @@
         const noteArea = document.getElementById('noteArea');
         const currentNotes = noteArea.value;
         let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
+        if (isNameFromFirstLine) {
             const lines = originalSectionKey.split('\n');
             newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
         } else {
@@ -1876,12 +1882,18 @@
                     if(e.target.closest('.macos-checkbox')) updateSelectedCountNoteTaker();
                     return;
                 }
+                
+                const isChecked = checkbox.checked;
+
                 if(e.ctrlKey || e.metaKey){
                     e.preventDefault();
-                    checkbox.checked = !checkbox.checked;
+                    checkbox.checked = !isChecked;
                 } else {
                     document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => cb.checked = false);
                     checkbox.checked = true;
+                }
+                 if(isChecked && !(e.ctrlKey || e.metaKey)) {
+                    checkbox.checked = false;
                 }
                 updateSelectedCountNoteTaker();
             });
@@ -2495,7 +2507,13 @@
     }
 
     function openSettingsModal() {
-        document.getElementById('settingsModal').style.display = 'flex';
+        const modal = document.getElementById('settingsModal');
+        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
+        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
+        document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
+        document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
+        modal.style.display = 'flex';
     }
 
     function closeSettingsModal() {
@@ -3642,8 +3660,6 @@
             document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
             document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
             document.getElementById('btnExportCaseTracker')?.addEventListener('click', exportCaseTrackerFile);
-            document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
-            document.getElementById('btnViewGlobalRo')?.addEventListener('click', ()=> openGlobalRoChecklistModal());
             document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
                 parseNotesForCaseMode();
                 const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
@@ -3665,6 +3681,23 @@
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
             document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
+            document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
+            document.getElementById('settingsModal')?.addEventListener('click', (e) => {
+                if (e.target.id === 'settingsModal') closeSettingsModal();
+            });
+            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { 
+                const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
+                appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
+                const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
+                appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
+                appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
+                appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
+                appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+                saveSettings(); 
+                closeSettingsModal();
+            });
+            document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
+
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
             
