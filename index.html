@@ -1890,10 +1890,7 @@
                     checkbox.checked = !isChecked;
                 } else {
                     document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => cb.checked = false);
-                    checkbox.checked = true;
-                }
-                 if(isChecked && !(e.ctrlKey || e.metaKey)) {
-                    checkbox.checked = false;
+                    checkbox.checked = !isChecked;
                 }
                 updateSelectedCountNoteTaker();
             });
@@ -3345,39 +3342,25 @@
 
         const rawText = roMatchInput.value;
         const idsFromPaste = new Set(rawText.split(/[\s,;\t\n]+/).filter(Boolean));
+        let newlyMatchedCount = 0;
         
-        const manuallyMatched = new Map();
-        for (const [id, type] of matchedRoIds.entries()) {
-            if (type === 'manual') {
-                manuallyMatched.set(id, 'manual');
-            }
-        }
-        
-        matchedRoIds.clear();
-        let autoMatchedCount = 0;
         idsFromPaste.forEach(id => {
-            if (!manuallyMatched.has(id)) {
+            if (!matchedRoIds.has(id)) {
                  matchedRoIds.set(id, 'auto');
-                 autoMatchedCount++;
+                 newlyMatchedCount++;
             }
         });
-
-        for (const [id, type] of manuallyMatched.entries()) {
-            matchedRoIds.set(id, type);
-        }
         
         saveMatchedRoIds();
         updateCaseCardMatchStatus();
         updateRoMatchCounter();
 
-        if (roMatchInput.value.trim()){
+        if (roMatchInput.value.trim() && newlyMatchedCount > 0){
              parseNotesForCaseMode();
              const regex = /Removal order ID:\s*(\S+)/g;
              const allTemplateIds = new Set(caseModeData.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))));
              const totalMatched = [...allTemplateIds].filter(id => matchedRoIds.has(id)).length;
-             if (autoMatchedCount > 0) {
-                 showNotification(`Auto-matched ${autoMatchedCount} ROs. Total matched: ${totalMatched} / ${allTemplateIds.size}`, 'success');
-             }
+             showNotification(`Auto-matched ${newlyMatchedCount} new ROs. Total matched: ${totalMatched} / ${allTemplateIds.size}`, 'success');
         }
     }
 
@@ -3673,7 +3656,6 @@
             document.getElementById('btnClearRoInput')?.addEventListener('click', () => {
                 const roInput = document.getElementById('roMatchInput');
                 roInput.value = '';
-                updateMatchedRoIdsFromInput();
                 saveRoMatchInput();
             });
 
