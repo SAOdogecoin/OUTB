@@ -401,12 +401,30 @@
     }
     .merchant-item:hover { background-color: var(--bg-hover); }
     .merchant-item.selected { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); color: white; }
-    .merchant-item [contenteditable] { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 50px;}
+    .merchant-item .merchant-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 50px;}
+    .merchant-item .status-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        margin-right: 8px; flex-shrink: 0;
+        background-color: var(--accent-red);
+    }
+    .merchant-item .status-dot.matched {
+        background-color: var(--accent-green);
+    }
     
+    .merchant-item .merchant-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
+    .merchant-item .edit-merchant-btn {
+        width: 24px; height: 24px; font-size: 12px;
+        opacity: 0; transition: opacity 0.2s ease;
+    }
+    .merchant-item:hover .edit-merchant-btn, .merchant-item.selected .edit-merchant-btn { opacity: 1; }
+    .merchant-item.selected .edit-merchant-btn { background-color: rgba(255,255,255,0.2); color: white; }
+    .merchant-item.selected .edit-merchant-btn:hover { background-color: rgba(255,255,255,0.3); }
+
+
     .merchant-item .case-count {
         font-size: 11px; font-weight: 600; color: var(--text-secondary);
         background-color: var(--bg-primary); padding: 3px 8px;
-        border-radius: 10px; margin-left: auto; flex-shrink: 0; transition: all 0.2s ease;
+        border-radius: 10px; transition: all 0.2s ease;
     }
     .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
     
@@ -620,6 +638,42 @@
         flex-wrap: nowrap;
         overflow-x: auto;
     }
+
+    /* UI Preferences Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: var(--bg-window);
+        min-width: 280px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1002;
+        border-radius: 14px;
+        padding: 10px;
+        border: 1px solid var(--border-subtle);
+    }
+    .dropdown-content.show { display: block; }
+    .dropdown-content .settings-group.inline {
+        padding: 8px 6px;
+        border-radius: 8px;
+    }
+     .dropdown-content .settings-group.inline label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+     }
+    .dropdown-content .settings-group.inline:hover {
+        background-color: var(--bg-hover);
+    }
+    .toggle-icons {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .toggle-icons i { color: var(--text-secondary); font-size: 1.1em; }
+
+
     @media (max-width: 600px) {
         .card-content {
             flex-direction: column;
@@ -690,10 +744,39 @@
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
             </div>
             <div class="toolbar-icon-group">
-                <button id="themeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-sun"></i></button>
-            </div>
-            <div class="toolbar-icon-group non-standalone">
-                <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+                 <div class="dropdown non-standalone">
+                    <button id="uiPreferencesBtn" class="macos secondary"><i class="fa-solid fa-swatchbook"></i>UI</button>
+                    <div id="uiPreferencesDropdown" class="dropdown-content">
+                        <div class="settings-group inline">
+                            <label>
+                                Theme
+                            </label>
+                            <span class="toggle-icons"><i class="fa-solid fa-sun"></i><label class="macos-switch"><input type="checkbox" id="dropdownThemeToggle"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></span>
+                        </div>
+                         <div class="settings-group inline">
+                            <label>Counter Position</label>
+                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Case Card Layout</label>
+                             <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Case Filer Tab Layout</label>
+                             <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="dropdownTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
+                        </div>
+                        <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 6px 0;">
+                        <div class="settings-group inline">
+                            <label>Show Merchant Search</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownSearchToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Show "Copy Title" Button</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownCopyTitleToggle"><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+                <button id="btnOpenSettings" class="macos-icon-button non-standalone" title="Settings"><i class="fa-solid fa-sliders"></i></button>
             </div>
         </div>
     </div>
@@ -831,38 +914,6 @@
         <div class="modal-content">
              <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
             <div class="settings-categories">
-                <div class="settings-category">
-                    <h4>UI Preferences</h4>
-                    <div class="settings-group">
-                        <label>Counter Position:</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="counterPosition" value="notes" id="counterPosNotes"> Notes Area</label>
-                            <label><input type="radio" name="counterPosition" value="merchants" id="counterPosMerchants"> Merchant List</label>
-                        </div>
-                    </div>
-                    <div class="settings-group">
-                        <label>Case Card Layout (Template Position):</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="caseTextPosition" value="left" id="caseTextPosLeft"> Left</label>
-                            <label><input type="radio" name="caseTextPosition" value="right" id="caseTextPosRight"> Right</label>
-                        </div>
-                    </div>
-                     <div class="settings-group">
-                        <label>Case Filer Tab Layout:</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="tabLayout" value="wrap"> Wrap</label>
-                            <label><input type="radio" name="tabLayout" value="h-scroll"> Horizontal Scroll</label>
-                        </div>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show Merchant Search Bar</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show "Copy Case Title" Button</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowCopyTitleToggleInput"><span class="slider"></span></label>
-                    </div>
-                </div>
                 <div class="settings-category">
                     <h4>Carrier Settings</h4>
                     <div class="settings-group">
@@ -1084,6 +1135,7 @@
         if (themeIcon) {
             themeIcon.className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
         }
+        document.getElementById('dropdownThemeToggle').checked = (theme === 'dark');
     }
     
     function setPrefix(prefix) {
@@ -1110,20 +1162,15 @@
         }
 
         setPrefix(appSettings.prefixOption);
-        document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
-        document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
-        document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
-        document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
-        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
-        document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
+
+        document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
+        document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
+        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseTextPosition === 'right');
+        document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
+        document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
+        document.getElementById('dropdownCopyTitleToggle').checked = appSettings.showCopyTitleBtn;
+        
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
-        const counterPosRadio = document.querySelector(`input[name="counterPosition"][value="${appSettings.counterPosition}"]`);
-        if (counterPosRadio) counterPosRadio.checked = true;
-        const caseTextPosRadio = document.querySelector(`input[name="caseTextPosition"][value="${appSettings.caseTextPosition}"]`);
-        if (caseTextPosRadio) caseTextPosRadio.checked = true;
-        const tabLayoutRadio = document.querySelector(`input[name="tabLayout"][value="${appSettings.tabLayout}"]`);
-        if (tabLayoutRadio) tabLayoutRadio.checked = true;
 
         initializeRegexPatterns();
         applyAppSettings();
@@ -1131,27 +1178,20 @@
     }
 
     function saveSettings() {
-        const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-        appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
-        const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-        appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
-        appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
-        appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
-        appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
-        appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-        appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
+        appSettings.theme = document.getElementById('dropdownThemeToggle').checked ? 'dark' : 'light';
+        appSettings.counterPosition = document.getElementById('dropdownCounterPosToggle').checked ? 'merchants' : 'notes';
+        appSettings.caseTextPosition = document.getElementById('dropdownCaseCardLayoutToggle').checked ? 'right' : 'left';
+        appSettings.tabLayout = document.getElementById('dropdownTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
+        appSettings.showMerchantSearch = document.getElementById('dropdownSearchToggle').checked;
+        appSettings.showCopyTitleBtn = document.getElementById('dropdownCopyTitleToggle').checked;
+
         appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
-        const selectedCounterPos = document.querySelector('input[name="counterPosition"]:checked');
-        if (selectedCounterPos) appSettings.counterPosition = selectedCounterPos.value;
-        const selectedCaseTextPos = document.querySelector('input[name="caseTextPosition"]:checked');
-        if (selectedCaseTextPos) appSettings.caseTextPosition = selectedCaseTextPos.value;
-        const selectedTabLayout = document.querySelector('input[name="tabLayout"]:checked');
-        if (selectedTabLayout) appSettings.tabLayout = selectedTabLayout.value;
 
         localStorage.setItem(settingsKey, JSON.stringify(appSettings));
         initializeRegexPatterns();
         applyAppSettings();
-        showNotification("Settings saved successfully!", "success");
+        setTheme(appSettings.theme);
+        showNotification("Settings saved!", "success");
     }
     
     function applyAppSettings() {
@@ -1713,9 +1753,10 @@
         a.remove();
     }
 
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameFromFirstLine) {
+    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
         const editableSpan = event.target;
         const newName = editableSpan.textContent.trim();
+        editableSpan.contentEditable = false; // Immediately disable editing
         if (!newName || newName === originalDisplayName) {
             editableSpan.textContent = originalDisplayName;
             return;
@@ -1723,7 +1764,7 @@
         const noteArea = document.getElementById('noteArea');
         const currentNotes = noteArea.value;
         let newSectionText;
-        if (isNameFromFirstLine) {
+        if (isNameOriginallyFromFirstLine) {
             const lines = originalSectionKey.split('\n');
             newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
         } else {
@@ -1774,18 +1815,38 @@
             merchantDiv.dataset.key = key;
             merchantDiv.dataset.displayName = data.displayName;
             merchantDiv.dataset.count = data.count;
+            
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'macos-checkbox';
-            checkbox.onchange = updateSelectedCountNoteTaker;
+            
+            const statusDot = document.createElement('div');
+            statusDot.className = 'status-dot';
+            
             const nameSpan = document.createElement('span');
-            nameSpan.contentEditable = true;
+            nameSpan.className = 'merchant-name';
             nameSpan.textContent = data.displayName;
             nameSpan.style.margin = '0 8px';
-            nameSpan.style.flexGrow = '1';
-            nameSpan.style.overflow = 'hidden';
-            nameSpan.style.textOverflow = 'ellipsis';
-            nameSpan.style.whiteSpace = 'nowrap';
+
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'merchant-controls';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'macos-icon-button edit-merchant-btn';
+            editBtn.title = 'Edit name';
+            editBtn.innerHTML = '<i class="fa-solid fa-pencil"></i>';
+            
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent row selection
+                nameSpan.contentEditable = true;
+                nameSpan.focus();
+                const range = document.createRange();
+                range.selectNodeContents(nameSpan);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            });
+
             nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
             nameSpan.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1797,18 +1858,34 @@
                     e.target.blur();
                 }
             });
+
             const countSpan = document.createElement('span');
             countSpan.className = 'case-count';
             countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
+            
+            controlsDiv.appendChild(countSpan);
+            controlsDiv.appendChild(editBtn);
+
+            merchantDiv.appendChild(statusDot);
             merchantDiv.appendChild(checkbox);
             merchantDiv.appendChild(nameSpan);
-            merchantDiv.appendChild(countSpan);
-            merchantDiv.onclick = (e) => {
-                if (e.target !== checkbox && e.target !== nameSpan) {
-                    checkbox.checked = !checkbox.checked;
-                    updateSelectedCountNoteTaker();
+            merchantDiv.appendChild(controlsDiv);
+
+             merchantDiv.addEventListener('click', (e) => {
+                if (e.target.closest('.edit-merchant-btn') || e.target.closest('.macos-checkbox')) {
+                    if(e.target.closest('.macos-checkbox')) updateSelectedCountNoteTaker();
+                    return;
                 }
-            };
+                if(e.ctrlKey || e.metaKey){
+                    e.preventDefault();
+                    checkbox.checked = !checkbox.checked;
+                } else {
+                    document.querySelectorAll('#merchantList .macos-checkbox').forEach(cb => cb.checked = false);
+                    checkbox.checked = true;
+                }
+                updateSelectedCountNoteTaker();
+            });
+
             merchantListDiv.appendChild(merchantDiv);
         });
         filterMerchants();
@@ -1885,6 +1962,7 @@
             }
         }
         updateRoMatchCounter();
+        updateMerchantStatusDots();
     }
     
     function downloadSelectedMerchants() {
@@ -2472,13 +2550,19 @@
         if (isActivating) {
             mainWrapper.style.display = 'none';
             caseModeWrapper.style.display = 'flex';
-            if (caseModeBtn) caseModeBtn.classList.add('active');
+            if (caseModeBtn) {
+                 caseModeBtn.classList.add('active');
+                 caseModeBtn.innerHTML = `<i class="fa-solid fa-folder-open"></i> Audit Cases`;
+            }
             localStorage.setItem(caseModeActiveKey, 'true');
             initCaseMode();
         } else if (!document.body.classList.contains('is-standalone-mode')) {
             mainWrapper.style.display = 'flex';
             caseModeWrapper.style.display = 'none';
-            if (caseModeBtn) caseModeBtn.classList.remove('active');
+            if (caseModeBtn) {
+                caseModeBtn.classList.remove('active');
+                caseModeBtn.innerHTML = `<i class="fa-solid fa-briefcase"></i> File Cases`;
+            }
             localStorage.removeItem(caseModeActiveKey);
         }
     }
@@ -3304,6 +3388,27 @@
         counter.style.display = 'inline';
     }
 
+    function updateMerchantStatusDots() {
+        parseNotesForCaseMode();
+        const regex = /Removal order ID:\s*(\S+)/g;
+
+        document.querySelectorAll('#merchantList .merchant-item').forEach(div => {
+            const merchant = caseModeData.find(m => m.originalText === div.dataset.key);
+            if (!merchant) return;
+
+            const statusDot = div.querySelector('.status-dot');
+            const merchantRoIds = new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])));
+            
+            if (merchantRoIds.size === 0) {
+                statusDot.classList.remove('matched');
+                return;
+            }
+
+            const allMatched = [...merchantRoIds].every(id => matchedRoIds.has(id));
+            statusDot.classList.toggle('matched', allMatched);
+        });
+    }
+
 
     function updateCaseCardMatchStatus() {
         const allCaseCards = document.querySelectorAll(`.case-card`);
@@ -3311,7 +3416,6 @@
 
         allCaseCards.forEach(card => {
             const caseItem = findCaseByUID(card.id);
-
             if (caseItem) {
                 const match = caseItem.text.match(roIdRegex);
                 const roId = match ? match[1] : null;
@@ -3331,6 +3435,7 @@
             }
         });
         updateRoMatchCounter();
+        updateMerchantStatusDots();
     }
     
     function updateFileInfo(fileNames = []) {
@@ -3430,7 +3535,6 @@
     function setTabLayout(layout) {
         appSettings.tabLayout = layout;
         applyTabLayout();
-        // In standalone/filer mode, we don't save this to persistent settings
         if (!document.body.classList.contains('is-standalone-mode')) {
              const radioToSelect = document.querySelector(`input[name="tabLayout"][value="${layout}"]`);
              if(radioToSelect) radioToSelect.checked = true;
@@ -3608,9 +3712,6 @@
             document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
             document.getElementById('btnYesDeleteSent')?.addEventListener('click', confirmAndDeleteSentMerchants);
             document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
-            document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
-            document.getElementById('settingsModal')?.addEventListener('click', e => { if (e.target.id === 'settingsModal') closeSettingsModal(); });
-            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { saveSettings(); closeSettingsModal(); });
             document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
             document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
             document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
@@ -3648,14 +3749,6 @@
         document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
         document.getElementById('btnTabLayoutWrap')?.addEventListener('click', () => setTabLayout('wrap'));
         document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
-        document.getElementById('themeToggle')?.addEventListener('click', () => {
-            const newTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            appSettings.theme = newTheme;
-            setTheme(newTheme);
-            if (!document.body.classList.contains('is-standalone-mode')) {
-                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-            }
-        });
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
         document.getElementById('copyUrlBtn').addEventListener('click', () => {
@@ -3666,12 +3759,7 @@
                 showNotification('Failed to copy URL.', 'error');
             });
         });
-        document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
-            appSettings.marketplaceUrlGen = e.target.value;
-            if (!document.body.classList.contains('is-standalone-mode')) {
-                localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-            }
-        });
+        document.getElementById('marketplaceSelectUrlGen').addEventListener('change', () => saveSettings());
 
         document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
         const actionModal = document.getElementById('caseModeActionModal');
@@ -3684,6 +3772,21 @@
         actionModal.querySelector('#caseModeActionModalCancelBtn').addEventListener('click', () => {
              actionModal.style.display = 'none';
              updateCaseCardMatchStatus(); // Update UI when modal is closed
+        });
+        
+        const uiPrefsBtn = document.getElementById('uiPreferencesBtn');
+        const uiPrefsDropdown = document.getElementById('uiPreferencesDropdown');
+        if (uiPrefsBtn) {
+            uiPrefsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                uiPrefsDropdown.classList.toggle('show');
+            });
+            uiPrefsDropdown.addEventListener('change', saveSettings);
+        }
+        document.addEventListener('click', (e) => {
+            if (uiPrefsDropdown && !uiPrefsBtn.contains(e.target) && !uiPrefsDropdown.contains(e.target)) {
+                 uiPrefsDropdown.classList.remove('show');
+            }
         });
         
 
