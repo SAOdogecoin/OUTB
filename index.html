@@ -33,6 +33,7 @@
         --highlight-bg: #B4D7FF; 
         --highlight-text: #000000; 
         --top-bar-height: 50px;
+        --bg-window-blur: rgba(250, 250, 250, 0.85);
         color-scheme: light;
     }
 
@@ -57,6 +58,7 @@
         --accent-purple: #5e5ce6;
         --highlight-bg: #0052A3; 
         --highlight-text: #FFFFFF; 
+        --bg-window-blur: rgba(44, 44, 46, 0.85);
         color-scheme: dark;
     }
 
@@ -86,8 +88,9 @@
         flex-shrink: 0;
         gap: 16px;
         position: sticky; top: 0; z-index: 1001;
-        border-bottom: 1px solid var(--border-subtle);
+        transition: box-shadow 0.2s ease-in-out;
     }
+
     .top-bar-title {
         font-size: 1.4em;
         font-weight: 700;
@@ -106,6 +109,32 @@
         box-shadow: 0 1px 4px rgba(0,0,0,0.07);
         gap: 4px;
     }
+    .toolbar-icon-group .macos-icon-button, .toolbar-icon-group .dropdown > .macos-icon-button {
+        background-color: transparent;
+    }
+
+    #caseModeToggleGroup {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+    #caseModeToggleGroup #btnCaseMode, #caseModeToggleGroup #caseModeText {
+        height: 30px;
+        padding-top: 0;
+        padding-bottom: 0;
+        display: flex;
+        align-items: center;
+    }
+    #caseModeToggleGroup #btnCaseMode {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    #caseModeToggleGroup #caseModeText {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        padding-left: 10px;
+    }
+
     html[data-theme="dark"] .toolbar-icon-group,
     html[data-theme="dark"] .url-generator-group {
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -125,6 +154,7 @@
         -moz-appearance: none;
         -webkit-appearance: none;
         appearance: none;
+        line-height: 30px;
     }
 
     #marketplaceSelectUrlGen:hover {
@@ -211,18 +241,21 @@
         white-space: nowrap;
         display: none; /* Hidden by default */
     }
+    #ro-not-found-btn {
+        display: none;
+        color: var(--accent-orange);
+    }
     #btnClearRoInput {
         position: absolute;
         right: 4px; top: 50%;
         transform: translateY(-50%);
         width: 20px; height: 20px;
-        color: var(--text-secondary);
-        background-color: var(--bg-hover);
+        color: white;
+        background-color: var(--accent-red); /* Always red */
         font-size: 10px;
     }
     #btnClearRoInput:hover {
-        background-color: var(--accent-red);
-        color: white;
+        background-color: var(--accent-red-hover);
     }
 
 
@@ -340,12 +373,17 @@
 
     .modal-overlay {
         display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-        width: 100%; height: 100%; justify-content: center; align-items: flex-start;
-        background-color: rgba(0,0,0,0.4);
-        padding: 5vh 20px; overflow-y: auto;
+        width: 100%; height: 100%; justify-content: center; align-items: center; /* Centered */
+        background-color: transparent; 
+        padding: 20px; 
+        overflow-y: auto;
     }
     .modal-content {
-        background-color: var(--bg-primary); padding: 20px; border-radius: 14px; width: 100%;
+        background-color: var(--bg-window-blur);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-subtle);
+        padding: 20px; border-radius: 14px; width: 100%;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
         margin-bottom: auto;
     }
@@ -379,11 +417,33 @@
     .notification-popup.show {
         display: block; opacity: 1; top: 30px; transform: translateX(-50%) scale(1);
     }
-
-    .left-column-wrapper, #merchantList, #noteArea, #historyList, #preSendFileList, #caseModeTabContainer { scrollbar-width: thin; scrollbar-color: #c0c0c0 transparent; }
-    .left-column-wrapper::-webkit-scrollbar, #merchantList::-webkit-scrollbar, #noteArea::-webkit-scrollbar, #historyList::-webkit-scrollbar, #preSendFileList::-webkit-scrollbar, #caseModeTabContainer::-webkit-scrollbar { width: 9px; }
-    .left-column-wrapper::-webkit-scrollbar-thumb, #merchantList::-webkit-scrollbar-thumb, #noteArea::-webkit-scrollbar-thumb, #historyList::-webkit-scrollbar-thumb, #preSendFileList::-webkit-scrollbar-thumb, #caseModeTabContainer::-webkit-scrollbar-thumb { background-color: #cccccc; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
-    #caseModeTabContainer::-webkit-scrollbar { height: 9px; }
+    
+    /* Modern, minimal scrollbar */
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-color) transparent;
+    }
+    ::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 10px;
+        border: 4px solid transparent;
+        background-clip: content-box;
+        min-width: 32px;
+        min-height: 32px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--text-secondary);
+    }
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
 
 
     #merchantList {
@@ -439,7 +499,8 @@
 
     .counter-pill {
         display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;
-        padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-input);
+        padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color);
+        background-color: var(--bg-hover); /* UPDATED as requested */
     }
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
@@ -632,18 +693,21 @@
     #caseModeActionModalBody .macos-textfield-container { margin-top: 1rem; }
     
     /* Horizontal Scroll Tab Layout */
-    .tab-layout-h-scroll #caseModeTabContainer {
+    .case-mode-wrapper.tab-layout-h-scroll #caseModeTabContainer {
         flex-wrap: nowrap;
         overflow-x: auto;
     }
 
     /* UI Preferences Dropdown */
     .dropdown { position: relative; display: inline-block; }
+    .dropdown > button:disabled + .dropdown-content { display:none !important; }
     .dropdown-content {
         display: none;
         position: absolute;
         right: 0;
-        background-color: var(--bg-window);
+        background-color: var(--bg-window-blur);
+        -webkit-backdrop-filter: blur(15px);
+        backdrop-filter: blur(15px);
         min-width: 280px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
         z-index: 1002;
@@ -651,7 +715,23 @@
         padding: 10px;
         border: 1px solid var(--border-subtle);
     }
+    .dropdown[data-align="left"] .dropdown-content {
+        left: 0;
+        right: auto;
+    }
     .dropdown-content.show { display: block; }
+    .dropdown-content.download-options {
+        min-width: unset;
+        padding: 8px;
+    }
+    .download-options .button-row { display: flex; gap: 8px; }
+    .download-options button {
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px;
+        width: 100px;
+    }
+    .download-options button i { margin: 0; font-size: 1.2em; }
     .dropdown-content .settings-group.inline {
         padding: 8px 6px;
         border-radius: 8px;
@@ -729,8 +809,11 @@
                 <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
-
-            <button id="btnCaseMode" class="macos secondary non-standalone"><i class="fa-solid fa-briefcase"></i>File Cases</button>
+            
+            <div id="caseModeToggleGroup" class="toolbar-icon-group non-standalone" title="Toggle Case/Audit View">
+                <button id="btnCaseMode" class="macos-icon-button"><i class="fa-solid fa-briefcase"></i></button>
+                <span id="caseModeText" style="font-weight: 500; padding: 0 8px 0 2px; cursor:pointer;">File Cases</span>
+            </div>
             
             <div class="toolbar-icon-group standalone-only">
                  <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
@@ -743,7 +826,7 @@
             </div>
             <div class="toolbar-icon-group">
                  <div class="dropdown non-standalone">
-                    <button id="uiPreferencesBtn" class="macos secondary"><i class="fa-solid fa-swatchbook"></i>UI</button>
+                    <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
                     <div id="uiPreferencesDropdown" class="dropdown-content">
                         <div class="settings-group inline">
                             <label>
@@ -809,12 +892,27 @@
                     <div id="merchantCounterTarget"></div>
                 </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
-                    <button id="btnExportCaseTracker" class="macos primary" disabled><i class="fa-solid fa-file-export"></i>Export Filer View</button>
-                    <button id="btnSendToTelegram" class="macos primary" disabled><i class="fa-solid fa-paper-plane"></i>Send to Telegram</button>
-                    <button id="btnSelectAll" class="macos primary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
-                    <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
-                    <button id="btnSplitSelected" class="macos primary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
+                    <div class="dropdown" data-align="left">
+                        <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
+                        <div id="downloadSelectedDropdown" class="dropdown-content download-options">
+                            <div class="button-row">
+                                <button class="macos secondary" data-action="download-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
+                                <button class="macos secondary" data-action="download-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="dropdown" data-align="left">
+                        <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
+                        <div id="downloadAllDropdown" class="dropdown-content download-options">
+                             <div class="button-row">
+                                <button class="macos secondary" data-action="download-all-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
+                                <button class="macos secondary" data-action="download-all-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btnSendToTelegram" class="macos secondary" disabled><i class="fa-solid fa-paper-plane"></i>Send to TG</button>
+                    <button id="btnSelectAll" class="macos secondary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
+                    <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                 </div>
                  <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative; flex-shrink:0;">
@@ -835,14 +933,11 @@
                 <div class="ro-match-controls non-standalone">
                      <div class="macos-textfield-container">
                         <input type="text" id="roMatchInput" class="macos-textfield" placeholder="Paste RO data for matching...">
-                        <button id="btnClearRoInput" class="macos-icon-button danger" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
+                        <button id="btnClearRoInput" class="macos-icon-button" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                     <span id="roMatchCounter">0/0</span>
-                    <button id="btnViewRoIdsMain" class="macos secondary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
-                </div>
-                <div class="toolbar-icon-group" style="border:none; padding: 0;">
-                     <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
-                     <button id="btnRedoNote" class="macos-icon-button" title="Redo"><i class="fa-solid fa-redo"></i></button>
+                    <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
+                    <button id="ro-not-found-btn" class="macos-icon-button" title="ROs not found in notes"><i class="fa-solid fa-triangle-exclamation"></i></button>
                 </div>
             </div>
             <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
@@ -850,9 +945,13 @@
             </div>
             <div class="controls-and-stats">
                 <div>
-                    <div style="display: flex; gap: 8px; flex-wrap:wrap">
+                    <div style="display: flex; gap: 8px; flex-wrap:wrap; align-items: center;">
                         <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-equals"></i>Separator</button>
                         <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
+                        <div class="toolbar-icon-group" style="border:none; padding: 0; box-shadow: none; background: transparent;">
+                            <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
+                            <button id="btnRedoNote" class="macos-icon-button" title="Redo"><i class="fa-solid fa-redo"></i></button>
+                       </div>
                     </div>
                      <div id="notesCounterTarget" class="counter-pill-container">
                         <div id="theCounterPill" class="counter-pill">
@@ -912,6 +1011,29 @@
         <div class="modal-content">
              <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
             <div class="settings-categories">
+                <div class="settings-category">
+                    <h4>UI Preferences</h4>
+                    <div class="settings-group inline">
+                        <label>Counter Position</label>
+                        <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Case Card Layout</label>
+                         <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Case Filer Tab Layout</label>
+                         <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="settingsTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
+                    </div>
+                     <div class="settings-group inline">
+                        <label>Show Merchant Search Bar</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Show "Copy Case Title" Button</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsShowCopyTitleToggleInput"><span class="slider"></span></label>
+                    </div>
+                </div>
                 <div class="settings-category">
                     <h4>Carrier Settings</h4>
                     <div class="settings-group">
@@ -1129,14 +1251,11 @@
 
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
-        document.getElementById('dropdownThemeToggle').checked = (theme === 'dark');
     }
     
     function setPrefix(prefix) {
         appSettings.prefixOption = prefix;
-        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        document.getElementById('btnPrefix3C').classList.toggle('active', prefix === '3C');
-        document.getElementById('btnPrefixLS').classList.toggle('active', prefix === 'LS');
+        saveSettings();
     }
 
     function loadSettings() {
@@ -1150,13 +1269,28 @@
             }
         }
         
-        // Sanitize tab layout setting
         if (appSettings.tabLayout === 'vertical') {
             appSettings.tabLayout = 'wrap';
         }
 
-        setPrefix(appSettings.prefixOption);
-
+        initializeRegexPatterns();
+        applyAppSettings();
+    }
+    
+    function saveSettings() {
+        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
+        initializeRegexPatterns();
+        applyAppSettings();
+        showNotification("Settings saved!", "success");
+    }
+    
+    function applyAppSettings() {
+        // Sync UI elements to reflect current settings
+        setTheme(appSettings.theme);
+        document.getElementById('btnPrefix3C').classList.toggle('active', appSettings.prefixOption === '3C');
+        document.getElementById('btnPrefixLS').classList.toggle('active', appSettings.prefixOption === 'LS');
+        
+        // Sync dropdown toggles
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
         document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
         document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseTextPosition === 'right');
@@ -1166,41 +1300,7 @@
         
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
 
-        initializeRegexPatterns();
-        applyAppSettings();
-        setTheme(appSettings.theme);
-    }
-
-    function saveSettings() {
-        appSettings.theme = document.getElementById('dropdownThemeToggle').checked ? 'dark' : 'light';
-        appSettings.counterPosition = document.getElementById('dropdownCounterPosToggle').checked ? 'merchants' : 'notes';
-        appSettings.caseTextPosition = document.getElementById('dropdownCaseCardLayoutToggle').checked ? 'right' : 'left';
-        appSettings.tabLayout = document.getElementById('dropdownTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
-        appSettings.showMerchantSearch = document.getElementById('dropdownSearchToggle').checked;
-        appSettings.showCopyTitleBtn = document.getElementById('dropdownCopyTitleToggle').checked;
-
-        appSettings.marketplaceUrlGen = document.getElementById('marketplaceSelectUrlGen').value;
-
-        // Also save settings from the modal if it's open
-        const settingsModal = document.getElementById('settingsModal');
-        if (settingsModal.style.display === 'flex') {
-            const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-            appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
-            const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-            appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
-            appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
-            appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
-            appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-        }
-
-        localStorage.setItem(settingsKey, JSON.stringify(appSettings));
-        initializeRegexPatterns();
-        applyAppSettings();
-        setTheme(appSettings.theme);
-        showNotification("Settings saved!", "success");
-    }
-    
-    function applyAppSettings() {
+        // Apply visual changes
         applyMerchantSearchVisibility();
         updateCounterPillLocation();
         applyCaseCardLayout();
@@ -1786,6 +1886,12 @@
         const noteArea = document.getElementById('noteArea');
         const fullText = noteArea.value;
         const merchantListDiv = document.getElementById('merchantList');
+
+        // Preserve selection before clearing the list
+        const selectedKeys = new Set(
+            Array.from(merchantListDiv.querySelectorAll('.merchant-item.selected'), div => div.dataset.key)
+        );
+
         merchantListDiv.innerHTML = '';
         const merchantsData = {};
         let totalTemplatesOverall = 0;
@@ -1897,6 +2003,17 @@
 
             merchantListDiv.appendChild(merchantDiv);
         });
+        
+        // Restore selection after rebuilding the list
+        if (selectedKeys.size > 0) {
+            merchantListDiv.querySelectorAll('.merchant-item').forEach(item => {
+                if (selectedKeys.has(item.dataset.key)) {
+                    const checkbox = item.querySelector('.macos-checkbox');
+                    if (checkbox) checkbox.checked = true;
+                }
+            });
+        }
+        
         filterMerchants();
         updateSelectedCountNoteTaker();
         updateStateContent(noteArea.value);
@@ -1916,8 +2033,7 @@
         const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
         const splitButton = document.getElementById('btnSplitSelected');
         const sendButton = document.getElementById('btnSendToTelegram');
-        const downloadSelectedButton = document.getElementById('btnDownloadSelected');
-        const exportButton = document.getElementById('btnExportCaseTracker');
+        const downloadSelectedDropdown = document.getElementById('downloadSelectedDropdown');
         const btnViewRoIdsMain = document.getElementById('btnViewRoIdsMain');
 
         let selectedCaseCount = 0;
@@ -1934,8 +2050,7 @@
         const isAnythingSelected = selectedCheckboxes.length > 0;
         if (splitButton) splitButton.disabled = !isAnythingSelected;
         if (sendButton) sendButton.disabled = !isAnythingSelected;
-        if (downloadSelectedButton) downloadSelectedButton.disabled = !isAnythingSelected;
-        if (exportButton) exportButton.disabled = !isAnythingSelected;
+        if (downloadSelectedDropdown) downloadSelectedDropdown.previousElementSibling.disabled = !isAnythingSelected;
         if (btnViewRoIdsMain) btnViewRoIdsMain.disabled = selectedCheckboxes.length !== 1;
 
         const totalTemplatesSpan = document.getElementById('totalTemplates');
@@ -1974,22 +2089,49 @@
         updateMerchantStatusDots();
     }
     
-    function downloadSelectedMerchants() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) return;
+    function downloadSelectedMerchants(asHtml = false) {
+        // This is the action for the "Download Selected" button
+        // First, ensure `caseModeData` is perfectly synced with the notes content.
+        parseNotesForCaseMode(); 
+        
+        if (asHtml) {
+            exportCaseTrackerFile(false); // Call the main export function for selected.
+        } else { // TXT Download Logic
+            const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+            if (selectedDivs.length === 0) return;
 
-        let totalSelectedCases = 0;
-        const merchantObjectsToDownload = Array.from(selectedDivs).map(div => {
-            const key = div.dataset.key;
-            totalSelectedCases += parseInt(div.dataset.count || '0', 10);
-            return caseModeData.find(m => m.originalText === key);
-        }).filter(Boolean);
+            const selectedMerchantsData = Array.from(selectedDivs).map(div => {
+                // Find the corresponding object in the freshly parsed caseModeData
+                return caseModeData.find(m => m.originalText === div.dataset.key);
+            }).filter(Boolean);
 
-        if (merchantObjectsToDownload.length === 0) return;
+            if (selectedMerchantsData.length === 0) {
+                 showNotification("Could not find data for selected merchants.", "error");
+                 return;
+            }
+            
+            const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
+            const filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
 
-        const combinedText = merchantObjectsToDownload.map(getFormattedBlockWithVerification).join(merchantSeparator);
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalSelectedCases}).txt`;
-        downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
+            const combinedText = selectedMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
+            const filename = `${filenameBase}.txt`;
+            downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
+        }
+    }
+
+    function downloadAll(asHtml = false){
+        // Ensure `caseModeData` is perfectly synced before any download
+        parseNotesForCaseMode(); 
+        if (asHtml) {
+            exportCaseTrackerFile(true); // Call main export function for all.
+        } else {
+            const allMerchantsData = caseModeData;
+            const totalCases = allMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
+            const filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
+            const combinedText = allMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
+            const filename = `${filenameBase}.txt`;
+            downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
+        }
     }
 
     function processSingleROBlock(roBlockText, removalOrdersArray) {
@@ -2115,7 +2257,7 @@
             return;
         }
 
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
         if (ros.length === 0) {
             showNotification("No valid removal orders found to split.", "info");
@@ -2505,11 +2647,18 @@
 
     function openSettingsModal() {
         const modal = document.getElementById('settingsModal');
+        // Sync modal inputs with current appSettings
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
         document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
         document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
+        document.getElementById('settingsCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
+        document.getElementById('settingsCaseCardLayoutToggle').checked = (appSettings.caseTextPosition === 'right');
+        document.getElementById('settingsTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
+        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
+        document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
+
         modal.style.display = 'flex';
     }
 
@@ -2559,24 +2708,26 @@
     function toggleCaseMode() {
         const mainWrapper = document.getElementById('mainWrapper');
         const caseModeWrapper = document.getElementById('caseModeWrapper');
-        const caseModeBtn = document.getElementById('btnCaseMode');
+        const toggleGroup = document.getElementById('caseModeToggleGroup');
+        const caseModeText = document.getElementById('caseModeText');
+        const caseModeIcon = document.querySelector('#btnCaseMode i');
         const isActivating = caseModeWrapper.style.display === 'none';
 
         if (isActivating) {
             mainWrapper.style.display = 'none';
             caseModeWrapper.style.display = 'flex';
-            if (caseModeBtn) {
-                 caseModeBtn.classList.add('active');
-                 caseModeBtn.innerHTML = `<i class="fa-solid fa-folder-open"></i> Audit Cases`;
+            if (toggleGroup) {
+                 caseModeIcon.className = 'fa-solid fa-folder-open';
+                 caseModeText.textContent = 'Audit Cases';
             }
             localStorage.setItem(caseModeActiveKey, 'true');
             initCaseMode();
         } else if (!document.body.classList.contains('is-standalone-mode')) {
             mainWrapper.style.display = 'flex';
             caseModeWrapper.style.display = 'none';
-            if (caseModeBtn) {
-                caseModeBtn.classList.remove('active');
-                caseModeBtn.innerHTML = `<i class="fa-solid fa-briefcase"></i> File Cases`;
+            if (toggleGroup) {
+                caseModeIcon.className = 'fa-solid fa-briefcase';
+                caseModeText.textContent = 'File Cases';
             }
             localStorage.removeItem(caseModeActiveKey);
         }
@@ -2644,50 +2795,36 @@
         applyTabLayout();
     }
     
-    function exportCaseTrackerFile() {
-        parseNotesForCaseMode(); // Ensure data is current
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) {
-            showNotification("No merchants selected to export.", "info");
-            return;
-        }
-
-        const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
-        const selectedMerchantsData = caseModeData.filter(m => selectedKeys.has(m.originalText));
-
-        if (selectedMerchantsData.length === 0) {
-            showNotification("Could not find data for selected merchants.", "error");
-            return;
-        }
-        
-        const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
-        let filenamePart;
-        if (selectedMerchantsData.length === 1) {
-            filenamePart = sanitizeFilename(selectedMerchantsData[0].displayName);
-        } else if (selectedMerchantsData.length > 1) {
-            filenamePart = sanitizeFilename(`${selectedMerchantsData[0].displayName}_Multi`);
+    function exportCaseTrackerFile(all = false) {
+        let merchantsToExport;
+        let filenameBase;
+    
+        if (all) {
+            merchantsToExport = caseModeData;
         } else {
-            filenamePart = 'FilerView'; // Fallback
-        }
-
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
-
-        const payload = {
-            data: selectedMerchantsData,
-            layout: appSettings.caseTextPosition,
-            matched: Array.from(matchedRoIds.entries()),
-            settings: {
-                showCopyTitleBtn: appSettings.showCopyTitleBtn,
-                marketplaceUrlGen: appSettings.marketplaceUrlGen,
-                tabLayout: appSettings.tabLayout
+            const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+            if (selectedDivs.length === 0) {
+                showNotification("No merchants selected to export.", "info");
+                return;
             }
-        };
+            const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
+            // Crucially, filter the up-to-date `caseModeData`
+            merchantsToExport = caseModeData.filter(m => selectedKeys.has(m.originalText));
+    
+            if (merchantsToExport.length === 0) {
+                showNotification("Could not find data for selected merchants. This can happen if notes were edited after selection.", "error");
+                return;
+            }
+        }
         
+        const totalCases = merchantsToExport.reduce((sum, m) => sum + m.cases.length, 0);
+        filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
+    
+        const filename = `${filenameBase}.html`;
+        const payload = { data: merchantsToExport, layout: appSettings.caseTextPosition, matched: Array.from(matchedRoIds.entries()), settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout } };
         const payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
-        
-        let fileContent = document.documentElement.outerHTML;
-        fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
-
+        let fileContent = document.documentElement.outerHTML.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
+    
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification("Filer View HTML file has been downloaded.", "success");
     }
@@ -2714,15 +2851,7 @@
         
         // Generate a new filename
         const totalCases = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
-        let filenamePart;
-        if (caseModeData.length === 1) {
-            filenamePart = sanitizeFilename(caseModeData[0].displayName);
-        } else if (caseModeData.length > 1) {
-            filenamePart = sanitizeFilename(`${caseModeData[0].displayName}_Multi`);
-        } else {
-            filenamePart = 'FilerView';
-        }
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView_updated.html`;
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
 
         downloadFile(newHtml, filename, 'text/html;charset=utf-8');
         showNotification("Filer View re-exported with changes saved!", "success");
@@ -2732,8 +2861,7 @@
         if (!merchant) return;
 
         const totalCases = merchant.cases.length;
-        const filenamePart = sanitizeFilename(merchant.displayName);
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_${filenamePart}(${totalCases})_FilerView.html`;
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
 
         const payload = {
             data: [merchant], // Pass as an array with one item
@@ -2893,7 +3021,6 @@
                        <button class="macos secondary" data-action="view-ro-ids"><i class="fa-solid fa-list-ol"></i> View RO IDs</button>
                        <button class="macos secondary" data-action="open-report-url"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Report URL</button>
                        <button class="macos secondary ${merchant.isAccountIssue ? 'purple' : ''}" data-action="tag-account-issue"><i class="fa-solid fa-user-slash"></i> Tag Account Issue</button>
-                       <button class="macos primary non-standalone" data-action="export-filer-view" data-merchant-id="${merchant.id}"><i class="fa-solid fa-file-export"></i> Export Filer View</button>
                     </div>
                     <div class="tab-actions-right">
                         <label class="macos-checkbox-container" style="font-weight: normal; font-size: 0.85rem; margin-right: 8px;">
@@ -3115,13 +3242,6 @@
                     }
                 }
                 showNotification(`Account issue tagged ${merchant.isAccountIssue ? 'ON' : 'OFF'}.`, 'info');
-
-            } else if (action === 'export-filer-view') {
-                const merchantId = button.dataset.merchantId;
-                const merchantToExport = caseModeData.find(m => m.id === merchantId);
-                if (merchantToExport) {
-                    exportSingleMerchantFilerView(merchantToExport);
-                }
             }
         });
         
@@ -3355,12 +3475,28 @@
         updateCaseCardMatchStatus();
         updateRoMatchCounter();
 
-        if (roMatchInput.value.trim() && newlyMatchedCount > 0){
+        if (rawText.trim() && newlyMatchedCount > 0){
              parseNotesForCaseMode();
              const regex = /Removal order ID:\s*(\S+)/g;
              const allTemplateIds = new Set(caseModeData.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))));
+             const notFoundIds = [...idsFromPaste].filter(id => !allTemplateIds.has(id));
+             
+             const notFoundBtn = document.getElementById('ro-not-found-btn');
+             if(notFoundBtn) {
+                if(notFoundIds.length > 0) {
+                    notFoundBtn.style.display = 'inline-flex';
+                    notFoundBtn.title = `${notFoundIds.length} RO IDs from your paste were not found in any templates:\n${notFoundIds.join('\n')}`;
+                    notFoundBtn.querySelector('.fa-solid').textContent = ` ${notFoundIds.length}`;
+                } else {
+                    notFoundBtn.style.display = 'none';
+                }
+             }
+
              const totalMatched = [...allTemplateIds].filter(id => matchedRoIds.has(id)).length;
              showNotification(`Auto-matched ${newlyMatchedCount} new ROs. Total matched: ${totalMatched} / ${allTemplateIds.size}`, 'success');
+        } else {
+            const notFoundBtn = document.getElementById('ro-not-found-btn');
+            if(notFoundBtn) notFoundBtn.style.display = 'none';
         }
     }
 
@@ -3535,10 +3671,10 @@
     
     function setTabLayout(layout) {
         appSettings.tabLayout = layout;
-        applyTabLayout();
         if (!document.body.classList.contains('is-standalone-mode')) {
-             const radioToSelect = document.querySelector(`input[name="tabLayout"][value="${layout}"]`);
-             if(radioToSelect) radioToSelect.checked = true;
+             saveSettings();
+        } else {
+             applyTabLayout();
         }
     }
 
@@ -3546,8 +3682,8 @@
         const wrapper = document.getElementById('caseModeWrapper');
         if (!wrapper) return;
         const layout = appSettings.tabLayout || 'wrap';
-        wrapper.classList.remove('tab-layout-wrap', 'tab-layout-h-scroll', 'tab-layout-vertical');
-        wrapper.classList.add(`tab-layout-${layout}`);
+        wrapper.classList.remove('tab-layout-wrap', 'tab-layout-h-scroll');
+        wrapper.classList.add(`tab-layout-${layout.startsWith('h') ? 'h-scroll' : 'wrap'}`);
 
         // Update active state of toggle buttons in standalone mode
         document.getElementById('btnTabLayoutWrap')?.classList.toggle('active', layout === 'wrap');
@@ -3590,8 +3726,10 @@
             noteArea.addEventListener('input', () => {
                 clearTimeout(noteChangeTimeout);
                 noteChangeTimeout = setTimeout(() => {
-                    recordNoteChange();
+                    // When notes change, re-parse data BEFORE re-rendering the list
+                    parseNotesForCaseMode(); 
                     countTemplatesNoteTaker();
+                    recordNoteChange();
                 }, 500);
             });
             noteArea.addEventListener('paste', () => { setTimeout(()=>{recordNoteChange(); countTemplatesNoteTaker();}, 50); });
@@ -3642,7 +3780,6 @@
             document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
             document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
             document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
-            document.getElementById('btnExportCaseTracker')?.addEventListener('click', exportCaseTrackerFile);
             document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
                 parseNotesForCaseMode();
                 const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
@@ -3657,8 +3794,8 @@
                 const roInput = document.getElementById('roMatchInput');
                 roInput.value = '';
                 saveRoMatchInput();
+                updateMatchedRoIdsFromInput();
             });
-
 
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
@@ -3667,23 +3804,26 @@
             document.getElementById('settingsModal')?.addEventListener('click', (e) => {
                 if (e.target.id === 'settingsModal') closeSettingsModal();
             });
-            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => { 
-                const amzlStr = document.getElementById('settingsAmzlCarriers').value.trim();
-                appSettings.amzlTypeCarriers = amzlStr ? amzlStr.split(',').map(s => s.trim()).filter(Boolean) : ['AMZN', 'AMZL'];
-                const otherStr = document.getElementById('settingsOtherCarriers').value.trim();
-                appSettings.otherCarriers = otherStr ? otherStr.split(',').map(s => s.trim()).filter(Boolean) : ['UPS', 'USPS'];
+            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => {
+                appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
+                appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
                 appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
                 appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-                saveSettings(); 
+                appSettings.counterPosition = document.getElementById('settingsCounterPosToggle').checked ? 'merchants' : 'notes';
+                appSettings.caseTextPosition = document.getElementById('settingsCaseCardLayoutToggle').checked ? 'right' : 'left';
+                appSettings.tabLayout = document.getElementById('settingsTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
+                appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
+                appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
+                
+                saveSettings();
                 closeSettingsModal();
             });
             document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
 
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
-            document.getElementById('btnCaseMode')?.addEventListener('click', toggleCaseMode);
+            document.getElementById('caseModeToggleGroup')?.addEventListener('click', toggleCaseMode);
             
-
             const btnSelectAll = document.getElementById('btnSelectAll');
             if (btnSelectAll) {
                 btnSelectAll.addEventListener('click', () => {
@@ -3701,12 +3841,17 @@
                 });
             }
 
-            document.getElementById('btnDownloadAll')?.addEventListener('click', () => {
-                const count = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
-                const combinedText = caseModeData.map(getFormattedBlockWithVerification).join(merchantSeparator);
-                downloadFile(combinedText + '\n', `${getFilenamePrefix()}_${getFormattedDate()}_(${count}).txt`, 'text/plain;charset=utf-8');
+            document.getElementById('downloadSelectedDropdown').addEventListener('click', e => {
+                const action = e.target.closest('button')?.dataset.action;
+                if(action === 'download-txt') downloadSelectedMerchants(false);
+                if(action === 'download-html') downloadSelectedMerchants(true);
             });
-            document.getElementById('btnDownloadSelected')?.addEventListener('click', downloadSelectedMerchants);
+             document.getElementById('downloadAllDropdown').addEventListener('click', e => {
+                const action = e.target.closest('button')?.dataset.action;
+                if(action === 'download-all-txt') downloadAll(false);
+                if(action === 'download-all-html') downloadAll(true);
+            });
+            
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
             document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
             document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
@@ -3774,9 +3919,14 @@
                 showNotification('Failed to copy URL.', 'error');
             });
         });
-        document.getElementById('marketplaceSelectUrlGen').addEventListener('change', () => saveSettings());
+        document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
+            appSettings.marketplaceUrlGen = e.target.value;
+            saveSettings();
+        });
 
-        document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => document.getElementById('caseTextModal').style.display = 'none');
+        document.getElementById('closeCaseTextModalBtn')?.addEventListener('click', () => {
+            document.getElementById('caseTextModal').style.display = 'none';
+        });
         const actionModal = document.getElementById('caseModeActionModal');
         actionModal.addEventListener('click', e => {
             if(e.target === actionModal) { // Only close if clicking on the overlay itself
@@ -3789,22 +3939,42 @@
              updateCaseCardMatchStatus(); // Update UI when modal is closed
         });
         
-        const uiPrefsBtn = document.getElementById('uiPreferencesBtn');
+        // --- Dropdown and Auto-saving Settings Logic ---
         const uiPrefsDropdown = document.getElementById('uiPreferencesDropdown');
-        if (uiPrefsBtn) {
-            uiPrefsBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                uiPrefsDropdown.classList.toggle('show');
-            });
-            uiPrefsDropdown.addEventListener('change', saveSettings);
+        if (uiPrefsDropdown) {
+             uiPrefsDropdown.addEventListener('change', () => {
+                appSettings.theme = document.getElementById('dropdownThemeToggle').checked ? 'dark' : 'light';
+                appSettings.counterPosition = document.getElementById('dropdownCounterPosToggle').checked ? 'merchants' : 'notes';
+                appSettings.caseTextPosition = document.getElementById('dropdownCaseCardLayoutToggle').checked ? 'right' : 'left';
+                appSettings.tabLayout = document.getElementById('dropdownTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
+                appSettings.showMerchantSearch = document.getElementById('dropdownSearchToggle').checked;
+                appSettings.showCopyTitleBtn = document.getElementById('dropdownCopyTitleToggle').checked;
+                saveSettings();
+             });
         }
-        document.addEventListener('click', (e) => {
-            if (uiPrefsDropdown && !uiPrefsBtn.contains(e.target) && !uiPrefsDropdown.contains(e.target)) {
-                 uiPrefsDropdown.classList.remove('show');
-            }
-        });
         
+        document.addEventListener('click', (e) => {
+            document.querySelectorAll('.dropdown').forEach(dropdownContainer => {
+                const dropdownContent = dropdownContainer.querySelector('.dropdown-content');
+                if (dropdownContent && !dropdownContainer.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+        });
 
+        document.querySelectorAll('.dropdown > button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdownContent = button.nextElementSibling;
+                if (dropdownContent && dropdownContent.classList.contains('dropdown-content')) {
+                    const isShowing = dropdownContent.classList.contains('show');
+                    document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+                    if (!isShowing) {
+                        dropdownContent.classList.add('show');
+                    }
+                }
+            });
+        });
     });
 </script>
 </body>
