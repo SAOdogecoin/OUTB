@@ -180,7 +180,7 @@
         padding: 20px 20px 25px 20px;
         display: flex; flex-direction: column;
         position: relative;
-        border: none;
+        border: 1px solid var(--border-subtle);
         overflow: hidden;
         resize: none;
         min-height: 200px;
@@ -273,6 +273,7 @@
         padding: 20px;
         position: relative;
         overflow-y: auto;
+        border: 1px solid var(--border-subtle);
     }
     .main-wrapper.layout-side-by-side .note-taker-tool {
         flex-grow: 1;
@@ -282,7 +283,7 @@
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .tool-container {
         background-color: transparent; border-radius: 0; padding: 0;
-        min-height: unset; overflow: visible; flex-grow: 1;
+        min-height: unset; overflow: visible; flex-grow: 1; border: none;
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .parser-tool {
         padding-bottom: 20px !important; margin-bottom: 20px;
@@ -481,7 +482,7 @@
 
     .merchant-item .case-count {
         font-size: 11px; font-weight: 600; color: var(--text-secondary);
-        background-color: var(--bg-primary); padding: 3px 8px;
+        background-color: var(--bg-hover); padding: 3px 8px;
         border-radius: 10px; transition: all 0.2s ease;
     }
     .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
@@ -1009,7 +1010,15 @@
             </div>
             <div class="modal-actions">
                 <button id="btnCancelSplit" class="macos secondary"><i class="fa-solid fa-xmark"></i>Cancel</button>
-                <button id="btnGenerateSplits" class="macos primary"><i class="fa-solid fa-file-zipper"></i>Generate & Download</button>
+                <div class="dropdown" data-align="left">
+                    <button id="generateSplitsDropdownBtn" class="macos primary"><i class="fa-solid fa-file-zipper"></i>Generate & Download</button>
+                    <div id="generateSplitsDropdown" class="dropdown-content download-options">
+                         <div class="button-row">
+                            <button class="macos secondary" data-action="download-split-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
+                            <button class="macos secondary" data-action="download-split-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
+                        </div>
+                    </div>
+                </div>
                 <button id="btnSendSplitsToTelegram" class="macos primary"><i class="fa-solid fa-paper-plane"></i>Send Splits</button>
             </div>
         </div>
@@ -2210,57 +2219,97 @@
         } else calcSpan.textContent = '0';
     }
 
-    function generateAndDownloadSplits() {
+    function generateAndDownloadSplits(asHtml = false) {
         const modal = document.getElementById('splitModal');
         if (!modal) return;
-        const combinedText = modal.dataset.combinedText || '';
+
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
-        if (!combinedText || isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
-             showNotification("Please enter valid numbers for splitting.", "error");
+
+        if (isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
+            showNotification("Please enter valid numbers for splitting.", "error");
             return;
         }
-        let templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
-        const ros = splitTextIntoRemovalOrders(combinedText);
-        if (ros.length === 0) {
-            showNotification("No valid removal orders found to split.", "info");
+
+        // 1. Get all cases from selected merchants, keeping track of the original merchant
+        const allCasesWithMerchant = selectedMerchantDataForSplit.flatMap(merchantData => {
+            const merchantObject = caseModeData.find(m => m.originalText === merchantData.key);
+            if (!merchantObject) return [];
+            return merchantObject.cases.map(caseItem => ({
+                ...caseItem,
+                originalMerchant: merchantObject
+            }));
+        });
+        
+        if (allCasesWithMerchant.length === 0) {
+            showNotification("No valid cases found to split.", "info");
             return;
         }
-        const templateGroups = createTemplates(ros, ordersPer);
-        if (templateGroups.length === 0) {
-            showNotification("Failed to generate template groups.", "error");
-            return;
-        }
+
+        // 2. Group cases into templates (here, each "case" is a template)
+        const templates = allCasesWithMerchant; // 1 case = 1 template in this tool's logic
+        
+        // 3. Group templates into split files
         const splitOutputs = [];
-        for (let i = 0; i < templateGroups.length; i += splitNum) {
-            const chunk = templateGroups.slice(i, i + splitNum);
-            if (chunk.length > 0) {
-                 const chunkText = chunk.map(data => templateToUse + "\n\n" + data).join(caseSeparator);
-                 splitOutputs.push({ text: chunkText, count: chunk.length });
-            }
+        for (let i = 0; i < templates.length; i += splitNum) {
+            splitOutputs.push(templates.slice(i, i + splitNum));
         }
+
         if (splitOutputs.length === 0) {
             showNotification("No split files generated.", "info");
             return;
         }
-        
-        const merchantDisplay = selectedMerchantDataForSplit.map(item => {
-            const merchantObj = caseModeData.find(m => m.originalText === item.key);
-            let name = item.name;
-            if(merchantObj && isMerchantVerified(merchantObj)){
-                name += ' ***Verified Removal***';
-            }
-            return name;
-        }).join(' & ');
 
+        const merchantDisplayNames = selectedMerchantDataForSplit.map(item => {
+            const merchantObj = caseModeData.find(m => m.originalText === item.key);
+            return (merchantObj && isMerchantVerified(merchantObj)) ? `${item.name} ***Verified Removal***` : item.name;
+        }).join(' & ');
+        
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
         const dateStr = getFormattedDate();
-        
-        splitOutputs.forEach((output, index) => {
-            const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
-            const fileContent = merchantDisplay + '\n\n' + output.text + '\n';
-            downloadFile(fileContent, filename, 'text/plain;charset=utf-8');
+
+        // 4. Generate each file
+        splitOutputs.forEach((splitCases, index) => {
+            const caseCount = splitCases.length;
+            const filenameBase = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index + 1}(${caseCount})`;
+
+            if (asHtml) {
+                // Construct a payload for the Filer View
+                const payloadData = [];
+                const merchantsInThisSplit = new Map();
+
+                splitCases.forEach(caseItem => {
+                    if (!merchantsInThisSplit.has(caseItem.originalMerchant.id)) {
+                        merchantsInThisSplit.set(caseItem.originalMerchant.id, {
+                            ...caseItem.originalMerchant,
+                            cases: [] // create a new merchant object with an empty case array
+                        });
+                    }
+                    merchantsInThisSplit.get(caseItem.originalMerchant.id).cases.push(caseItem);
+                });
+                
+                const payload = {
+                    data: Array.from(merchantsInThisSplit.values()),
+                    layout: appSettings.caseTextPosition,
+                    matched: Array.from(matchedRoIds.entries()),
+                    settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout }
+                };
+
+                let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+                payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
+                let fileContent = document.documentElement.outerHTML.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
+                
+                downloadFile(fileContent, `${filenameBase}.html`, 'text/html;charset=utf-8');
+
+            } else { // TXT Download
+                const templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
+                
+                const textForSplit = splitCases.map(caseItem => caseItem.text).join(caseSeparator);
+                const fileContent = merchantDisplayNames + '\n\n' + textForSplit + '\n';
+                downloadFile(fileContent, `${filenameBase}.txt`, 'text/plain;charset=utf-8');
+            }
         });
+
         closeSplitModal();
     }
     
@@ -2268,7 +2317,6 @@
         const splitModal = document.getElementById('splitModal');
         if (!splitModal) return;
 
-        const combinedText = splitModal.dataset.combinedText || '';
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
 
@@ -3894,7 +3942,13 @@
             document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
             document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
             document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
-            document.getElementById('btnGenerateSplits')?.addEventListener('click', generateAndDownloadSplits);
+            
+            document.getElementById('generateSplitsDropdown').addEventListener('click', e => {
+                const action = e.target.closest('button')?.dataset.action;
+                if (action === 'download-split-txt') generateAndDownloadSplits(false);
+                if (action === 'download-split-html') generateAndDownloadSplits(true);
+            });
+
             document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
             document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
             document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
@@ -3925,7 +3979,7 @@
             const newMerchantInput = document.getElementById('newMerchantInput');
             if (newMerchantInput) {
                 const handleNewMerchantAdd = (name) => {
-                    const newName = name.trim();
+                    const newName = name.split('\n')[0].trim(); // Use only the first line
                     if (newName) {
                         addNewMerchant(newName);
                         newMerchantInput.value = '';
@@ -3933,18 +3987,16 @@
                         if (dropdown) dropdown.classList.remove('show');
                     }
                 };
-
-                // Keep the 'Enter' key functionality for manual typing
+                
                 newMerchantInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         handleNewMerchantAdd(newMerchantInput.value);
                     }
                 });
-
-                // Add the new 'paste' functionality
+                
                 newMerchantInput.addEventListener('paste', (e) => {
-                    e.preventDefault(); // Prevent the text from being pasted into the input
+                    e.preventDefault();
                     const pastedText = (e.clipboardData || window.clipboardData).getData('text');
                     handleNewMerchantAdd(pastedText);
                 });
@@ -4019,6 +4071,10 @@
                     document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
                     if (!isShowing) {
                         dropdownContent.classList.add('show');
+                        // Auto-focus logic for New Merchant input
+                        if(button.id === 'btnAddNewMerchant') {
+                            setTimeout(() => document.getElementById('newMerchantInput')?.focus(), 50);
+                        }
                     }
                 }
             });
