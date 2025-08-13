@@ -475,6 +475,7 @@
     .merchant-item .merchant-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
     .merchant-item .edit-merchant-btn {
         width: 24px; height: 24px; font-size: 12px;
+        background-color: var(--bg-hover);
     }
     .merchant-item.selected .edit-merchant-btn { background-color: rgba(255,255,255,0.2); color: white; }
     .merchant-item.selected .edit-merchant-btn:hover { background-color: rgba(255,255,255,0.3); }
@@ -501,7 +502,7 @@
     .counter-pill {
         display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px;
         padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-color);
-        background-color: var(--bg-hover); /* UPDATED as requested */
+        background-color: var(--bg-hover);
     }
     .counter-pill p { margin:0; display:flex; align-items:center; gap: 5px;}
     .counter-pill p > i { color: var(--text-secondary); }
@@ -2123,16 +2124,13 @@
     }
     
     function downloadSelectedMerchants(asHtml = false) {
-        // This is the action for the "Download Selected" button.
-        // `caseModeData` is assumed to be up-to-date from the last note edit.
         if (asHtml) {
-            exportCaseTrackerFile(false); // Call the main export function for selected.
-        } else { // TXT Download Logic
+            exportCaseTrackerFile(false); 
+        } else { 
             const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
             if (selectedDivs.length === 0) return;
 
             const selectedMerchantsData = Array.from(selectedDivs).map(div => {
-                // Find the corresponding object in caseModeData to get all details
                 return caseModeData.find(m => m.originalText === div.dataset.key);
             }).filter(Boolean);
 
@@ -2152,7 +2150,7 @@
 
     function downloadAll(asHtml = false){
         if (asHtml) {
-            exportCaseTrackerFile(true); // Call main export function for all.
+            exportCaseTrackerFile(true);
         } else {
             const allMerchantsData = caseModeData;
             const totalCases = allMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
@@ -2223,44 +2221,39 @@
         const modal = document.getElementById('splitModal');
         if (!modal) return;
 
-        const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
-
-        if (isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
-            showNotification("Please enter valid numbers for splitting.", "error");
+        if (isNaN(splitNum) || splitNum < 1) {
+            showNotification("Please enter a valid number for 'Templates per Split File'.", "error");
             return;
         }
 
-        // 1. Get all cases from selected merchants, keeping track of the original merchant
-        const allCasesWithMerchant = selectedMerchantDataForSplit.flatMap(merchantData => {
+        closeSplitModal();
+
+        const allCasesWithMerchantContext = selectedMerchantDataForSplit.flatMap(merchantData => {
             const merchantObject = caseModeData.find(m => m.originalText === merchantData.key);
             if (!merchantObject) return [];
             return merchantObject.cases.map(caseItem => ({
                 ...caseItem,
-                originalMerchant: merchantObject
+                originalMerchant: merchantObject 
             }));
         });
         
-        if (allCasesWithMerchant.length === 0) {
+        if (allCasesWithMerchantContext.length === 0) {
             showNotification("No valid cases found to split.", "info");
             return;
         }
 
-        // 2. Group cases into templates (here, each "case" is a template)
-        const templates = allCasesWithMerchant; // 1 case = 1 template in this tool's logic
-        
-        // 3. Group templates into split files
-        const splitOutputs = [];
-        for (let i = 0; i < templates.length; i += splitNum) {
-            splitOutputs.push(templates.slice(i, i + splitNum));
+        const caseChunks = [];
+        for (let i = 0; i < allCasesWithMerchantContext.length; i += splitNum) {
+            caseChunks.push(allCasesWithMerchantContext.slice(i, i + splitNum));
         }
 
-        if (splitOutputs.length === 0) {
+        if (caseChunks.length === 0) {
             showNotification("No split files generated.", "info");
             return;
         }
 
-        const merchantDisplayNames = selectedMerchantDataForSplit.map(item => {
+        const merchantDisplayNamesForTxt = selectedMerchantDataForSplit.map(item => {
             const merchantObj = caseModeData.find(m => m.originalText === item.key);
             return (merchantObj && isMerchantVerified(merchantObj)) ? `${item.name} ***Verified Removal***` : item.name;
         }).join(' & ');
@@ -2268,24 +2261,27 @@
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
         const dateStr = getFormattedDate();
 
-        // 4. Generate each file
-        splitOutputs.forEach((splitCases, index) => {
-            const caseCount = splitCases.length;
+        caseChunks.forEach((chunkOfCases, index) => {
+            const caseCount = chunkOfCases.length;
             const filenameBase = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index + 1}(${caseCount})`;
 
             if (asHtml) {
-                // Construct a payload for the Filer View
-                const payloadData = [];
                 const merchantsInThisSplit = new Map();
-
-                splitCases.forEach(caseItem => {
-                    if (!merchantsInThisSplit.has(caseItem.originalMerchant.id)) {
-                        merchantsInThisSplit.set(caseItem.originalMerchant.id, {
-                            ...caseItem.originalMerchant,
-                            cases: [] // create a new merchant object with an empty case array
+                chunkOfCases.forEach(caseItem => {
+                    const originalMerchant = caseItem.originalMerchant;
+                    if (!merchantsInThisSplit.has(originalMerchant.id)) {
+                        merchantsInThisSplit.set(originalMerchant.id, {
+                            id: originalMerchant.id,
+                            displayName: originalMerchant.displayName,
+                            originalText: originalMerchant.originalText,
+                            isCompleted: originalMerchant.isCompleted,
+                            isAccountIssue: originalMerchant.isAccountIssue,
+                            cases: []
                         });
                     }
-                    merchantsInThisSplit.get(caseItem.originalMerchant.id).cases.push(caseItem);
+                    const cleanCaseItem = { ...caseItem };
+                    delete cleanCaseItem.originalMerchant;
+                    merchantsInThisSplit.get(originalMerchant.id).cases.push(cleanCaseItem);
                 });
                 
                 const payload = {
@@ -2294,23 +2290,16 @@
                     matched: Array.from(matchedRoIds.entries()),
                     settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout }
                 };
-
-                let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
-                payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
-                let fileContent = document.documentElement.outerHTML.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
                 
+                const fileContent = generateFilerHTML(payload);
                 downloadFile(fileContent, `${filenameBase}.html`, 'text/html;charset=utf-8');
 
             } else { // TXT Download
-                const templateToUse = (modal.dataset.containsUpsUsps === 'true' && modal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
-                
-                const textForSplit = splitCases.map(caseItem => caseItem.text).join(caseSeparator);
-                const fileContent = merchantDisplayNames + '\n\n' + textForSplit + '\n';
+                const textForSplit = chunkOfCases.map(caseItem => caseItem.text).join(caseSeparator);
+                const fileContent = merchantDisplayNamesForTxt + '\n\n' + textForSplit + '\n';
                 downloadFile(fileContent, `${filenameBase}.txt`, 'text/plain;charset=utf-8');
             }
         });
-
-        closeSplitModal();
     }
     
     async function generateAndSendSplitsToTelegram() {
@@ -2319,11 +2308,14 @@
 
         const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
         const splitNum = parseInt(document.getElementById('splitNumberInput').value);
+        const combinedText = splitModal.dataset.combinedText || '';
 
         if (!combinedText || isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
             showNotification("Please enter valid numbers for splitting.", "error");
             return;
         }
+        
+        closeSplitModal();
 
         let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
         const ros = splitTextIntoRemovalOrders(combinedText);
@@ -2411,8 +2403,7 @@
         sendButton.disabled = false;
         sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Files';
         modal.style.display = 'none';
-        closeSplitModal();
-
+        
         if (successfulSends.length > 0) {
             merchantsToDeleteAfterSend = selectedMerchantDataForSplit.map(m => ({
                 key: m.key,
@@ -2771,6 +2762,35 @@
     }
 
     // --- CASE MODE ---
+
+    function generateFilerHTML(payload) {
+        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
+        
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        const fullScript = document.querySelector('script').innerHTML;
+        
+        const fileContent = `
+            <!DOCTYPE html>
+            <html lang="en" data-theme="${theme}">
+            <head>
+                ${document.head.innerHTML}
+            </head>
+            <body>
+                ${document.getElementById('notificationPopup').outerHTML}
+                ${document.querySelector('.top-bar').outerHTML}
+                ${document.getElementById('caseModeWrapper').outerHTML}
+                ${document.getElementById('caseTextModal').outerHTML}
+                ${document.getElementById('caseModeActionModal').outerHTML}
+
+                <script>
+                    ${fullScript.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString)}
+                <\/script>
+            </body>
+            </html>`;
+        return fileContent;
+    }
+
     function getCompletionState() {
         try {
             const state = localStorage.getItem(merchantCompletionKey);
@@ -2863,7 +2883,9 @@
         if (caseModeData.length > 0) {
             activeCaseModeTabId = caseModeData[0].id;
         }
-        document.getElementById('mainWrapper').style.display = 'none';
+        const mainWrapper = document.getElementById('mainWrapper');
+        if(mainWrapper) mainWrapper.style.display = 'none';
+        
         document.getElementById('caseModeWrapper').style.display = 'flex';
         renderCaseModeUI();
         applyCaseCardLayout();
@@ -2872,7 +2894,6 @@
     
     function exportCaseTrackerFile(all = false) {
         let merchantsToExport;
-        let filenameBase;
     
         if (all) {
             merchantsToExport = caseModeData;
@@ -2892,27 +2913,29 @@
         }
         
         const totalCases = merchantsToExport.reduce((sum, m) => sum + m.cases.length, 0);
-        filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
+        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
     
-        const filename = `${filenameBase}.html`;
-        const payload = { data: merchantsToExport, layout: appSettings.caseTextPosition, matched: Array.from(matchedRoIds.entries()), settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout } };
+        const payload = { 
+            data: merchantsToExport, 
+            layout: appSettings.caseTextPosition, 
+            matched: Array.from(matchedRoIds.entries()), 
+            settings: { 
+                showCopyTitleBtn: appSettings.showCopyTitleBtn, 
+                marketplaceUrlGen: appSettings.marketplaceUrlGen, 
+                tabLayout: appSettings.tabLayout 
+            } 
+        };
         
-        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
-        // FIX: Escape the closing script tag to prevent premature script termination in the generated file.
-        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
-        
-        let fileContent = document.documentElement.outerHTML.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
-    
+        const fileContent = generateFilerHTML(payload);
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification("Filer View HTML file has been downloaded.", "success");
     }
 
     function reExportFilerView() {
         if (!document.body.classList.contains('is-standalone-mode')) return;
-
-        // Construct the new payload with the current, updated data
+        
         const newPayload = {
-            data: caseModeData, // This contains all the latest changes
+            data: caseModeData,
             layout: appSettings.caseTextPosition,
             matched: Array.from(matchedRoIds.entries()),
             settings: {
@@ -2921,19 +2944,12 @@
                 tabLayout: appSettings.tabLayout
             }
         };
-        let newPayloadString = `const standalonePayload = ${JSON.stringify(newPayload)};`;
-        // FIX: Escape the closing script tag.
-        newPayloadString = newPayloadString.replace(/<\/script>/gi, '<\\/script>');
 
-        // Get the current page's HTML and replace the old payload with the new one
-        const currentHtml = document.documentElement.outerHTML;
-        const newHtml = currentHtml.replace(/const standalonePayload = .*?;/s, newPayloadString);
-        
-        // Generate a new filename
         const totalCases = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
         const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
+        const fileContent = generateFilerHTML(newPayload);
 
-        downloadFile(newHtml, filename, 'text/html;charset=utf-8');
+        downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification("Filer View re-exported with changes saved!", "success");
     }
 
@@ -2944,7 +2960,7 @@
         const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
 
         const payload = {
-            data: [merchant], // Pass as an array with one item
+            data: [merchant],
             layout: appSettings.caseTextPosition,
             matched: Array.from(matchedRoIds.entries()),
             settings: {
@@ -2954,13 +2970,7 @@
             }
         };
         
-        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
-        // FIX: Escape the closing script tag.
-        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
-        
-        let fileContent = document.documentElement.outerHTML;
-        fileContent = fileContent.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString);
-
+        const fileContent = generateFilerHTML(payload);
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
         showNotification(`Filer View for ${merchant.displayName} downloaded.`, "success");
     }
@@ -3330,7 +3340,7 @@
     }
 
     function handleCasePaste(event) {
-        // Removed auto-save functionality as requested. User must click to save.
+        // Removed auto-save functionality. User must click to save.
     }
     
     function handleCaseCardAction(button) {
