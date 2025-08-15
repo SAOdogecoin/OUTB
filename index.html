@@ -388,7 +388,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
         margin-bottom: auto;
     }
-    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content {max-width: 520px;}
+    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content, #roMatchModal .modal-content {max-width: 520px;}
     #preSendConfirmModal .modal-content { max-width: 600px; }
     #historyModal .modal-content { max-width: 800px; }
     #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
@@ -819,7 +819,9 @@
             
             <div class="toolbar-icon-group standalone-only">
                  <button id="btnToggleFilerLayout" class="macos-icon-button" title="Toggle Template Position"><i class="fa-solid fa-align-left"></i></button>
+                 <button id="btnToggleCardLayout" class="macos-icon-button" title="Reverse Card Layout"><i class="fa-solid fa-sort"></i></button>
                  <button id="btnToggleCopyTitle" class="macos-icon-button" title="Toggle 'Copy Case Title' Button"><i class="fa-solid fa-heading"></i></button>
+                 <button id="btnToggleAutoSave" class="macos-icon-button" title="Toggle Auto-Save on Paste"><i class="fa-solid fa-paste"></i></button>
                  <button id="btnReExportFilerView" class="macos-icon-button" title="Save & Re-export Filer View"><i class="fa-solid fa-save"></i></button>
             </div>
             <div class="toolbar-icon-group standalone-only">
@@ -830,6 +832,14 @@
                  <div class="dropdown non-standalone">
                     <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
                     <div id="uiPreferencesDropdown" class="dropdown-content">
+<div class="settings-group inline">
+    <label>Case Card Text Position</label>
+    <span class="toggle-icons">
+        <i class="fa-solid fa-align-left"></i>
+        <label class="macos-switch"><input type="checkbox" id="dropdownTextPosToggle"><span class="slider"></span></label>
+        <i class="fa-solid fa-align-right"></i>
+    </span>
+</div>
                         <div class="settings-group inline">
                             <label>
                                 Theme
@@ -841,7 +851,7 @@
                             <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
                         </div>
                         <div class="settings-group inline">
-                            <label>Case Card Layout</label>
+                            <label>Reverse Case Card Controls</label>
                              <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
                         </div>
                         <div class="settings-group inline">
@@ -1032,18 +1042,14 @@
                 <div class="settings-category">
                     <h4>UI Preferences</h4>
                     <div class="settings-group inline">
-                        <label>Counter Position</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
+                        <label>Show RO Match popup on new merchant</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsShowRoMatchPopupToggle"><span class="slider"></span></label>
                     </div>
                     <div class="settings-group inline">
-                        <label>Case Card Layout</label>
-                         <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                        <label>Auto-save Case ID on paste</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsAutoSaveOnPasteToggle"><span class="slider"></span></label>
                     </div>
                     <div class="settings-group inline">
-                        <label>Case Filer Tab Layout</label>
-                         <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="settingsTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
-                    </div>
-                     <div class="settings-group inline">
                         <label>Show Merchant Search Bar</label>
                         <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
                     </div>
@@ -1168,6 +1174,22 @@
         </div>
     </div>
 
+    <div id="roMatchModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-paste" style="margin-right:8px;"></i>Paste RO Data for Matching</h2>
+            <div class="macos-textfield-container">
+                <textarea id="roMatchModalInput" class="macos-textfield" style="min-height: 150px;" placeholder="Paste RO data here..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <label class="macos-checkbox-container">
+                    <input type="checkbox" id="autoCloseOnPaste" class="macos-checkbox">
+                    <span>Auto close after pasting</span>
+                </label>
+                <button id="btnDoneRoMatch" class="macos primary">Done</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     // STANDALONE_DATA_PLACEHOLDER
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
@@ -1180,14 +1202,14 @@
     const upsUspsOutputKey = 'stagedUpsUspsTNs_amzlTool';
     const upsUspsContextKey = 'stagedUpsUspsContext_amzlTool';
     const historyKey = 'outboundToolHistory_v2';
-    const settingsKey = 'outboundToolSettings_v2_telegram';
+    const settingsKey = 'outboundToolSettings_v3';
     const parserStateKey = 'outboundToolParserState';
     const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
     const merchantCompletionKey = 'outboundToolMerchantCompletionState';
     const matchedRoIdsKey = 'outboundToolMatchedRoIds_v3'; 
     const caseModeActiveKey = 'outboundToolCaseModeActive';
-    const filerViewStateKey = 'outboundToolFilerViewState';
+    const filerViewStateKey = 'outboundToolFilerViewState_v2';
     const accountIssueKey = 'outboundToolAccountIssues';
     const roMatchDataKey = 'outboundToolRoMatchData';
     const scrollPosKeys = {
@@ -1210,6 +1232,9 @@
         caseTextPosition: 'left',
         showCopyTitleBtn: false,
         tabLayout: 'wrap',
+        showRoMatchPopup: false,
+        caseCardLayout: 'default', // 'default' or 'reversed'
+        autoSaveOnPaste: false,
     };
     let regexPatterns = {
         amzlSource: null,
@@ -1304,7 +1329,6 @@
     }
     
     function applyAppSettings() {
-        // Sync UI elements to reflect current settings
         setTheme(appSettings.theme);
         document.getElementById('btnPrefix3C').classList.toggle('active', appSettings.prefixOption === '3C');
         document.getElementById('btnPrefixLS').classList.toggle('active', appSettings.prefixOption === 'LS');
@@ -1312,7 +1336,8 @@
         // Sync dropdown toggles
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
         document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
-        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseTextPosition === 'right');
+        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
+document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
         document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
         document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
         document.getElementById('dropdownCopyTitleToggle').checked = appSettings.showCopyTitleBtn;
@@ -1322,7 +1347,9 @@
         // Apply visual changes
         applyMerchantSearchVisibility();
         updateCounterPillLocation();
-        applyCaseCardLayout();
+        if(document.body.classList.contains('is-standalone-mode') || document.getElementById('caseModeWrapper').style.display !== 'none'){
+            applyCaseCardLayout();
+        }
         applyCopyTitleButtonVisibility();
         applyTabLayout();
     }
@@ -2288,7 +2315,13 @@
                     data: Array.from(merchantsInThisSplit.values()),
                     layout: appSettings.caseTextPosition,
                     matched: Array.from(matchedRoIds.entries()),
-                    settings: { showCopyTitleBtn: appSettings.showCopyTitleBtn, marketplaceUrlGen: appSettings.marketplaceUrlGen, tabLayout: appSettings.tabLayout }
+                    settings: { 
+                        showCopyTitleBtn: appSettings.showCopyTitleBtn, 
+                        marketplaceUrlGen: appSettings.marketplaceUrlGen, 
+                        tabLayout: appSettings.tabLayout,
+                        caseCardLayout: appSettings.caseCardLayout,
+                        autoSaveOnPaste: appSettings.autoSaveOnPaste
+                    }
                 };
                 
                 const fileContent = generateFilerHTML(payload);
@@ -2435,6 +2468,9 @@
         countTemplatesNoteTaker();
         recordNoteChange();
         showNotification(`Added merchant: ${name}`, 'success');
+        if (appSettings.showRoMatchPopup) {
+            openRoMatchModal();
+        }
     }
 
     function confirmAndClearAllNotes() {
@@ -2719,14 +2755,13 @@
     function openSettingsModal() {
         const modal = document.getElementById('settingsModal');
         // Sync modal inputs with current appSettings
+        document.getElementById('settingsShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
+        document.getElementById('settingsAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
         document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
         document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
-        document.getElementById('settingsCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
-        document.getElementById('settingsCaseCardLayoutToggle').checked = (appSettings.caseTextPosition === 'right');
-        document.getElementById('settingsTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
         document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
         document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
 
@@ -2759,6 +2794,23 @@
         renderHistoryModal();
         closeClearHistoryConfirmModal();
         showNotification("All history cleared.", "success");
+    }
+
+    function openRoMatchModal() {
+        const modal = document.getElementById('roMatchModal');
+        const input = document.getElementById('roMatchModalInput');
+        if (modal && input) {
+            input.value = ''; // Clear previous content
+            modal.style.display = 'flex';
+            input.focus();
+        }
+    }
+
+    function closeRoMatchModal() {
+        const modal = document.getElementById('roMatchModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 
     // --- CASE MODE ---
@@ -2842,6 +2894,8 @@
             appSettings: {
                 caseTextPosition: appSettings.caseTextPosition,
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
+                caseCardLayout: appSettings.caseCardLayout,
+                autoSaveOnPaste: appSettings.autoSaveOnPaste
             }
         };
         localStorage.setItem(filerViewStateKey, JSON.stringify(state));
@@ -2852,9 +2906,7 @@
         
         // Initial load from payload
         if (payload.settings) {
-            appSettings.showCopyTitleBtn = payload.settings.showCopyTitleBtn;
-            appSettings.marketplaceUrlGen = payload.settings.marketplaceUrlGen;
-            appSettings.tabLayout = payload.settings.tabLayout || 'wrap';
+            appSettings = {...appSettings, ...payload.settings};
         }
         caseModeData = payload.data || (Array.isArray(payload) ? payload : []);
         appSettings.caseTextPosition = payload.layout || 'left';
@@ -2865,12 +2917,10 @@
         if (savedStateJSON) {
             try {
                 const savedState = JSON.parse(savedStateJSON);
-                // Simple check to see if the saved data might match the payload data
                 if (savedState.caseModeData && caseModeData.length > 0 && savedState.caseModeData[0]?.id === caseModeData[0]?.id) {
                     caseModeData = savedState.caseModeData;
                     if (savedState.appSettings) {
-                        appSettings.caseTextPosition = savedState.appSettings.caseTextPosition;
-                        appSettings.showCopyTitleBtn = savedState.appSettings.showCopyTitleBtn;
+                        appSettings = {...appSettings, ...savedState.appSettings};
                     }
                 }
             } catch(e) { console.error("Could not load Filer View state.", e); localStorage.removeItem(filerViewStateKey); }
@@ -2879,6 +2929,8 @@
         // Set initial UI state
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
         document.getElementById('btnToggleCopyTitle').classList.toggle('active', appSettings.showCopyTitleBtn);
+        document.getElementById('btnToggleAutoSave').classList.toggle('active', appSettings.autoSaveOnPaste);
+        document.getElementById('btnToggleCardLayout').classList.toggle('active', appSettings.caseCardLayout === 'reversed');
 
         if (caseModeData.length > 0) {
             activeCaseModeTabId = caseModeData[0].id;
@@ -2922,7 +2974,9 @@
             settings: { 
                 showCopyTitleBtn: appSettings.showCopyTitleBtn, 
                 marketplaceUrlGen: appSettings.marketplaceUrlGen, 
-                tabLayout: appSettings.tabLayout 
+                tabLayout: appSettings.tabLayout,
+                caseCardLayout: appSettings.caseCardLayout,
+                autoSaveOnPaste: appSettings.autoSaveOnPaste
             } 
         };
         
@@ -2941,7 +2995,9 @@
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
                 marketplaceUrlGen: appSettings.marketplaceUrlGen,
-                tabLayout: appSettings.tabLayout
+                tabLayout: appSettings.tabLayout,
+                caseCardLayout: appSettings.caseCardLayout,
+                autoSaveOnPaste: appSettings.autoSaveOnPaste
             }
         };
 
@@ -2966,7 +3022,9 @@
             settings: {
                 showCopyTitleBtn: appSettings.showCopyTitleBtn,
                 marketplaceUrlGen: appSettings.marketplaceUrlGen,
-                tabLayout: appSettings.tabLayout
+                tabLayout: appSettings.tabLayout,
+                caseCardLayout: appSettings.caseCardLayout,
+                autoSaveOnPaste: appSettings.autoSaveOnPaste
             }
         };
         
@@ -3158,31 +3216,21 @@
                     <span class="ro-match-indicator"><i class="fa-solid fa-check-circle"></i></span>
                     <div class="case-number">${number}</div>
                     <div class="main-content">
-                        <div class="case-text">${caseItem.text}</div>
+                        <div class="case-text">${escapeHTML(caseItem.text)}</div>
                         <div class="editing-info">
                             <div class="macos-textfield-container">
-                                <input type="text" class="macos-textfield case-id-input" placeholder="Update Case ID..." value="${caseItem.filedId || ''}">
+                                <input type="text" class="macos-textfield case-id-input" placeholder="Update Case ID..." value="${escapeHTML(caseItem.filedId || '')}">
                             </div>
                             <button class="macos danger" data-action="delete-case"><i class="fa-solid fa-trash"></i></button>
                             <button class="macos primary" data-action="update-case"><i class="fa-solid fa-save"></i>Update</button>
                         </div>
                         <div class="filed-info">
-                            <span class="case-id-display">${caseItem.filedId || ''}</span>
+                            <span class="case-id-display">${escapeHTML(caseItem.filedId || '')}</span>
                         </div>
                     </div>
                 </div>
                 <div class="right-pane">
-                    <div class="unfiled-controls">
-                         <div class="case-id-input-group">
-                            <div class="macos-textfield-container">
-                                 <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID..." ${controlsDisabled}>
-                            </div>
-                            <button class="macos-icon-button success" data-action="save-case" title="Save Case ID" ${controlsDisabled}><i class="fa-solid fa-save"></i></button>
-                        </div>
-                        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 8px 0;" />
-                        <button class="macos primary" data-action="copy-text" style="padding-top: 8px; padding-bottom: 8px; margin-top: 8px;" ${controlsDisabled}><i class="fa-solid fa-copy"></i>Copy Template</button>
-                        <button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>
-                    </div>
+                    <div class="unfiled-controls"></div>
                     <div class="filed-controls">
                         <button class="macos secondary" data-action="view-case">View</button>
                         <button class="macos primary" data-action="copy-id">Copy ID</button>
@@ -3191,6 +3239,27 @@
                 </div>
             </div>`;
         
+        const unfiledControlsContainer = card.querySelector('.unfiled-controls');
+
+        const inputGroupHTML = `
+            <div class="case-id-input-group">
+                <div class="macos-textfield-container">
+                    <input type="text" class="macos-textfield case-id-input" placeholder="Enter Case ID..." ${controlsDisabled}>
+                </div>
+                <button class="macos-icon-button success" data-action="save-case" title="Save Case ID" ${controlsDisabled}><i class="fa-solid fa-save"></i></button>
+            </div>`;
+        const separatorHTML = `<hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 8px 0;" />`;
+        const copyTemplateBtnHTML = `<button class="macos primary" data-action="copy-text" style="padding-top: 8px; padding-bottom: 8px;" ${controlsDisabled}><i class="fa-solid fa-copy"></i>Copy Template</button>`;
+        const copyTitleBtnHTML = `<button class="macos secondary copy-case-title" data-action="copy-case-title" style="width: 100%;"><i class="fa-solid fa-heading"></i>Copy Case Title</button>`;
+        
+        if (appSettings.caseCardLayout === 'reversed') {
+            unfiledControlsContainer.innerHTML = copyTemplateBtnHTML + copyTitleBtnHTML + separatorHTML + inputGroupHTML;
+            unfiledControlsContainer.style.justifyContent = 'flex-end';
+        } else {
+            unfiledControlsContainer.innerHTML = inputGroupHTML + separatorHTML + copyTemplateBtnHTML + copyTitleBtnHTML;
+            unfiledControlsContainer.style.justifyContent = 'flex-start';
+        }
+
         const cardContent = card.querySelector('.card-content');
         if (appSettings.caseTextPosition === 'right') {
             cardContent.classList.add('layout-right');
@@ -3340,7 +3409,17 @@
     }
 
     function handleCasePaste(event) {
-        // Removed auto-save functionality. User must click to save.
+        if (!appSettings.autoSaveOnPaste) return;
+        const input = event.target;
+        setTimeout(() => {
+            const card = input.closest('.case-card');
+            if (card) {
+                const saveButton = input.closest('.unfiled-controls, .editing-info')?.querySelector('[data-action="save-case"], [data-action="update-case"]');
+                if (saveButton && !saveButton.disabled) {
+                    saveButton.click();
+                }
+            }
+        }, 50);
     }
     
     function handleCaseCardAction(button) {
@@ -3701,7 +3780,9 @@
     }
     
     function escapeHTML(str) {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
     
     function copyAllMerchantsWithIds() {
@@ -3734,9 +3815,30 @@
 
     function applyCaseCardLayout() {
         const isRight = appSettings.caseTextPosition === 'right';
+        const isReversed = appSettings.caseCardLayout === 'reversed';
         document.querySelectorAll('.case-card .card-content').forEach(el => {
             el.classList.toggle('layout-right', isRight);
         });
+
+        document.querySelectorAll('.case-card .unfiled-controls').forEach(container => {
+            const inputGroup = container.querySelector('.case-id-input-group');
+            const separator = container.querySelector('hr');
+            const copyTemplateBtn = container.querySelector('[data-action="copy-text"]');
+            const copyTitleBtn = container.querySelector('[data-action="copy-case-title"]');
+
+            if (isReversed) {
+                container.appendChild(copyTemplateBtn);
+                container.appendChild(copyTitleBtn);
+                container.appendChild(separator);
+                container.appendChild(inputGroup);
+            } else {
+                container.appendChild(inputGroup);
+                container.appendChild(separator);
+                container.appendChild(copyTemplateBtn);
+                container.appendChild(copyTitleBtn);
+            }
+        });
+
         const icon = document.getElementById('btnToggleFilerLayout')?.querySelector('i');
         if (icon) {
             icon.className = `fa-solid fa-align-${isRight ? 'right' : 'left'}`;
@@ -3771,6 +3873,20 @@
     function toggleFilerLayout() {
         appSettings.caseTextPosition = appSettings.caseTextPosition === 'left' ? 'right' : 'left';
         applyCaseCardLayout();
+        saveFilerViewState();
+    }
+
+    function toggleCardLayout() {
+        appSettings.caseCardLayout = appSettings.caseCardLayout === 'default' ? 'reversed' : 'default';
+        document.getElementById('btnToggleCardLayout').classList.toggle('active', appSettings.caseCardLayout === 'reversed');
+        renderCaseModeUI(); // Re-render to apply the new layout structure
+        saveFilerViewState();
+    }
+
+    function toggleAutoSave() {
+        appSettings.autoSaveOnPaste = !appSettings.autoSaveOnPaste;
+        document.getElementById('btnToggleAutoSave').classList.toggle('active', appSettings.autoSaveOnPaste);
+        showNotification(`Auto-save on paste ${appSettings.autoSaveOnPaste ? 'enabled' : 'disabled'}.`, 'info');
         saveFilerViewState();
     }
     
@@ -3883,14 +3999,13 @@
                 if (e.target.id === 'settingsModal') closeSettingsModal();
             });
             document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => {
+                appSettings.showRoMatchPopup = document.getElementById('settingsShowRoMatchPopupToggle').checked;
+                appSettings.autoSaveOnPaste = document.getElementById('settingsAutoSaveOnPasteToggle').checked;
                 appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
                 appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
                 appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-                appSettings.counterPosition = document.getElementById('settingsCounterPosToggle').checked ? 'merchants' : 'notes';
-                appSettings.caseTextPosition = document.getElementById('settingsCaseCardLayoutToggle').checked ? 'right' : 'left';
-                appSettings.tabLayout = document.getElementById('settingsTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
                 appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
                 appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
                 
@@ -4011,11 +4126,39 @@
                     handleNewMerchantAdd(pastedText);
                 });
             }
+
+            // RO Match Modal Listeners
+            const roMatchModal = document.getElementById('roMatchModal');
+            const roMatchModalInput = document.getElementById('roMatchModalInput');
+            const autoCloseCheckbox = document.getElementById('autoCloseOnPaste');
+            const mainRoInput = document.getElementById('roMatchInput');
+
+            document.getElementById('btnDoneRoMatch')?.addEventListener('click', closeRoMatchModal);
+            roMatchModal?.addEventListener('click', (e) => {
+                if (e.target === roMatchModal) closeRoMatchModal();
+            });
+
+            roMatchModalInput?.addEventListener('input', () => {
+                if (mainRoInput) {
+                    mainRoInput.value = roMatchModalInput.value;
+                    mainRoInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+
+            roMatchModalInput?.addEventListener('paste', () => {
+                setTimeout(() => {
+                    if (autoCloseCheckbox?.checked) {
+                        closeRoMatchModal();
+                    }
+                }, 50);
+            });
         }
 
         // --- Common Listeners for both modes ---
         document.getElementById('btnReExportFilerView')?.addEventListener('click', reExportFilerView);
         document.getElementById('btnToggleFilerLayout')?.addEventListener('click', toggleFilerLayout);
+        document.getElementById('btnToggleCardLayout')?.addEventListener('click', toggleCardLayout);
+        document.getElementById('btnToggleAutoSave')?.addEventListener('click', toggleAutoSave);
         document.getElementById('btnToggleCopyTitle')?.addEventListener('click', toggleCopyTitleVisibility);
         document.getElementById('btnTabLayoutWrap')?.addEventListener('click', () => setTabLayout('wrap'));
         document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
@@ -4052,13 +4195,15 @@
         // --- Dropdown and Auto-saving Settings Logic ---
         const uiPrefsDropdown = document.getElementById('uiPreferencesDropdown');
         if (uiPrefsDropdown) {
-             uiPrefsDropdown.addEventListener('change', () => {
-                appSettings.theme = document.getElementById('dropdownThemeToggle').checked ? 'dark' : 'light';
-                appSettings.counterPosition = document.getElementById('dropdownCounterPosToggle').checked ? 'merchants' : 'notes';
-                appSettings.caseTextPosition = document.getElementById('dropdownCaseCardLayoutToggle').checked ? 'right' : 'left';
-                appSettings.tabLayout = document.getElementById('dropdownTabLayoutToggle').checked ? 'h-scroll' : 'wrap';
-                appSettings.showMerchantSearch = document.getElementById('dropdownSearchToggle').checked;
-                appSettings.showCopyTitleBtn = document.getElementById('dropdownCopyTitleToggle').checked;
+             uiPrefsDropdown.addEventListener('change', (e) => {
+                const targetId = e.target.id;
+if(targetId === 'dropdownTextPosToggle') appSettings.caseTextPosition = e.target.checked ? 'right' : 'left';
+                if(targetId === 'dropdownThemeToggle') appSettings.theme = e.target.checked ? 'dark' : 'light';
+                if(targetId === 'dropdownCounterPosToggle') appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
+                if(targetId === 'dropdownCaseCardLayoutToggle') appSettings.caseCardLayout = e.target.checked ? 'reversed' : 'default';
+                if(targetId === 'dropdownTabLayoutToggle') appSettings.tabLayout = e.target.checked ? 'h-scroll' : 'wrap';
+                if(targetId === 'dropdownSearchToggle') appSettings.showMerchantSearch = e.target.checked;
+                if(targetId === 'dropdownCopyTitleToggle') appSettings.showCopyTitleBtn = e.target.checked;
                 saveSettings();
              });
         }
