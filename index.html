@@ -1182,7 +1182,7 @@
             <div class="macos-textfield-container">
                 <textarea id="roMatchModalInput" class="macos-textfield" style="min-height: 150px;" placeholder="Paste RO data here..."></textarea>
             </div>
-            <div style="display: justify-content: space-between; align-items: center; margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                 <label class="macos-checkbox-container">
                     <input type="checkbox" id="autoCloseOnPaste" class="macos-checkbox">
                     <span>Auto close after pasting</span>
@@ -2289,10 +2289,17 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         }).join(' & ');
         
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
-        const dateStr = getFormattedDate();
+        const startDate = new Date();
 
         caseChunks.forEach((chunkOfCases, index) => {
             const caseCount = chunkOfCases.length;
+            
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + index);
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = currentDate.getDate().toString().padStart(2, '0');
+            const dateStr = `${month}-${day}`;
+            
             const filenameBase = `${getFilenamePrefix()}(${caseCount})-${dateStr}-${filenamePart}-PART_${index + 1}`;
 
             if (asHtml) {
@@ -2392,9 +2399,15 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         preSendModal.dataset.merchantDisplay = merchantDisplay;
 
         let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
-        const dateStr = getFormattedDate();
+        const startDate = new Date();
         
         splitOutputs.forEach((output, index) => {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + index);
+            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = currentDate.getDate().toString().padStart(2, '0');
+            const dateStr = `${month}-${day}`;
+
             const filename = `${getFilenamePrefix()}(${output.count})-${dateStr}-${filenamePart}-PART_${index+1}.txt`;
             const fileItem = document.createElement('div');
             fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 8px;';
