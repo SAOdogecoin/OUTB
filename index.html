@@ -1182,7 +1182,7 @@
             <div class="macos-textfield-container">
                 <textarea id="roMatchModalInput" class="macos-textfield" style="min-height: 150px;" placeholder="Paste RO data here..."></textarea>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <div style="display: justify-content: space-between; align-items: center; margin-top: 10px;">
                 <label class="macos-checkbox-container">
                     <input type="checkbox" id="autoCloseOnPaste" class="macos-checkbox">
                     <span>Auto close after pasting</span>
@@ -2170,7 +2170,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
             }
             
             const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
-            const filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
+            const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
 
             const combinedText = selectedMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
             const filename = `${filenameBase}.txt`;
@@ -2184,7 +2184,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         } else {
             const allMerchantsData = caseModeData;
             const totalCases = allMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
-            const filenameBase = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases})`;
+            const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
             const combinedText = allMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
             const filename = `${filenameBase}.txt`;
             downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
@@ -2293,7 +2293,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
 
         caseChunks.forEach((chunkOfCases, index) => {
             const caseCount = chunkOfCases.length;
-            const filenameBase = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index + 1}(${caseCount})`;
+            const filenameBase = `${getFilenamePrefix()}(${caseCount})-${dateStr}-${filenamePart}-PART_${index + 1}`;
 
             if (asHtml) {
                 const merchantsInThisSplit = new Map();
@@ -2395,7 +2395,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         const dateStr = getFormattedDate();
         
         splitOutputs.forEach((output, index) => {
-            const filename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}_PART_${index+1}(${output.count}).txt`;
+            const filename = `${getFilenamePrefix()}(${output.count})-${dateStr}-${filenamePart}-PART_${index+1}.txt`;
             const fileItem = document.createElement('div');
             fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 8px;';
             fileItem.innerHTML = `
@@ -2687,7 +2687,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         } else {
             filenamePart = sanitizeFilename(`${merchantsToSend[0].name}_Multi_${merchantsToSend.length}`);
         }
-        const defaultFilename = `${getFilenamePrefix()}_${dateStr}_${filenamePart}(${totalCases}).txt`;
+        const defaultFilename = `${getFilenamePrefix()}(${totalCases})-${dateStr}-${filenamePart}.txt`;
 
         let lastNumber = parseInt(localStorage.getItem(telegramNumberKey)) || 0;
         const newNumber = lastNumber + 1;
@@ -3003,7 +3003,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         }
         
         const totalCases = merchantsToExport.reduce((sum, m) => sum + m.cases.length, 0);
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
+        const filename = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-.html`;
     
         const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const payload = { 
@@ -3047,7 +3047,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         // MODIFICATION END
 
         const totalCases = caseModeData.reduce((sum, m) => sum + m.cases.length, 0);
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
+        const filename = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-.html`;
         const fileContent = generateFilerHTML(newPayload);
 
         downloadFile(fileContent, filename, 'text/html;charset=utf-8');
@@ -3058,7 +3058,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         if (!merchant) return;
 
         const totalCases = merchant.cases.length;
-        const filename = `${getFilenamePrefix()}_${getFormattedDate()}_(${totalCases}).html`;
+        const filename = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-.html`;
         
         // MODIFICATION START: Also add a fileId here for consistency
         const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
