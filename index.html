@@ -2650,7 +2650,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         const endDate = new Date();
         endDate.setDate(today.getDate() - 15);
         const startDate = new Date();
-        startDate.setDate(today.getDate() - 50);
+        startDate.setDate(today.getDate() - 60);
         const formatUrlDate = (date) => {
             const y = date.getFullYear();
             const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -4300,4 +4300,5 @@ if(targetId === 'dropdownTextPosToggle') appSettings.caseTextPosition = e.target
 </script>
 </body>
 </html>
+
 
