@@ -302,7 +302,7 @@
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .parser-tool {
         padding-bottom: 20px !important; margin-bottom: 20px;
-        border-bottom: 1px solid var(--border-subtle); flex-grow: 0;
+        flex-grow: 0;
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .merchant-actions-tool {
         padding-bottom: 0 !important;
@@ -421,12 +421,12 @@
     .notification-popup {
         display: none; position: fixed; top: 20px; left: 50%;
         transform: translateX(-50%) scale(0.9);
-        color: white; padding: 10px 20px; border-radius: 20px;
+        color: white; padding: 10px 20px; border-radius: 8px;
         font-size: 1.1em; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 2000; opacity: 0;
         transition: opacity 0.3s ease, top 0.3s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
     }
-    .notification-popup.success { background-color: color-mix(in srgb, var(--accent-green) 85%, #000000 15%); }
+    .notification-popup.success { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
     .notification-popup.error { background-color: color-mix(in srgb, var(--accent-red) 85%, #000000 15%); }
     .notification-popup.info { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
 
@@ -858,9 +858,9 @@
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
             </div>
             <div class="toolbar-icon-group non-standalone">
-                <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i><span class="desktop-only" style="margin-left: 6px;">Theme</span></button>
+                <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
                 <div class="dropdown">
-                    <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i><span class="desktop-only" style="margin-left: 6px;">History</span></button>
+                    <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
                     <div id="historyDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
                         <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Deletion History</div>
                         <div id="historyList">
