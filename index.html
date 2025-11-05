@@ -844,19 +844,20 @@
                 <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
             </div>
-            <button id="btnThemeToggle" class="macos-icon-button non-standalone" title="Toggle Theme"><i class="fa-solid fa-moon"></i><span class="desktop-only" style="margin-left: 6px;">Theme</span></button>
-            <div class="dropdown non-standalone">
-                <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i><span class="desktop-only" style="margin-left: 6px;">History</span></button>
-                <div id="historyDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
-                    <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Deletion History</div>
-                    <div id="historyList">
-                        <p style="color: var(--text-secondary); font-size: 0.9em;">No history found.</p>
+            <div class="toolbar-icon-group non-standalone">
+                <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i><span class="desktop-only" style="margin-left: 6px;">Theme</span></button>
+                <div class="dropdown">
+                    <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i><span class="desktop-only" style="margin-left: 6px;">History</span></button>
+                    <div id="historyDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
+                        <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Deletion History</div>
+                        <div id="historyList">
+                            <p style="color: var(--text-secondary); font-size: 0.9em;">No history found.</p>
+                        </div>
+                        <button id="btnClearAllHistory" class="macos danger" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-trash"></i> Clear History</button>
                     </div>
-                    <button id="btnClearAllHistory" class="macos danger" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-trash"></i> Clear History</button>
                 </div>
-            </div>
-            <div class="dropdown non-standalone">
-                <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
+                <div class="dropdown">
+                    <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
                     <div id="uiPreferencesDropdown" class="dropdown-content" style="min-width: 320px; max-width: 360px;">
                         <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">General Preferences</div>
                         <div class="settings-group inline">
@@ -902,9 +903,9 @@
                             <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="dropdownTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
                         </div>
                     </div>
-            </div>
-            <div class="dropdown non-standalone">
-                <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+                </div>
+                <div class="dropdown">
+                    <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
                 <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
                     <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
                     <div class="settings-group">
@@ -931,6 +932,7 @@
                         <label>Default Download Format</label>
                         <span class="toggle-icons">TXT<label class="macos-switch"><input type="checkbox" id="settingsDefaultFileTypeToggle"><span class="slider"></span></label>HTML</span>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -3939,7 +3941,7 @@
                 }
                 if(targetId === 'dropdownCounterPosToggle') {
                     appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
-                    updateCounterPosition();
+                    updateCounterPillLocation();
                 }
                 // File UI
                 if(targetId === 'dropdownAutoSaveOnPasteToggle') appSettings.autoSaveOnPaste = e.target.checked;
