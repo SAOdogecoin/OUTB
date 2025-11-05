@@ -1761,28 +1761,6 @@
         a.remove();
     }
 
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
-        const editableSpan = event.target;
-        const newName = editableSpan.textContent.trim();
-        editableSpan.contentEditable = false; // Immediately disable editing
-        if (!newName || newName === originalDisplayName) {
-            editableSpan.textContent = originalDisplayName;
-            return;
-        }
-        const noteArea = document.getElementById('noteArea');
-        const currentNotes = noteArea.value;
-        let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
-            const lines = originalSectionKey.split('\n');
-            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
-        } else {
-            newSectionText = newName + '\n\n' + originalSectionKey;
-        }
-
-        noteArea.value = currentNotes.replace(originalSectionKey, newSectionText);
-        countTemplatesNoteTaker();
-        recordNoteChange();
-    }
 
     function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
@@ -1809,7 +1787,7 @@
             let merchantName = `Entry ${++merchantIndex}`;
             const firstLine = sectionText.split('\n')[0]?.trim();
             let isNameFromFirstLine = false;
-            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
+            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100 && !firstLine.startsWith('Removal order ID')) {
                 merchantName = firstLine;
                 isNameFromFirstLine = true;
             } else if (sectionText.includes('Removal order ID:')) {
@@ -1845,40 +1823,11 @@
             const controlsDiv = document.createElement('div');
             controlsDiv.className = 'merchant-controls';
 
-            const editBtn = document.createElement('button');
-            editBtn.className = 'macos-icon-button edit-merchant-btn';
-            editBtn.title = 'Edit name';
-            editBtn.innerHTML = '<i class="fa-solid fa-pencil"></i>';
-            
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent row selection
-                nameSpan.contentEditable = true;
-                nameSpan.focus();
-                const range = document.createRange();
-                range.selectNodeContents(nameSpan);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            });
-
-            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
-            nameSpan.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.target.blur();
-                } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    e.target.textContent = data.displayName;
-                    e.target.blur();
-                }
-            });
-
             const countSpan = document.createElement('span');
             countSpan.className = 'case-count';
             countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
-            
+
             controlsDiv.appendChild(countSpan);
-            controlsDiv.appendChild(editBtn);
 
             merchantDiv.appendChild(statusDot);
             merchantDiv.appendChild(checkbox);
@@ -1886,11 +1835,11 @@
             merchantDiv.appendChild(controlsDiv);
 
              merchantDiv.addEventListener('click', (e) => {
-                if (e.target.closest('.edit-merchant-btn') || e.target.closest('.macos-checkbox')) {
-                    if(e.target.closest('.macos-checkbox')) updateSelectedCountNoteTaker();
+                if (e.target.closest('.macos-checkbox')) {
+                    updateSelectedCountNoteTaker();
                     return;
                 }
-                
+
                 const isChecked = checkbox.checked;
 
                 if(e.ctrlKey || e.metaKey){
