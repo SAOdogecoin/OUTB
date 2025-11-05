@@ -1743,10 +1743,8 @@ html[data-theme="dark"] .merchant-item {
 
             countTemplatesNoteTaker();
             recordNoteChange();
-            let processedMessage = `Processed ${validShipmentsFound} new shipment(s). `;
-            if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-            showNotification(processedMessage, "success");
             if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
+            if (skippedDuplicateCount > 0) showNotification(`Skipped ${skippedDuplicateCount} duplicate(s).`, "info");
         } else if (!isUpsUspsMode) {
              let message = "No new AMZL-type shipments found. ";
              if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
@@ -1799,7 +1797,6 @@ html[data-theme="dark"] .merchant-item {
             });
             saveUpsUspsOutputToLocalStorage();
             saveUpsUspsContextToLocalStorage();
-            showNotification(`Added ${processedBlocks.length} Other Carrier entries to notes.`, "success");
             if (processedBlocks.length > 0) showNotification(`+${processedBlocks.length} cases added`, "info");
         }
         if (notFoundCount > 0) showNotification(`Warning: Could not find data for ${notFoundCount} tracking number(s).`, "error");
@@ -2043,10 +2040,13 @@ html[data-theme="dark"] .merchant-item {
     
     function downloadSelectedMerchants(asHtml = false) {
         if (asHtml) {
-            exportCaseTrackerFile(false); 
-        } else { 
+            exportCaseTrackerFile(false);
+        } else {
             const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-            if (selectedDivs.length === 0) return;
+            if (selectedDivs.length === 0) {
+                showNotification("No merchants selected to download.", "info");
+                return;
+            }
 
             const selectedMerchantsData = Array.from(selectedDivs).map(div => {
                 return caseModeData.find(m => m.originalText === div.dataset.key);
@@ -2056,13 +2056,14 @@ html[data-theme="dark"] .merchant-item {
                  showNotification("Could not find data for selected merchants.", "error");
                  return;
             }
-            
+
             const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
             const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
 
             const combinedText = selectedMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
             const filename = `${filenameBase}.txt`;
             downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
+            showNotification("TXT file has been downloaded.", "success");
         }
     }
 
@@ -2687,8 +2688,11 @@ html[data-theme="dark"] .merchant-item {
 
     // MODIFICATION START: exportCaseTrackerFile is updated to inject the unique fileId
     function exportCaseTrackerFile(all = false) {
+        // Parse notes first to ensure caseModeData is up to date
+        parseNotesForCaseMode();
+
         let merchantsToExport;
-    
+
         if (all) {
             merchantsToExport = caseModeData;
         } else {
