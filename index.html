@@ -795,12 +795,34 @@
     </div>
 
     <div class="top-bar">
-        <button id="btnOpenSettings" class="macos-icon-button non-standalone" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
+        <div class="dropdown non-standalone">
+            <button id="btnOpenSettings" class="macos-icon-button" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
+            <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
+                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
+                <div class="settings-group">
+                    <label for="settingsAmzlCarriers" style="font-size: 0.9em;">AMZL-type Carriers:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
+                </div>
+                <div class="settings-group">
+                    <label for="settingsOtherCarriers" style="font-size: 0.9em;">Other Carriers:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
+                </div>
+                <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Data & History</div>
+                <div class="settings-group inline">
+                    <label>Auto-clear history (24h)</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
+                </div>
+                <button id="btnSaveSettings" class="macos primary" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-save"></i> Save Settings</button>
+            </div>
+        </div>
         <h1 class="top-bar-title">OUTB</h1>
         <div class="toolbar-right">
             <div class="url-generator-group">
-                <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
-                <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span class="desktop-only" style="margin-left: 6px;">Open Report URL</span>
+                </button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
                     <option value="co.uk">UK</option>
@@ -808,6 +830,7 @@
                 </select>
             </div>
             <div id="prefixToggleGroup" class="toolbar-icon-group non-standalone">
+                <span class="desktop-only" style="margin-right: 8px; font-weight: 500;">Use Prefix:</span>
                 <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
@@ -828,20 +851,28 @@
                 <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
             </div>
+            <div class="toolbar-icon-group non-standalone">
+                <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+                <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+            </div>
             <div class="toolbar-icon-group">
                  <div class="dropdown non-standalone">
                     <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
-                    <div id="uiPreferencesDropdown" class="dropdown-content">
-                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">General</div>
+                    <div id="uiPreferencesDropdown" class="dropdown-content" style="min-width: 320px; max-width: 360px;">
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">General Preferences</div>
                         <div class="settings-group inline">
                             <label>Theme</label>
                             <span class="toggle-icons"><i class="fa-solid fa-sun"></i><label class="macos-switch"><input type="checkbox" id="dropdownThemeToggle"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></span>
                         </div>
                         <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
 
-                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Audit UI</div>
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Audit UI Preferences</div>
                         <div class="settings-group inline">
-                            <label>Show Merchant Search</label>
+                            <label>Show RO Match popup on new merchant</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownShowRoMatchPopupToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Show Merchant Search Bar</label>
                             <label class="macos-switch"><input type="checkbox" id="dropdownSearchToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
@@ -850,9 +881,13 @@
                         </div>
                         <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
 
-                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">File UI</div>
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">File UI Preferences</div>
                         <div class="settings-group inline">
-                            <label>Show "Copy Title" Button</label>
+                            <label>Auto-save Case ID on paste</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownAutoSaveOnPasteToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Show "Copy Case Title" Button</label>
                             <label class="macos-switch"><input type="checkbox" id="dropdownCopyTitleToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
@@ -902,7 +937,7 @@
                     <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
                     <div id="merchantCounterTarget"></div>
                 </div>
-                <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                     <div class="dropdown" data-align="left">
                         <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                         <div id="downloadSelectedDropdown" class="dropdown-content download-options">
@@ -912,24 +947,11 @@
                             </div>
                         </div>
                     </div>
-                     <div class="dropdown" data-align="left">
-                        <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
-                        <div id="downloadAllDropdown" class="dropdown-content download-options">
-                             <div class="button-row">
-                                <button class="macos secondary" data-action="download-all-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
-                                <button class="macos secondary" data-action="download-all-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
-                            </div>
-                        </div>
-                    </div>
-                    <button id="btnSelectAll" class="macos secondary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
-                    <div class="dropdown" data-align="left">
-                        <button id="btnAddNewMerchant" class="macos secondary"><i class="fa-solid fa-plus"></i>New Merchant</button>
-                        <div id="newMerchantDropdown" class="dropdown-content" style="padding: 12px; min-width: 250px;">
-                            <label for="newMerchantInput" style="font-weight: 500; display: block; margin-bottom: 8px;">Enter New Merchant Name:</label>
-                            <div class="macos-textfield-container">
-                                <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
-                            </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="newMerchantInput" style="font-weight: 500; white-space: nowrap;"><i class="fa-solid fa-plus"></i> New Merchant:</label>
+                        <div class="macos-textfield-container" style="min-width: 250px;">
+                            <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
                         </div>
                     </div>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
@@ -1032,84 +1054,6 @@
         </div>
     </div>
     
-    <div id="settingsModal" class="modal-overlay">
-        <div class="modal-content">
-             <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
-            <div class="settings-categories">
-                <div class="settings-category">
-                    <h4>General Preferences</h4>
-                    <div class="settings-group inline">
-                        <label>Theme</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-sun"></i><label class="macos-switch"><input type="checkbox" id="settingsThemeToggle"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></span>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>Audit UI Preferences</h4>
-                    <div class="settings-group inline">
-                        <label>Show RO Match popup on new merchant</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowRoMatchPopupToggle"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show Merchant Search Bar</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Counter Position</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>File UI Preferences</h4>
-                    <div class="settings-group inline">
-                        <label>Auto-save Case ID on paste</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsAutoSaveOnPasteToggle"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show "Copy Case Title" Button</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowCopyTitleToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Case Card Text Position</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsTextPosToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Reverse Case Card Controls</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="settingsCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Case Filer Tab Layout</label>
-                        <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="settingsTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>Carrier Settings</h4>
-                    <div class="settings-group">
-                        <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
-                    </div>
-                    <div class="settings-group">
-                        <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>Data & History</h4>
-                    <div class="settings-group inline">
-                        <label>Auto-clear history older than 24 hours</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group">
-                        <button id="btnViewHistoryFromSettings" class="macos secondary"><i class="fa-solid fa-trash-alt"></i> View Deletion History</button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button id="btnCloseSettingsModal" class="macos secondary">Cancel</button>
-                <button id="btnSaveChangesSettings" class="macos primary"><i class="fa-solid fa-save"></i>Save Settings</button>
-            </div>
-        </div>
-    </div>
-    
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content">
             <h2><i class="fa-solid fa-trash-alt" style="margin-right:8px;"></i>Deletion History</h2>
@@ -1207,7 +1151,7 @@
         tabLayout: 'wrap',
         showRoMatchPopup: false,
         caseCardLayout: 'default', // 'default' or 'reversed'
-        autoSaveOnPaste: false,
+        autoSaveOnPaste: true,
     };
     let regexPatterns = {
         amzlSource: null,
@@ -1270,7 +1214,17 @@
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
     }
-    
+
+    const applyTheme = setTheme; // Alias for consistency
+
+    function updateThemeToggleIcon() {
+        const btn = document.getElementById('btnThemeToggle');
+        const icon = btn?.querySelector('i');
+        if (icon) {
+            icon.className = appSettings.theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+    }
+
     function setPrefix(prefix) {
         appSettings.prefixOption = prefix;
         saveSettings();
@@ -1307,16 +1261,21 @@
         document.getElementById('btnPrefix3C').classList.toggle('active', appSettings.prefixOption === '3C');
         document.getElementById('btnPrefixLS').classList.toggle('active', appSettings.prefixOption === 'LS');
         
-        // Sync dropdown toggles
+        // Sync UI preferences dropdown toggles
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
-        document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
-        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
-document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
-        document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
+        document.getElementById('dropdownShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
         document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
+        document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
+        document.getElementById('dropdownAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
         document.getElementById('dropdownCopyTitleToggle').checked = appSettings.showCopyTitleBtn;
+        document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
+        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
+        document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'hscroll');
         
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
+
+        // Update theme toggle icon
+        updateThemeToggleIcon();
 
         // Apply visual changes
         applyMerchantSearchVisibility();
@@ -2462,37 +2421,11 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         document.getElementById('splitModal').style.display = 'none';
     }
 
-    function openSettingsModal() {
-        const modal = document.getElementById('settingsModal');
-        // Sync modal inputs with current appSettings
-
-        // General Preferences
-        document.getElementById('settingsThemeToggle').checked = appSettings.theme === 'dark';
-
-        // Audit UI Preferences
-        document.getElementById('settingsShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
-        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        document.getElementById('settingsCounterPosToggle').checked = appSettings.counterPosition === 'merchants';
-
-        // File UI Preferences
-        document.getElementById('settingsAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
-        document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
-        document.getElementById('settingsTextPosToggle').checked = appSettings.caseTextPosition === 'right';
-        document.getElementById('settingsCaseCardLayoutToggle').checked = appSettings.caseCardLayout === 'reversed';
-        document.getElementById('settingsTabLayoutToggle').checked = appSettings.tabLayout === 'hscroll';
-
-        // Carrier Settings
+    function openSettingsDropdown() {
+        // Sync dropdown inputs with current appSettings
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
-
-        // Data & History
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
-
-        modal.style.display = 'flex';
-    }
-
-    function closeSettingsModal() {
-        document.getElementById('settingsModal').style.display = 'none';
     }
     
     function openHistoryModal() {
@@ -3759,46 +3692,28 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
 
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
-            document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
-            document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
-            document.getElementById('settingsModal')?.addEventListener('click', (e) => {
-                if (e.target.id === 'settingsModal') closeSettingsModal();
-            });
-            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => {
-                // General Preferences
-                appSettings.theme = document.getElementById('settingsThemeToggle').checked ? 'dark' : 'light';
-                applyTheme(appSettings.theme);
 
-                // Audit UI Preferences
-                appSettings.showRoMatchPopup = document.getElementById('settingsShowRoMatchPopupToggle').checked;
-                appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
-                appSettings.counterPosition = document.getElementById('settingsCounterPosToggle').checked ? 'merchants' : 'notes';
-
-                // File UI Preferences
-                appSettings.autoSaveOnPaste = document.getElementById('settingsAutoSaveOnPasteToggle').checked;
-                appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
-                appSettings.caseTextPosition = document.getElementById('settingsTextPosToggle').checked ? 'right' : 'left';
-                appSettings.caseCardLayout = document.getElementById('settingsCaseCardLayoutToggle').checked ? 'reversed' : 'default';
-                appSettings.tabLayout = document.getElementById('settingsTabLayoutToggle').checked ? 'hscroll' : 'wrap';
-
-                // Carrier Settings
+            // Settings dropdown
+            document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsDropdown);
+            document.getElementById('btnSaveSettings')?.addEventListener('click', () => {
                 appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
-
-                // Data & History
                 appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-
                 saveSettings();
                 initializeRegexPatterns();
-                updateMerchantSearchVisibility();
-                updateCopyTitleBtnVisibility();
-                updateCounterPosition();
-                updateCaseTextPosition();
-                updateTabLayout();
-                updateCaseCardLayout();
-                closeSettingsModal();
+                showNotification("Settings saved successfully!", "success");
             });
-            document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
+
+            // Theme toggle button
+            document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
+                appSettings.theme = appSettings.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(appSettings.theme);
+                saveSettings();
+                updateThemeToggleIcon();
+            });
+
+            // History button
+            document.getElementById('btnOpenHistory')?.addEventListener('click', openHistoryModal);
 
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('caseModeToggleGroup')?.addEventListener('click', toggleCaseMode);
@@ -3969,18 +3884,45 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
              updateCaseCardMatchStatus(); // Update UI when modal is closed
         });
         
-        // --- Dropdown and Auto-saving Settings Logic ---
+        // --- UI Preferences Dropdown Auto-saving Logic ---
         const uiPrefsDropdown = document.getElementById('uiPreferencesDropdown');
         if (uiPrefsDropdown) {
              uiPrefsDropdown.addEventListener('change', (e) => {
                 const targetId = e.target.id;
-if(targetId === 'dropdownTextPosToggle') appSettings.caseTextPosition = e.target.checked ? 'right' : 'left';
-                if(targetId === 'dropdownThemeToggle') appSettings.theme = e.target.checked ? 'dark' : 'light';
-                if(targetId === 'dropdownCounterPosToggle') appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
-                if(targetId === 'dropdownCaseCardLayoutToggle') appSettings.caseCardLayout = e.target.checked ? 'reversed' : 'default';
-                if(targetId === 'dropdownTabLayoutToggle') appSettings.tabLayout = e.target.checked ? 'h-scroll' : 'wrap';
-                if(targetId === 'dropdownSearchToggle') appSettings.showMerchantSearch = e.target.checked;
-                if(targetId === 'dropdownCopyTitleToggle') appSettings.showCopyTitleBtn = e.target.checked;
+                // General
+                if(targetId === 'dropdownThemeToggle') {
+                    appSettings.theme = e.target.checked ? 'dark' : 'light';
+                    applyTheme(appSettings.theme);
+                    updateThemeToggleIcon();
+                }
+                // Audit UI
+                if(targetId === 'dropdownShowRoMatchPopupToggle') appSettings.showRoMatchPopup = e.target.checked;
+                if(targetId === 'dropdownSearchToggle') {
+                    appSettings.showMerchantSearch = e.target.checked;
+                    updateMerchantSearchVisibility();
+                }
+                if(targetId === 'dropdownCounterPosToggle') {
+                    appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
+                    updateCounterPosition();
+                }
+                // File UI
+                if(targetId === 'dropdownAutoSaveOnPasteToggle') appSettings.autoSaveOnPaste = e.target.checked;
+                if(targetId === 'dropdownCopyTitleToggle') {
+                    appSettings.showCopyTitleBtn = e.target.checked;
+                    updateCopyTitleBtnVisibility();
+                }
+                if(targetId === 'dropdownTextPosToggle') {
+                    appSettings.caseTextPosition = e.target.checked ? 'right' : 'left';
+                    updateCaseTextPosition();
+                }
+                if(targetId === 'dropdownCaseCardLayoutToggle') {
+                    appSettings.caseCardLayout = e.target.checked ? 'reversed' : 'default';
+                    updateCaseCardLayout();
+                }
+                if(targetId === 'dropdownTabLayoutToggle') {
+                    appSettings.tabLayout = e.target.checked ? 'hscroll' : 'wrap';
+                    updateTabLayout();
+                }
                 saveSettings();
              });
         }
