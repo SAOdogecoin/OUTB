@@ -843,6 +843,8 @@ html[data-theme="dark"] .merchant-item {
 </style>
 </head>
 <body>
+    <!-- Hidden textarea for Chrome extension paste target (must be first input) -->
+    <textarea id="extensionPasteTarget" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" tabindex="-1" aria-hidden="true"></textarea>
     <div id="toastContainer"></div>
     <div id="clearAllConfirmModal" class="modal-overlay">
         <div class="modal-content">
@@ -3764,6 +3766,46 @@ html[data-theme="dark"] .merchant-item {
                          triggerParse();
                      }
                  }, 500);
+
+                 // Monitor hidden extension paste target and copy to shipmentInput
+                 const extensionPasteTarget = document.getElementById('extensionPasteTarget');
+                 if (extensionPasteTarget) {
+                     // Monitor for input events (when extension pastes)
+                     extensionPasteTarget.addEventListener('input', () => {
+                         if (extensionPasteTarget.value.trim()) {
+                             shipmentInput.value = extensionPasteTarget.value;
+                             lastValue = shipmentInput.value;
+                             extensionPasteTarget.value = ''; // Clear the hidden target
+                             triggerParse();
+                         }
+                     });
+
+                     // Also use MutationObserver as backup
+                     const observer = new MutationObserver(() => {
+                         if (extensionPasteTarget.value.trim()) {
+                             shipmentInput.value = extensionPasteTarget.value;
+                             lastValue = shipmentInput.value;
+                             extensionPasteTarget.value = '';
+                             triggerParse();
+                         }
+                     });
+                     observer.observe(extensionPasteTarget, {
+                         attributes: true,
+                         childList: true,
+                         characterData: true,
+                         subtree: true
+                     });
+
+                     // Poll for changes as another fallback
+                     setInterval(() => {
+                         if (extensionPasteTarget.value.trim()) {
+                             shipmentInput.value = extensionPasteTarget.value;
+                             lastValue = shipmentInput.value;
+                             extensionPasteTarget.value = '';
+                             triggerParse();
+                         }
+                     }, 200);
+                 }
             }
             const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
             if(upsUspsOutputArea) {
