@@ -22,8 +22,8 @@
         --text-placeholder: #aaaaaf;
         --border-color: #C6C6C6;
         --border-subtle: #E0E0E0;
-        --accent-blue: #1d1d1f;
-        --accent-blue-dark: #000000;
+        --accent-blue: #007AFF;
+        --accent-blue-dark: #0051D5;
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
@@ -48,8 +48,8 @@
         --text-placeholder: #8e8e93;
         --border-color: #545458;
         --border-subtle: #424245;
-        --accent-blue: #f2f2f7;
-        --accent-blue-dark: #FFFFFF;
+        --accent-blue: #0A84FF;
+        --accent-blue-dark: #409CFF;
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
@@ -104,8 +104,8 @@
     .toolbar-icon-group, .url-generator-group {
         display: flex;
         align-items: center;
-        border: none;
-        border-radius: 50px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
         padding: 4px;
         background-color: var(--bg-window);
         box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -305,6 +305,7 @@
         font-family: var(--system-font); font-weight: 500; cursor: pointer;
         border: none; transition: all 0.15s ease; font-size: 13px;
         padding: 4px 14px; border-radius: 8px;
+        min-height: 32px;
         display: inline-flex; align-items: center; justify-content: center;
     }
     button.macos > i { margin-right: 6px; font-size: 0.9em; }
@@ -465,12 +466,7 @@
     .merchant-item.selected { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); color: white; }
     .merchant-item .merchant-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 50px;}
     .merchant-item .status-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        margin-right: 8px; flex-shrink: 0;
-        background-color: var(--accent-red);
-    }
-    .merchant-item .status-dot.matched {
-        background-color: var(--accent-green);
+        display: none;
     }
     
     .merchant-item .merchant-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
@@ -487,16 +483,21 @@
         background-color: var(--bg-hover); padding: 3px 8px;
         border-radius: 10px; transition: all 0.2s ease;
     }
+    .merchant-item .case-count.matched {
+        background-color: var(--accent-green);
+        color: white;
+    }
     .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
+    .merchant-item.selected .case-count.matched { background-color: rgba(255,255,255,0.3); color: white; }
     
     .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: auto; }
     .macos-checkbox {
-        appearance: none; margin: 0; width: 15px; height: 15px; border-radius: 4px;
+        appearance: none; margin: 0; width: 20px; height: 20px; border-radius: 5px;
         display: flex; align-items: center; justify-content: center;
         background-color: var(--bg-input); border: 0.5px solid var(--border-color); flex-shrink: 0;
     }
     .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); }
-    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; }
+    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 14px; font-weight: bold; }
     .merchant-item.selected .macos-checkbox { background-color: #fff; border-color: transparent; }
     .merchant-item.selected .macos-checkbox:checked::after { color: var(--accent-blue); }
 
@@ -733,6 +734,14 @@
         width: 100px;
     }
     .download-options button i { margin: 0; font-size: 1.2em; }
+
+    .split-button-dropdown { display: flex; gap: 0; position: relative; }
+    .split-button-main { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .split-button-toggle {
+        border-top-left-radius: 0; border-bottom-left-radius: 0;
+        padding: 4px 8px; border-left: 1px solid rgba(255,255,255,0.2);
+    }
+    .split-button-toggle > i { margin: 0; }
     .dropdown-content .settings-group.inline {
         padding: 8px 6px;
         border-radius: 8px;
@@ -801,37 +810,11 @@
     </div>
 
     <div class="top-bar">
-        <div class="dropdown non-standalone" data-align="right">
-            <button id="btnOpenSettings" class="macos-icon-button" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
-            <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
-                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
-                <div class="settings-group">
-                    <label for="settingsAmzlCarriers" style="font-size: 0.9em;">AMZL-type Carriers:</label>
-                    <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
-                </div>
-                <div class="settings-group">
-                    <label for="settingsOtherCarriers" style="font-size: 0.9em;">Other Carriers:</label>
-                    <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
-                </div>
-                <div class="settings-group inline">
-                    <label>Enable UPS/USPS Mode</label>
-                    <label class="macos-switch"><input type="checkbox" id="settingsUpsUspsToggle"><span class="slider"></span></label>
-                </div>
-                <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
-                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Data & History</div>
-                <div class="settings-group inline">
-                    <label>Auto-clear history (24h)</label>
-                    <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
-                </div>
-                <button id="btnSaveSettings" class="macos primary" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-save"></i> Save Settings</button>
-            </div>
-        </div>
         <h1 class="top-bar-title">OUTB</h1>
         <div class="toolbar-right">
             <div class="url-generator-group">
                 <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    <span class="desktop-only" style="margin-left: 6px;">URL</span>
                 </button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -895,6 +878,10 @@
                             <label class="macos-switch"><input type="checkbox" id="dropdownSearchToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
+                            <label>Show Parser View</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownParserToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
                             <label>Counter Position</label>
                             <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
                         </div>
@@ -924,6 +911,31 @@
                     </div>
                 </div>
             </div>
+            <div class="dropdown non-standalone">
+                <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+                <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
+                    <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
+                    <div class="settings-group">
+                        <label for="settingsAmzlCarriers" style="font-size: 0.9em;">AMZL-type Carriers:</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
+                    </div>
+                    <div class="settings-group">
+                        <label for="settingsOtherCarriers" style="font-size: 0.9em;">Other Carriers:</label>
+                        <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
+                    </div>
+                    <div class="settings-group inline">
+                        <label>Enable UPS/USPS Mode</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsUpsUspsToggle"><span class="slider"></span></label>
+                    </div>
+                    <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+                    <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Data & History</div>
+                    <div class="settings-group inline">
+                        <label>Auto-clear history (24h)</label>
+                        <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
+                    </div>
+                    <button id="btnSaveSettings" class="macos primary" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-save"></i> Save Settings</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -931,7 +943,7 @@
         <div class="left-column-wrapper">
             <div id="parserTool" class="tool-container parser-tool">
                  <div class="tool-card-title-bar">
-                    <h3 class="tool-card-title"><i class="fa-solid fa-filter"></i>Parser</h3>
+                    <h3 class="tool-card-title">Parser</h3>
                     <button id="parserToggle" class="macos-icon-button" title="Toggle Parser View"><i class="fa-solid fa-eye-slash"></i></button>
                 </div>
                 <div class="parser-content">
@@ -947,12 +959,13 @@
 
             <div class="tool-container merchant-actions-tool">
                 <div class="tool-card-title-bar">
-                    <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
+                    <h3 class="tool-card-title">Merchants</h3>
                     <div id="merchantCounterTarget"></div>
                 </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    <div class="dropdown" data-align="left">
-                        <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
+                    <div class="dropdown split-button-dropdown" data-align="left">
+                        <button id="btnDownloadSelected" class="macos primary split-button-main" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
+                        <button id="btnDownloadSelectedDropdownToggle" class="macos primary split-button-toggle" disabled><i class="fa-solid fa-chevron-down"></i></button>
                         <div id="downloadSelectedDropdown" class="dropdown-content download-options">
                             <div class="button-row">
                                 <button class="macos secondary" data-action="download-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
@@ -974,14 +987,19 @@
 
         <div class="tool-container note-taker-tool">
              <div class="tool-card-title-bar">
-                <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
+                <h3 class="tool-card-title">Notes</h3>
                 <div class="ro-match-controls non-standalone">
                      <div class="macos-textfield-container">
                         <input type="text" id="roMatchInput" class="macos-textfield" placeholder="Paste RO data for matching...">
                         <button id="btnClearRoInput" class="macos-icon-button" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                     <span id="roMatchCounter">0/0</span>
-                    <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
+                    <div class="dropdown">
+                        <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
+                        <div id="roIdsDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
+                            <div id="roIdsDropdownContent"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
@@ -1093,7 +1111,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
                 <label class="macos-checkbox-container">
-                    <input type="checkbox" id="autoCloseOnPaste" class="macos-checkbox">
+                    <input type="checkbox" id="autoCloseOnPaste" class="macos-checkbox" checked>
                     <span>Auto close after pasting</span>
                 </label>
                 <button id="btnDoneRoMatch" class="macos primary">Done</button>
@@ -1132,6 +1150,7 @@
         amzlTypeCarriers: ['AMZN', 'AMZL', 'AMZL_US_PREMIUM', 'AMZL_CA_PREMIUM', 'AMZN_UK_PRIME', 'AMZN_UK_STD'],
         otherCarriers: ['UPS', 'USPS'],
         showMerchantSearch: false,
+        showParser: true,
         theme: 'light',
         layout: 'auto',
         counterPosition: 'notes',
@@ -1257,6 +1276,7 @@
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
         document.getElementById('dropdownShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
         document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
+        document.getElementById('dropdownParserToggle').checked = appSettings.showParser;
         document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
         document.getElementById('dropdownAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
         document.getElementById('dropdownCopyTitleToggle').checked = appSettings.showCopyTitleBtn;
@@ -1271,6 +1291,7 @@
 
         // Apply visual changes
         applyMerchantSearchVisibility();
+        updateParserVisibility();
         updateCounterPillLocation();
         if(document.body.classList.contains('is-standalone-mode') || document.getElementById('caseModeWrapper').style.display !== 'none'){
             applyCaseCardLayout();
@@ -1464,6 +1485,20 @@
             searchContainer.style.display = appSettings.showMerchantSearch ? 'block' : 'none';
             if (!appSettings.showMerchantSearch && searchInput) searchInput.value = '';
             filterMerchants();
+        }
+    }
+
+    function updateParserVisibility() {
+        const parserTool = document.getElementById('parserTool');
+        const parserToggleBtn = document.getElementById('parserToggle');
+        if (parserTool && parserToggleBtn) {
+            if (appSettings.showParser) {
+                parserTool.classList.remove('is-hidden');
+                parserToggleBtn.querySelector('i').className = 'fa-solid fa-eye-slash';
+            } else {
+                parserTool.classList.add('is-hidden');
+                parserToggleBtn.querySelector('i').className = 'fa-solid fa-eye';
+            }
         }
     }
 
@@ -1741,13 +1776,13 @@
         const noteArea = document.getElementById('noteArea');
         const currentNotes = noteArea.value;
         let newSectionText;
-        if (isNameFromFirstLine) {
+        if (isNameOriginallyFromFirstLine) {
             const lines = originalSectionKey.split('\n');
             newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
         } else {
             newSectionText = newName + '\n\n' + originalSectionKey;
         }
-        
+
         noteArea.value = currentNotes.replace(originalSectionKey, newSectionText);
         countTemplatesNoteTaker();
         recordNoteChange();
@@ -1918,7 +1953,8 @@
     function updateSelectedCountNoteTaker() {
         const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
         const splitButton = document.getElementById('btnSplitSelected');
-        const downloadSelectedDropdown = document.getElementById('downloadSelectedDropdown');
+        const btnDownloadSelected = document.getElementById('btnDownloadSelected');
+        const btnDownloadSelectedToggle = document.getElementById('btnDownloadSelectedDropdownToggle');
         const btnViewRoIdsMain = document.getElementById('btnViewRoIdsMain');
 
         let selectedCaseCount = 0;
@@ -1934,7 +1970,8 @@
 
         const isAnythingSelected = selectedCheckboxes.length > 0;
         if (splitButton) splitButton.disabled = !isAnythingSelected;
-        if (downloadSelectedDropdown) downloadSelectedDropdown.previousElementSibling.disabled = !isAnythingSelected;
+        if (btnDownloadSelected) btnDownloadSelected.disabled = !isAnythingSelected;
+        if (btnDownloadSelectedToggle) btnDownloadSelectedToggle.disabled = !isAnythingSelected;
         if (btnViewRoIdsMain) btnViewRoIdsMain.disabled = selectedCheckboxes.length !== 1;
 
         const totalTemplatesSpan = document.getElementById('totalTemplates');
@@ -3227,6 +3264,59 @@
         }
     }
     
+    function populateRoIdsDropdown(specificMerchant) {
+        parseNotesForCaseMode();
+        const dropdownContent = document.getElementById('roIdsDropdownContent');
+        const dataSource = specificMerchant ? [specificMerchant] : caseModeData;
+
+        const regex = /Removal order ID:\s*(\S+)/g;
+        const allUniqueIds = [...new Set(dataSource.flatMap(m => m.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1]))))];
+
+        if (allUniqueIds.length > 0) {
+            const idListHTML = allUniqueIds.sort().map((id, index) => {
+                const isMatched = matchedRoIds.has(id);
+                const matchType = isMatched ? matchedRoIds.get(id) : '';
+                const uniqueId = `ro-check-dropdown-${index}`;
+
+                let statusHTML = '';
+                if(isMatched) {
+                    statusHTML = `<span class="ro-id-match-status ${matchType}">${matchType.toUpperCase()} MATCHED</span>`;
+                }
+
+                return `
+                <div class="ro-id-item">
+                    <label class="macos-checkbox-container" for="${uniqueId}" style="flex-grow:1;">
+                        <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox-dropdown" data-id="${id}" ${isMatched ? 'checked' : ''}>
+                        <span class="ro-id-text">${id}</span>
+                    </label>
+                    ${statusHTML}
+                </div>`;
+            }).join('');
+
+            dropdownContent.innerHTML = `
+                <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Match RO IDs for ${specificMerchant.displayName}</div>
+                <div class="ro-id-list">${idListHTML}</div>`;
+        } else {
+             dropdownContent.innerHTML = "<p>No 'Removal order ID' found in any templates.</p>";
+        }
+
+        const checklist = dropdownContent.querySelector('.ro-id-list');
+        if(checklist) {
+            checklist.onchange = (e) => {
+                if (e.target.classList.contains('ro-match-checkbox-dropdown')) {
+                    const id = e.target.dataset.id;
+                    if (e.target.checked) {
+                        matchedRoIds.set(id, 'manual');
+                    } else {
+                        matchedRoIds.delete(id);
+                    }
+                    saveMatchedRoIds();
+                    updateCaseCardMatchStatus();
+                }
+            };
+        }
+    }
+
     function openGlobalRoChecklistModal(specificMerchant = null) {
         parseNotesForCaseMode();
         const modal = document.getElementById('caseModeActionModal');
@@ -3375,15 +3465,18 @@
             if (!merchant) return;
 
             const statusDot = div.querySelector('.status-dot');
+            const caseCount = div.querySelector('.case-count');
             const merchantRoIds = new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])));
-            
+
             if (merchantRoIds.size === 0) {
                 statusDot.classList.remove('matched');
+                if (caseCount) caseCount.classList.remove('matched');
                 return;
             }
 
             const allMatched = [...merchantRoIds].every(id => matchedRoIds.has(id));
             statusDot.classList.toggle('matched', allMatched);
+            if (caseCount) caseCount.classList.toggle('matched', allMatched);
         });
     }
 
@@ -3652,18 +3745,24 @@
             parserToggleBtn.addEventListener('click', () => {
                 const isHidden = parserTool.classList.toggle('is-hidden');
                 parserToggleBtn.querySelector('i').className = `fa-solid fa-eye${isHidden ? '' : '-slash'}`;
-                localStorage.setItem(parserStateKey, isHidden ? 'hidden' : 'visible');
+                appSettings.showParser = !isHidden;
+                saveSettings();
             });
 
             document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
             document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
-            document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
+            document.getElementById('btnViewRoIdsMain')?.addEventListener('click', (e) => {
+                e.stopPropagation();
                 parseNotesForCaseMode();
                 const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
                 if (selectedDiv) {
                     const merchant = caseModeData.find(m => m.originalText === selectedDiv.dataset.key);
                     if (merchant) {
-                        openGlobalRoChecklistModal(merchant);
+                        populateRoIdsDropdown(merchant);
+                        const dropdown = document.getElementById('roIdsDropdown');
+                        if (dropdown) {
+                            dropdown.classList.toggle('show');
+                        }
                     }
                 }
             });
@@ -3727,12 +3826,28 @@
                 });
             }
 
+            // Download selected button - direct click downloads HTML
+            document.getElementById('btnDownloadSelected')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadSelectedMerchants(true); // Download as HTML (Filer)
+            });
+
+            // Download selected dropdown toggle
+            document.getElementById('btnDownloadSelectedDropdownToggle')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dropdown = document.getElementById('downloadSelectedDropdown');
+                if (dropdown) {
+                    dropdown.classList.toggle('show');
+                }
+            });
+
+            // Download selected dropdown menu items
             document.getElementById('downloadSelectedDropdown')?.addEventListener('click', e => {
                 const action = e.target.closest('button')?.dataset.action;
                 if(action === 'download-txt') downloadSelectedMerchants(false);
                 if(action === 'download-html') downloadSelectedMerchants(true);
             });
-            
+
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
             document.getElementById('btnProcessUpsUsps')?.addEventListener('click', processUpsUspsData);
             document.getElementById('btnAddSeparator')?.addEventListener('click', addSeparator);
@@ -3873,6 +3988,10 @@
                 if(targetId === 'dropdownSearchToggle') {
                     appSettings.showMerchantSearch = e.target.checked;
                     updateMerchantSearchVisibility();
+                }
+                if(targetId === 'dropdownParserToggle') {
+                    appSettings.showParser = e.target.checked;
+                    updateParserVisibility();
                 }
                 if(targetId === 'dropdownCounterPosToggle') {
                     appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
