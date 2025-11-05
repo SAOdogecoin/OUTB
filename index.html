@@ -3735,15 +3735,10 @@
                 });
             }
 
-            document.getElementById('downloadSelectedDropdown').addEventListener('click', e => {
+            document.getElementById('downloadSelectedDropdown')?.addEventListener('click', e => {
                 const action = e.target.closest('button')?.dataset.action;
                 if(action === 'download-txt') downloadSelectedMerchants(false);
                 if(action === 'download-html') downloadSelectedMerchants(true);
-            });
-             document.getElementById('downloadAllDropdown').addEventListener('click', e => {
-                const action = e.target.closest('button')?.dataset.action;
-                if(action === 'download-all-txt') downloadAll(false);
-                if(action === 'download-all-html') downloadAll(true);
             });
             
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
@@ -3856,14 +3851,6 @@
         document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
-        document.getElementById('copyUrlBtn').addEventListener('click', () => {
-            const url = generateReportUrl();
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification('Report URL copied!', 'success');
-            }, () => {
-                showNotification('Failed to copy URL.', 'error');
-            });
-        });
         document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
             appSettings.marketplaceUrlGen = e.target.value;
             saveSettings();
