@@ -22,8 +22,8 @@
         --text-placeholder: #aaaaaf;
         --border-color: #C6C6C6;
         --border-subtle: #E0E0E0;
-        --accent-blue: #007AFF;
-        --accent-blue-dark: #006ADC;
+        --accent-blue: #1d1d1f;
+        --accent-blue-dark: #000000;
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
@@ -48,8 +48,8 @@
         --text-placeholder: #8e8e93;
         --border-color: #545458;
         --border-subtle: #424245;
-        --accent-blue: #0A84FF; 
-        --accent-blue-dark: #007AFF;
+        --accent-blue: #f2f2f7;
+        --accent-blue-dark: #FFFFFF;
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
@@ -390,18 +390,17 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 15px;
         margin-bottom: auto;
     }
-    #splitModal .modal-content, #settingsModal .modal-content, #telegramSendModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content, #roMatchModal .modal-content {max-width: 520px;}
-    #preSendConfirmModal .modal-content { max-width: 600px; }
+    #splitModal .modal-content, #settingsModal .modal-content, #caseTextModal .modal-content, #caseModeActionModal .modal-content, #roMatchModal .modal-content {max-width: 520px;}
     #historyModal .modal-content { max-width: 800px; }
-    #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmDeleteSentModal .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
+    #clearAllConfirmModal .modal-content, #clearAllSuccessPopup .modal-content, #confirmClearHistoryModal .modal-content { max-width: 400px; text-align: center;}
     .modal-content h2 {
         margin: 0 0 8px 0; font-size: 1.15em; font-weight: 600;
         border-bottom: 1px solid var(--border-subtle); padding-bottom: 10px; display:flex; align-items:center;
     }
-    #clearAllConfirmModal .modal-content h2, #clearAllSuccessPopup .modal-content h2, #confirmDeleteSentModal .modal-content h2, #confirmClearHistoryModal .modal-content h2 { justify-content: center; }
-    #clearAllConfirmModal p, #clearAllSuccessPopup p, #confirmDeleteSentModal p, #confirmClearHistoryModal p { margin: 10px 0 20px; font-size: 1.05em;}
+    #clearAllConfirmModal .modal-content h2, #clearAllSuccessPopup .modal-content h2, #confirmClearHistoryModal .modal-content h2 { justify-content: center; }
+    #clearAllConfirmModal p, #clearAllSuccessPopup p, #confirmClearHistoryModal p { margin: 10px 0 20px; font-size: 1.05em;}
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
-    #clearAllConfirmModal .modal-actions, #confirmDeleteSentModal .modal-actions, #confirmClearHistoryModal .modal-actions { justify-content: center; }
+    #clearAllConfirmModal .modal-actions, #confirmClearHistoryModal .modal-actions { justify-content: center; }
     .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; gap: 0.5rem; }
     .modal-footer .right-actions { display: flex; gap: 0.5rem; }
     
@@ -558,9 +557,7 @@
     .settings-group.inline label:first-child { margin-bottom: 0; }
     .settings-group .radio-group label { display: inline-flex; align-items: center; margin-right: 15px; font-weight: normal; }
     .settings-group .radio-group input[type="radio"] { margin-right: 5px; }
-    
-    #telegram-merchant-list h4 { margin: 0 0 8px 0; }
-    #telegram-merchant-list p { margin: 2px 0 2px 10px; font-size: 0.9em; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
     #historyList, #caseModeActionModalBody { max-height: 60vh; overflow-y: auto; margin-top: 10px; }
     .history-item { background-color: var(--bg-input); padding: 10px 15px; border: 1px solid var(--border-subtle); border-radius: 10px; margin-bottom: 10px; }
     .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -756,6 +753,12 @@
     .toggle-icons i { color: var(--text-secondary); font-size: 1.1em; }
 
 
+    @media (max-width: 768px) {
+        .desktop-only {
+            display: none !important;
+        }
+    }
+
     @media (max-width: 600px) {
         .card-content {
             flex-direction: column;
@@ -798,11 +801,38 @@
     </div>
 
     <div class="top-bar">
+        <div class="dropdown non-standalone" data-align="right">
+            <button id="btnOpenSettings" class="macos-icon-button" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
+            <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
+                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
+                <div class="settings-group">
+                    <label for="settingsAmzlCarriers" style="font-size: 0.9em;">AMZL-type Carriers:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
+                </div>
+                <div class="settings-group">
+                    <label for="settingsOtherCarriers" style="font-size: 0.9em;">Other Carriers:</label>
+                    <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
+                </div>
+                <div class="settings-group inline">
+                    <label>Enable UPS/USPS Mode</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsUpsUspsToggle"><span class="slider"></span></label>
+                </div>
+                <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+                <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Data & History</div>
+                <div class="settings-group inline">
+                    <label>Auto-clear history (24h)</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
+                </div>
+                <button id="btnSaveSettings" class="macos primary" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-save"></i> Save Settings</button>
+            </div>
+        </div>
         <h1 class="top-bar-title">OUTB</h1>
         <div class="toolbar-right">
             <div class="url-generator-group">
-                <button id="copyUrlBtn" class="macos-icon-button" title="Copy Report URL"><i class="fa-solid fa-copy"></i></button>
-                <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+                <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span class="desktop-only" style="margin-left: 6px;">URL</span>
+                </button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
                     <option value="co.uk">UK</option>
@@ -810,6 +840,7 @@
                 </select>
             </div>
             <div id="prefixToggleGroup" class="toolbar-icon-group non-standalone">
+                <span class="desktop-only" style="margin-right: 8px; font-weight: 500;">Use Prefix:</span>
                 <button id="btnPrefix3C" class="macos-icon-button" title="Use 3C-OUTB Prefix">3C</button>
                 <button id="btnPrefixLS" class="macos-icon-button" title="Use LS-OUTB Prefix">LS</button>
             </div>
@@ -830,48 +861,68 @@
                 <button id="btnTabLayoutWrap" class="macos-icon-button" title="Wrap Tabs"><i class="fa-solid fa-grip"></i></button>
                 <button id="btnTabLayoutHScroll" class="macos-icon-button" title="Horizontal Scroll Tabs"><i class="fa-solid fa-grip-lines"></i></button>
             </div>
+            <div class="toolbar-icon-group non-standalone">
+                <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+                <div class="dropdown">
+                    <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+                    <div id="historyDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
+                        <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Deletion History</div>
+                        <div id="historyList">
+                            <p style="color: var(--text-secondary); font-size: 0.9em;">No history found.</p>
+                        </div>
+                        <button id="btnClearAllHistory" class="macos danger" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-trash"></i> Clear History</button>
+                    </div>
+                </div>
+            </div>
             <div class="toolbar-icon-group">
                  <div class="dropdown non-standalone">
                     <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
-                    <div id="uiPreferencesDropdown" class="dropdown-content">
-<div class="settings-group inline">
-    <label>Case Card Text Position</label>
-    <span class="toggle-icons">
-        <i class="fa-solid fa-align-left"></i>
-        <label class="macos-switch"><input type="checkbox" id="dropdownTextPosToggle"><span class="slider"></span></label>
-        <i class="fa-solid fa-align-right"></i>
-    </span>
-</div>
+                    <div id="uiPreferencesDropdown" class="dropdown-content" style="min-width: 320px; max-width: 360px;">
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">General Preferences</div>
                         <div class="settings-group inline">
-                            <label>
-                                Theme
-                            </label>
+                            <label>Theme</label>
                             <span class="toggle-icons"><i class="fa-solid fa-sun"></i><label class="macos-switch"><input type="checkbox" id="dropdownThemeToggle"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></span>
                         </div>
-                         <div class="settings-group inline">
-                            <label>Counter Position</label>
-                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
+                        <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Audit UI Preferences</div>
+                        <div class="settings-group inline">
+                            <label>Show RO Match popup on new merchant</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownShowRoMatchPopupToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
-                            <label>Reverse Case Card Controls</label>
-                             <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
-                        </div>
-                        <div class="settings-group inline">
-                            <label>Case Filer Tab Layout</label>
-                             <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="dropdownTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
-                        </div>
-                        <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 6px 0;">
-                        <div class="settings-group inline">
-                            <label>Show Merchant Search</label>
+                            <label>Show Merchant Search Bar</label>
                             <label class="macos-switch"><input type="checkbox" id="dropdownSearchToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
-                            <label>Show "Copy Title" Button</label>
+                            <label>Counter Position</label>
+                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCounterPosToggle"><span class="slider"></span></label><i class="fa-solid fa-users"></i></span>
+                        </div>
+                        <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+
+                        <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">File UI Preferences</div>
+                        <div class="settings-group inline">
+                            <label>Auto-save Case ID on paste</label>
+                            <label class="macos-switch"><input type="checkbox" id="dropdownAutoSaveOnPasteToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Show "Copy Case Title" Button</label>
                             <label class="macos-switch"><input type="checkbox" id="dropdownCopyTitleToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Case Card Text Position</label>
+                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownTextPosToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Reverse Case Card Controls</label>
+                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                        </div>
+                        <div class="settings-group inline">
+                            <label>Case Filer Tab Layout</label>
+                            <span class="toggle-icons"><i class="fa-solid fa-grip"></i><label class="macos-switch"><input type="checkbox" id="dropdownTabLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-grip-lines"></i></span>
                         </div>
                     </div>
                 </div>
-                <button id="btnOpenSettings" class="macos-icon-button non-standalone" title="Settings"><i class="fa-solid fa-sliders"></i></button>
             </div>
         </div>
     </div>
@@ -887,13 +938,7 @@
                     <div class="macos-textfield-container">
                         <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
                     </div>
-                    <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
-                        <label for="upsUspsToggle" class="parser-control-row">
-                            <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
-                            <span>UPS/USPS</span>
-                        </label>
-                    </div>
-                     <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
+                    <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
                         <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
                         <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
                     </div>
@@ -905,7 +950,7 @@
                     <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
                     <div id="merchantCounterTarget"></div>
                 </div>
-                <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                     <div class="dropdown" data-align="left">
                         <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                         <div id="downloadSelectedDropdown" class="dropdown-content download-options">
@@ -915,34 +960,11 @@
                             </div>
                         </div>
                     </div>
-                     <div class="dropdown" data-align="left">
-                        <button id="btnDownloadAll" class="macos primary"><i class="fa-solid fa-file-arrow-down"></i>Download All</button>
-                        <div id="downloadAllDropdown" class="dropdown-content download-options">
-                             <div class="button-row">
-                                <button class="macos secondary" data-action="download-all-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
-                                <button class="macos secondary" data-action="download-all-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
-                            </div>
-                        </div>
-                    </div>
-                    <button id="btnSendToTelegram" class="macos secondary" disabled><i class="fa-solid fa-paper-plane"></i>Send to TG</button>
-                    <button id="btnSelectAll" class="macos secondary"><i class="fa-regular fa-square-check"></i><span id="selectAllText" style="margin-left: 6px;">Select All</span></button>
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
-                    <div class="dropdown" data-align="left">
-                        <button id="btnAddNewMerchant" class="macos secondary"><i class="fa-solid fa-plus"></i>New Merchant</button>
-                        <div id="newMerchantDropdown" class="dropdown-content" style="padding: 12px; min-width: 250px;">
-                            <label for="newMerchantInput" style="font-weight: 500; display: block; margin-bottom: 8px;">Enter New Merchant Name:</label>
-                            <div class="macos-textfield-container">
-                                <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
-                            </div>
-                        </div>
-                    </div>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
-                </div>
-                 <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative; flex-shrink:0;">
-                    <div class="macos-textfield-container">
-                         <input type="text" id="merchantSearchInput" class="macos-textfield" style="padding-left:30px" placeholder="Search merchants...">
+                    <div class="macos-textfield-container" style="min-width: 250px;">
+                        <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
                     </div>
-                     <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
                 
                 <div id="merchantList"></div>
@@ -1032,119 +1054,6 @@
                         </div>
                     </div>
                 </div>
-                <button id="btnSendSplitsToTelegram" class="macos primary"><i class="fa-solid fa-paper-plane"></i>Send Splits</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="settingsModal" class="modal-overlay">
-        <div class="modal-content">
-             <h2><i class="fa-solid fa-sliders" style="margin-right:8px;"></i>Settings</h2>
-            <div class="settings-categories">
-                <div class="settings-category">
-                    <h4>UI Preferences</h4>
-                    <div class="settings-group inline">
-                        <label>Show RO Match popup on new merchant</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowRoMatchPopupToggle"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Auto-save Case ID on paste</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsAutoSaveOnPasteToggle"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show Merchant Search Bar</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowMerchantSearchToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group inline">
-                        <label>Show "Copy Case Title" Button</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsShowCopyTitleToggleInput"><span class="slider"></span></label>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>Carrier Settings</h4>
-                    <div class="settings-group">
-                        <label for="settingsAmzlCarriers">AMZL-type Carriers:</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsAmzlCarriers" class="macos-textfield" placeholder="e.g., AMZL,AMZN"></div>
-                    </div>
-                    <div class="settings-group">
-                        <label for="settingsOtherCarriers">Other Carriers (for extraction):</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
-                    </div>
-                </div>
-                <div class="settings-category">
-                    <h4>Telegram Integration (Send Files)</h4>
-                    <div class="settings-group">
-                        <label for="settingsTelegramToken">Telegram Bot Token:</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsTelegramToken" class="macos-textfield" placeholder="Enter your bot token"></div>
-                    </div>
-                    <div class="settings-group">
-                        <label for="settingsTelegramChatId">Telegram Chat ID:</label>
-                        <div class="macos-textfield-container"><input type="text" id="settingsTelegramChatId" class="macos-textfield" placeholder="Enter your group/chat ID"></div>
-                    </div>
-                </div>
-                 <div class="settings-category">
-                    <h4>Data & History</h4>
-                    <div class="settings-group inline">
-                        <label>Auto-clear history older than 24 hours</label>
-                        <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
-                    </div>
-                    <div class="settings-group">
-                        <button id="btnViewHistoryFromSettings" class="macos secondary"><i class="fa-solid fa-trash-alt"></i> View Deletion History</button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button id="btnCloseSettingsModal" class="macos secondary">Cancel</button>
-                <button id="btnSaveChangesSettings" class="macos primary"><i class="fa-solid fa-save"></i>Save Settings</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="telegramSendModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Send to Telegram</h2>
-            <div id="telegram-merchant-list"></div>
-            <div class="modal-actions">
-                <button id="btnCancelTelegramSend" class="macos secondary">Cancel</button>
-                <button id="btnConfirmTelegramSend" class="macos primary">Send File</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="preSendConfirmModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-file-export" style="margin-right:8px;"></i>Confirm & Send Files</h2>
-            <p>Please review the files that will be sent to Telegram. You can edit the filenames below.</p>
-            <div id="preSendFileList">
-                <!-- File items will be injected here by JS -->
-            </div>
-            <div class="modal-actions">
-                <button id="btnCancelPreSend" class="macos secondary">Cancel</button>
-                <button id="btnConfirmAndSend" class="macos primary"><i class="fa-solid fa-paper-plane"></i>Send Files</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirmDeleteSentModal" class="modal-overlay">
-        <div class="modal-content">
-             <h2><i class="fa-solid fa-check-circle" style="color:var(--accent-green); margin-right:8px;"></i>Send Complete</h2>
-            <p>All files sent to Telegram successfully. Do you want to remove the sent merchants from the list?</p>
-            <div class="modal-actions">
-                <button id="btnNoDeleteSent" class="macos secondary">Keep Them</button>
-                <button id="btnYesDeleteSent" class="macos danger">Yes, Remove Them</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="historyModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-trash-alt" style="margin-right:8px;"></i>Deletion History</h2>
-            <div id="historyList">
-                <p>No history found.</p>
-            </div>
-            <div class="modal-actions">
-                <button id="btnClearAllHistory" class="macos danger"><i class="fa-solid fa-trash"></i> Clear History</button>
-                <button id="btnCloseHistoryModal" class="macos primary">Close</button>
             </div>
         </div>
     </div>
@@ -1206,7 +1115,6 @@
     const historyKey = 'outboundToolHistory_v2';
     const settingsKey = 'outboundToolSettings_v3';
     const parserStateKey = 'outboundToolParserState';
-    const telegramNumberKey = 'outboundToolLastTelegramNumber';
     const caseModeStateKey = 'outboundToolCaseModeState_v3';
     const merchantCompletionKey = 'outboundToolMerchantCompletionState';
     const matchedRoIdsKey = 'outboundToolMatchedRoIds_v3'; 
@@ -1227,8 +1135,6 @@
         theme: 'light',
         layout: 'auto',
         counterPosition: 'notes',
-        telegramBotToken: '',
-        telegramChatId: '',
         autoClearHistory: true,
         marketplaceUrlGen: 'com',
         caseTextPosition: 'left',
@@ -1236,7 +1142,8 @@
         tabLayout: 'wrap',
         showRoMatchPopup: false,
         caseCardLayout: 'default', // 'default' or 'reversed'
-        autoSaveOnPaste: false,
+        autoSaveOnPaste: true,
+        upsUspsMode: false,
     };
     let regexPatterns = {
         amzlSource: null,
@@ -1299,7 +1206,17 @@
     function setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
     }
-    
+
+    const applyTheme = setTheme; // Alias for consistency
+
+    function updateThemeToggleIcon() {
+        const btn = document.getElementById('btnThemeToggle');
+        const icon = btn?.querySelector('i');
+        if (icon) {
+            icon.className = appSettings.theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+    }
+
     function setPrefix(prefix) {
         appSettings.prefixOption = prefix;
         saveSettings();
@@ -1336,16 +1253,21 @@
         document.getElementById('btnPrefix3C').classList.toggle('active', appSettings.prefixOption === '3C');
         document.getElementById('btnPrefixLS').classList.toggle('active', appSettings.prefixOption === 'LS');
         
-        // Sync dropdown toggles
+        // Sync UI preferences dropdown toggles
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
-        document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
-        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
-document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
-        document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'h-scroll');
+        document.getElementById('dropdownShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
         document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
+        document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
+        document.getElementById('dropdownAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
         document.getElementById('dropdownCopyTitleToggle').checked = appSettings.showCopyTitleBtn;
+        document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
+        document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
+        document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'hscroll');
         
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
+
+        // Update theme toggle icon
+        updateThemeToggleIcon();
 
         // Apply visual changes
         applyMerchantSearchVisibility();
@@ -1391,8 +1313,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         const newEntry = {
             id: Date.now() + Math.random().toString(36).substr(2, 9),
             deletedAt: new Date().toISOString(),
-            merchants: deletedMerchants,
-            telegramFiles: fileInfo
+            merchants: deletedMerchants
         };
         history.unshift(newEntry);
         saveHistory(history);
@@ -1411,10 +1332,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
             itemEl.className = 'history-item';
             const merchantNames = item.merchants.map(m => m.displayName).join(', ');
             const totalCases = item.merchants.reduce((sum, m) => sum + m.count, 0);
-            let filesHtml = '';
-            if (item.telegramFiles && item.telegramFiles.length > 0) {
-                filesHtml = `<div class="history-item-files"><b>Sent Files:</b><br>${item.telegramFiles.map(f => f.filename).join('<br>')}</div>`;
-            }
             itemEl.innerHTML = `
                 <div class="history-item-header">
                     <span class="history-item-date">${new Date(item.deletedAt).toLocaleString()}</span>
@@ -1423,7 +1340,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
                 <div class="history-item-content">
                     <p><b>Merchants:</b> ${merchantNames}</p>
                     <p><b>Total Cases:</b> ${totalCases}</p>
-                    ${filesHtml}
                 </div>`;
             listEl.appendChild(itemEl);
         });
@@ -1445,41 +1361,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         showNotification("Merchant(s) restored successfully!", "success");
     }
 
-    async function sendFileToTelegram(fileContent, filename, caption = '') {
-        const { telegramBotToken, telegramChatId } = appSettings;
-        if (!telegramBotToken || !telegramChatId) {
-            showNotification("Telegram Bot Token or Chat ID for sending files is missing in settings.", "error");
-            return null;
-        }
-        
-        const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
-        const formData = new FormData();
-        formData.append('chat_id', telegramChatId);
-        formData.append('document', blob, filename);
-        if (caption) {
-            formData.append('caption', caption);
-        }
-        
-        try {
-            const response = await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendDocument`, {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.ok) {
-                return { success: true, filename: filename };
-            } else {
-                console.error("Telegram API Error:", result.description);
-                showNotification(`Error sending ${filename}: ${result.description}`, "error", 5000);
-                return { success: false, filename: filename };
-            }
-        } catch (error) {
-            console.error("Fetch error:", error);
-            showNotification(`Network error while sending ${filename}.`, "error", 5000);
-            return { success: false, filename: filename };
-        }
-    }
-    
     function formatMerchantBlockForOutput(blockText) {
         let namePart = '';
         let casesPart = blockText;
@@ -1536,64 +1417,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         return formattedBlock;
     }
     
-    async function handleConfirmTelegramSend() {
-        const modal = document.getElementById('telegramSendModal');
-        const sendButton = document.getElementById('btnConfirmTelegramSend');
-        const filenameInput = document.getElementById('telegram-filename-edit');
-        const numberInput = document.getElementById('telegram-file-number-single');
-
-        sendButton.disabled = true;
-        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
-        
-        const merchantsData = JSON.parse(modal.dataset.merchantsToSend || '[]');
-        if (merchantsData.length === 0) {
-             showNotification("No merchants to send.", "error");
-             sendButton.disabled = false; sendButton.innerHTML = 'Send File';
-             return;
-        }
-        
-        const filename = filenameInput.value.trim();
-        if (!filename) {
-            showNotification("Filename cannot be empty.", "error");
-            sendButton.disabled = false; sendButton.innerHTML = 'Send File';
-            return;
-        }
-        
-        const numberToSave = parseInt(numberInput.value, 10);
-        if (!isNaN(numberToSave) && numberToSave > 0) {
-            localStorage.setItem(telegramNumberKey, numberToSave);
-        }
-        
-        const merchantObjectsToSend = merchantsData.map(m => caseModeData.find(obj => obj.originalText === m.key)).filter(Boolean);
-        const fileContent = merchantObjectsToSend.map(getFormattedBlockWithVerification).join(merchantSeparator);
-
-        const result = await sendFileToTelegram(fileContent, filename, ''); 
-        
-        sendButton.disabled = false;
-        sendButton.innerHTML = 'Send File';
-        closeTelegramSendModal();
-
-        if (result && result.success) {
-            merchantsToDeleteAfterSend = merchantsData;
-            addToHistory(merchantsToDeleteAfterSend, [{ filename: result.filename }]);
-            document.getElementById('confirmDeleteSentModal').style.display = 'flex';
-        }
-    }
-
-    function confirmAndDeleteSentMerchants() {
-        const keysToRemove = new Set(merchantsToDeleteAfterSend.map(m => m.key));
-        if (keysToRemove.size === 0) return;
-        const noteArea = document.getElementById('noteArea');
-        const allSections = noteArea.value.split(merchantSeparatorRegex);
-        const remainingSections = allSections.filter(section => !keysToRemove.has(section));
-        noteArea.value = remainingSections.join(merchantSeparator);
-        countTemplatesNoteTaker();
-        recordNoteChange();
-        document.getElementById('confirmDeleteSentModal').style.display = 'none';
-        showNotification("Sent merchants removed from the list.", "success");
-        merchantsToDeleteAfterSend = [];
-    }
-
     function initializeRegexPatterns() {
         const amzlCarrierPart = buildCarrierRegexPart(appSettings.amzlTypeCarriers);
         const otherCarrierPart = buildCarrierRegexPart(appSettings.otherCarriers);
@@ -1656,7 +1479,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
     function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
-        const upsUspsToggle = document.getElementById('upsUspsToggle');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const inputValue = input.value;
         if (inputValue.trim()) {
@@ -1665,7 +1487,7 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
             return;
         }
         const currentNoteValue = noteArea.value;
-        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
+        const isUpsUspsMode = appSettings.upsUspsMode;
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
         const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
         const coreTNReplaceRegex = regexPatterns.coreTnExtract;
@@ -2096,7 +1918,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
     function updateSelectedCountNoteTaker() {
         const selectedCheckboxes = document.querySelectorAll('#merchantList .macos-checkbox:checked');
         const splitButton = document.getElementById('btnSplitSelected');
-        const sendButton = document.getElementById('btnSendToTelegram');
         const downloadSelectedDropdown = document.getElementById('downloadSelectedDropdown');
         const btnViewRoIdsMain = document.getElementById('btnViewRoIdsMain');
 
@@ -2113,7 +1934,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
 
         const isAnythingSelected = selectedCheckboxes.length > 0;
         if (splitButton) splitButton.disabled = !isAnythingSelected;
-        if (sendButton) sendButton.disabled = !isAnythingSelected;
         if (downloadSelectedDropdown) downloadSelectedDropdown.previousElementSibling.disabled = !isAnythingSelected;
         if (btnViewRoIdsMain) btnViewRoIdsMain.disabled = selectedCheckboxes.length !== 1;
 
@@ -2347,126 +2167,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         });
     }
     
-    async function generateAndSendSplitsToTelegram() {
-        const splitModal = document.getElementById('splitModal');
-        if (!splitModal) return;
-
-        const ordersPer = parseInt(document.getElementById('splitOrdersPerTemplate').value);
-        const splitNum = parseInt(document.getElementById('splitNumberInput').value);
-        const combinedText = splitModal.dataset.combinedText || '';
-
-        if (!combinedText || isNaN(ordersPer) || ordersPer < 1 || isNaN(splitNum) || splitNum < 1) {
-            showNotification("Please enter valid numbers for splitting.", "error");
-            return;
-        }
-        
-        closeSplitModal();
-
-        let templateToUse = (splitModal.dataset.containsUpsUsps === 'true' && splitModal.dataset.containsAmzl !== 'true') ? upsUspsTemplate : amzlTemplate;
-        const ros = splitTextIntoRemovalOrders(combinedText);
-        if (ros.length === 0) {
-            showNotification("No valid removal orders found to split.", "info");
-            return;
-        }
-        const templateGroups = createTemplates(ros, ordersPer);
-        const splitOutputs = [];
-        for (let i = 0; i < templateGroups.length; i += splitNum) {
-            const chunk = templateGroups.slice(i, i + splitNum);
-             if (chunk.length > 0) {
-                 const chunkText = chunk.map(data => templateToUse + "\n\n" + data).join(caseSeparator);
-                 splitOutputs.push({ text: chunkText, count: chunk.length });
-            }
-        }
-        if (splitOutputs.length === 0) {
-            showNotification("No split files to send.", "info");
-            return;
-        }
-
-        const merchantDisplay = selectedMerchantDataForSplit.map(item => {
-            const merchantObj = caseModeData.find(m => m.originalText === item.key);
-            let name = item.name;
-            if(merchantObj && isMerchantVerified(merchantObj)){
-                name += ' ***Verified Removal***';
-            }
-            return name;
-        }).join(' & ');
-        
-        const preSendModal = document.getElementById('preSendConfirmModal');
-        const fileListEl = document.getElementById('preSendFileList');
-        fileListEl.innerHTML = '';
-        
-        preSendModal.dataset.filesToSend = JSON.stringify(splitOutputs);
-        preSendModal.dataset.merchantDisplay = merchantDisplay;
-
-        let filenamePart = sanitizeFilename(selectedMerchantDataForSplit.length === 1 ? selectedMerchantDataForSplit[0].name : `${selectedMerchantDataForSplit[0].name}_Multi`);
-        const startDate = new Date();
-        
-        splitOutputs.forEach((output, index) => {
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + index);
-            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const day = currentDate.getDate().toString().padStart(2, '0');
-            const dateStr = `${month}-${day}`;
-
-            const filename = `${getFilenamePrefix()}(${output.count})-${dateStr}-${filenamePart}-PART_${index+1}.txt`;
-            const fileItem = document.createElement('div');
-            fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 8px;';
-            fileItem.innerHTML = `
-                <i class="fa-solid fa-file-lines" style="color: var(--text-secondary);"></i>
-                <div class="macos-textfield-container" style="flex-grow:1;">
-                    <input type="text" class="macos-textfield pre-send-filename-input" value="${filename}">
-                </div>
-            `;
-            fileListEl.appendChild(fileItem);
-        });
-        
-        preSendModal.style.display = 'flex';
-    }
-
-    async function executeTelegramsendsFromModal() {
-        const modal = document.getElementById('preSendConfirmModal');
-        const sendButton = document.getElementById('btnConfirmAndSend');
-        
-        sendButton.disabled = true;
-        sendButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
-
-        const filesToSend = JSON.parse(modal.dataset.filesToSend || '[]');
-        const merchantDisplay = modal.dataset.merchantDisplay || '';
-        const filenameInputs = document.querySelectorAll('#preSendFileList .pre-send-filename-input');
-
-        if (filesToSend.length !== filenameInputs.length) {
-            showNotification('File data mismatch. Please try again.', 'error');
-            sendButton.disabled = false;
-            sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Files';
-            return;
-        }
-
-        const sendPromises = filesToSend.map((fileData, index) => {
-            const filename = filenameInputs[index].value.trim();
-            if (!filename) return Promise.resolve({ success: false, filename: '(empty)' }); // Skip empty filenames
-            const fileContent = merchantDisplay + '\n\n' + fileData.text + '\n';
-            return sendFileToTelegram(fileContent, filename, '');
-        });
-
-        const results = await Promise.all(sendPromises);
-        const successfulSends = results.filter(r => r && r.success);
-            
-        sendButton.disabled = false;
-        sendButton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Files';
-        modal.style.display = 'none';
-        
-        if (successfulSends.length > 0) {
-            merchantsToDeleteAfterSend = selectedMerchantDataForSplit.map(m => ({
-                key: m.key,
-                displayName: m.name,
-                count: parseInt(m.count)
-            }));
-            const fileInfo = successfulSends.map(r => ({ filename: r.filename }));
-            addToHistory(merchantsToDeleteAfterSend, fileInfo);
-            document.getElementById('confirmDeleteSentModal').style.display = 'flex';
-        }
-    }
-
     function addSeparator() {
         const ta = document.getElementById('noteArea');
         const trimmed = ta.value.trimEnd();
@@ -2674,64 +2374,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
     }
 
     // --- MODAL MANAGEMENT FUNCTIONS ---
-    function openTelegramSendModal() {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) {
-            showNotification("Please select at least one merchant to send.", "info");
-            return;
-        }
-
-        const modal = document.getElementById('telegramSendModal');
-        const listContainer = document.getElementById('telegram-merchant-list');
-        
-        const merchantsToSend = Array.from(selectedDivs).map(div => ({
-            key: div.dataset.key,
-            name: div.dataset.displayName,
-            count: parseInt(div.dataset.count, 10)
-        }));
-        
-        modal.dataset.merchantsToSend = JSON.stringify(merchantsToSend);
-
-        const totalCases = merchantsToSend.reduce((sum, m) => sum + m.count, 0);
-        const dateStr = getFormattedDate();
-        let filenamePart;
-        if (merchantsToSend.length === 1) {
-            filenamePart = sanitizeFilename(merchantsToSend[0].name);
-        } else {
-            filenamePart = sanitizeFilename(`${merchantsToSend[0].name}_Multi_${merchantsToSend.length}`);
-        }
-        const defaultFilename = `${getFilenamePrefix()}(${totalCases})-${dateStr}-${filenamePart}.txt`;
-
-        let lastNumber = parseInt(localStorage.getItem(telegramNumberKey)) || 0;
-        const newNumber = lastNumber + 1;
-
-        const merchantListHtml = merchantsToSend.map(m => `<p>${m.name} (${m.count} cases)</p>`).join('');
-
-        listContainer.innerHTML = `
-            <h4>Selected Merchants:</h4>
-            ${merchantListHtml}
-            <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 12px 0;">
-            <div class="settings-group">
-                <label for="telegram-filename-edit">Filename:</label>
-                <div class="macos-textfield-container">
-                    <input type="text" id="telegram-filename-edit" class="macos-textfield" value="${defaultFilename}">
-                </div>
-            </div>
-            <div class="settings-group">
-                <label for="telegram-file-number-single">File Number (for tracking):</label>
-                <div class="macos-textfield-container" style="width: 80px;">
-                    <input type="number" id="telegram-file-number-single" class="macos-textfield" style="text-align:center;" min="1" value="${newNumber}">
-                </div>
-            </div>
-        `;
-
-        modal.style.display = 'flex';
-    }
-
-    function closeTelegramSendModal() {
-        document.getElementById('telegramSendModal').style.display = 'none';
-    }
-
     function openSplitModal() {
         const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
         if (selectedDivs.length === 0) {
@@ -2770,34 +2412,14 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         document.getElementById('splitModal').style.display = 'none';
     }
 
-    function openSettingsModal() {
-        const modal = document.getElementById('settingsModal');
-        // Sync modal inputs with current appSettings
-        document.getElementById('settingsShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
-        document.getElementById('settingsAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
+    function openSettingsDropdown() {
+        // Sync dropdown inputs with current appSettings
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
-        document.getElementById('settingsTelegramToken').value = appSettings.telegramBotToken;
-        document.getElementById('settingsTelegramChatId').value = appSettings.telegramChatId;
+        document.getElementById('settingsUpsUspsToggle').checked = appSettings.upsUspsMode;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
-        document.getElementById('settingsShowMerchantSearchToggleInput').checked = appSettings.showMerchantSearch;
-        document.getElementById('settingsShowCopyTitleToggleInput').checked = appSettings.showCopyTitleBtn;
-
-        modal.style.display = 'flex';
-    }
-
-    function closeSettingsModal() {
-        document.getElementById('settingsModal').style.display = 'none';
     }
     
-    function openHistoryModal() {
-        renderHistoryModal();
-        document.getElementById('historyModal').style.display = 'flex';
-    }
-    
-    function closeHistoryModal() {
-        document.getElementById('historyModal').style.display = 'none';
-    }
 
     function openClearHistoryConfirmModal() {
         document.getElementById('confirmClearHistoryModal').style.display = 'flex';
@@ -4035,7 +3657,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
 
             document.getElementById('btnUndoNote').addEventListener('click', handleNoteUndo);
             document.getElementById('btnRedoNote').addEventListener('click', handleNoteRedo);
-            document.getElementById('btnSendToTelegram')?.addEventListener('click', openTelegramSendModal);
             document.getElementById('btnViewRoIdsMain')?.addEventListener('click', () => {
                 parseNotesForCaseMode();
                 const selectedDiv = document.querySelector('#merchantList .merchant-item.selected');
@@ -4055,26 +3676,36 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
 
             document.getElementById('btnPrefix3C').addEventListener('click', () => setPrefix('3C'));
             document.getElementById('btnPrefixLS').addEventListener('click', () => setPrefix('LS'));
-            document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsModal);
-            document.getElementById('btnCloseSettingsModal')?.addEventListener('click', closeSettingsModal);
-            document.getElementById('settingsModal')?.addEventListener('click', (e) => {
-                if (e.target.id === 'settingsModal') closeSettingsModal();
-            });
-            document.getElementById('btnSaveChangesSettings')?.addEventListener('click', () => {
-                appSettings.showRoMatchPopup = document.getElementById('settingsShowRoMatchPopupToggle').checked;
-                appSettings.autoSaveOnPaste = document.getElementById('settingsAutoSaveOnPasteToggle').checked;
+
+            // Settings dropdown
+            document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsDropdown);
+            document.getElementById('btnSaveSettings')?.addEventListener('click', () => {
                 appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
-                appSettings.telegramBotToken = document.getElementById('settingsTelegramToken').value.trim();
-                appSettings.telegramChatId = document.getElementById('settingsTelegramChatId').value.trim();
+                appSettings.upsUspsMode = document.getElementById('settingsUpsUspsToggle').checked;
                 appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
-                appSettings.showMerchantSearch = document.getElementById('settingsShowMerchantSearchToggleInput').checked;
-                appSettings.showCopyTitleBtn = document.getElementById('settingsShowCopyTitleToggleInput').checked;
-                
+
+                // Update UPS/USPS output container visibility
+                const upsUspsContainer = document.getElementById('upsUspsOutputContainer');
+                if (upsUspsContainer) {
+                    upsUspsContainer.style.display = appSettings.upsUspsMode ? 'block' : 'none';
+                }
+
                 saveSettings();
-                closeSettingsModal();
+                initializeRegexPatterns();
+                showNotification("Settings saved successfully!", "success");
             });
-            document.getElementById('btnViewHistoryFromSettings')?.addEventListener('click', openHistoryModal);
+
+            // Theme toggle button
+            document.getElementById('btnThemeToggle')?.addEventListener('click', () => {
+                appSettings.theme = appSettings.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(appSettings.theme);
+                saveSettings();
+                updateThemeToggleIcon();
+            });
+
+            // History button - render history when opening dropdown
+            document.getElementById('btnOpenHistory')?.addEventListener('click', renderHistoryModal);
 
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('caseModeToggleGroup')?.addEventListener('click', toggleCaseMode);
@@ -4096,15 +3727,10 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
                 });
             }
 
-            document.getElementById('downloadSelectedDropdown').addEventListener('click', e => {
+            document.getElementById('downloadSelectedDropdown')?.addEventListener('click', e => {
                 const action = e.target.closest('button')?.dataset.action;
                 if(action === 'download-txt') downloadSelectedMerchants(false);
                 if(action === 'download-html') downloadSelectedMerchants(true);
-            });
-             document.getElementById('downloadAllDropdown').addEventListener('click', e => {
-                const action = e.target.closest('button')?.dataset.action;
-                if(action === 'download-all-txt') downloadAll(false);
-                if(action === 'download-all-html') downloadAll(true);
             });
             
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
@@ -4115,18 +3741,11 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
             document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
             document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
             
-            document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
-            document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
             document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
             document.getElementById('btnClearAllHistory')?.addEventListener('click', openClearHistoryConfirmModal);
             document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
             document.getElementById('btnConfirmClearHistory')?.addEventListener('click', handleClearAllHistory);
             document.getElementById('confirmClearHistoryModal')?.addEventListener('click', e => { if (e.target.id === 'confirmClearHistoryModal') closeClearHistoryConfirmModal(); });
-            document.getElementById('btnCancelTelegramSend')?.addEventListener('click', closeTelegramSendModal);
-            document.getElementById('telegramSendModal')?.addEventListener('click', e => { if (e.target.id === 'telegramSendModal') closeTelegramSendModal(); });
-            document.getElementById('btnConfirmTelegramSend')?.addEventListener('click', handleConfirmTelegramSend);
-            document.getElementById('btnYesDeleteSent')?.addEventListener('click', confirmAndDeleteSentMerchants);
-            document.getElementById('btnNoDeleteSent')?.addEventListener('click', () => { document.getElementById('confirmDeleteSentModal').style.display = 'none'; merchantsToDeleteAfterSend = []; });
             document.getElementById('btnCancelSplit')?.addEventListener('click', closeSplitModal);
             document.getElementById('splitModal')?.addEventListener('click', e => { if (e.target.id === 'splitModal') closeSplitModal(); });
             
@@ -4136,24 +3755,16 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
                 if (action === 'download-split-html') generateAndDownloadSplits(true);
             });
 
-            document.getElementById('btnSendSplitsToTelegram')?.addEventListener('click', generateAndSendSplitsToTelegram);
             document.getElementById('splitOrdersPerTemplate')?.addEventListener('input', updateCalculatedTemplates);
             document.getElementById('splitNumberInput')?.addEventListener('input', updateCalculatedTemplates);
 
-            document.getElementById('btnCancelPreSend')?.addEventListener('click', () => { document.getElementById('preSendConfirmModal').style.display = 'none'; });
-            document.getElementById('btnConfirmAndSend')?.addEventListener('click', executeTelegramsendsFromModal);
-
             document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
 
-            const upsUspsToggle = document.getElementById('upsUspsToggle');
+            // Initialize UPS/USPS mode from settings
             const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-            if (upsUspsToggle && upsUspsOutputContainer && shipmentInput) {
-                function toggleUpsUspsMode(isUpsMode) {
-                    upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
-                    shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
-                }
-                upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
-                toggleUpsUspsMode(upsUspsToggle.checked);
+            if (upsUspsOutputContainer && shipmentInput) {
+                upsUspsOutputContainer.style.display = appSettings.upsUspsMode ? 'block' : 'none';
+                shipmentInput.placeholder = appSettings.upsUspsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
             }
              window.addEventListener('resize', handleAutoLayout);
             window.addEventListener('beforeunload', saveAllScrollPositions);
@@ -4226,14 +3837,6 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
         document.getElementById('btnTabLayoutHScroll')?.addEventListener('click', () => setTabLayout('h-scroll'));
         document.getElementById('copyAllMerchantsBtn')?.addEventListener('click', copyAllMerchantsWithIds);
         document.getElementById('openUrlBtn').addEventListener('click', openReportUrl);
-        document.getElementById('copyUrlBtn').addEventListener('click', () => {
-            const url = generateReportUrl();
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification('Report URL copied!', 'success');
-            }, () => {
-                showNotification('Failed to copy URL.', 'error');
-            });
-        });
         document.getElementById('marketplaceSelectUrlGen').addEventListener('change', (e) => {
             appSettings.marketplaceUrlGen = e.target.value;
             saveSettings();
@@ -4254,18 +3857,45 @@ document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseText
              updateCaseCardMatchStatus(); // Update UI when modal is closed
         });
         
-        // --- Dropdown and Auto-saving Settings Logic ---
+        // --- UI Preferences Dropdown Auto-saving Logic ---
         const uiPrefsDropdown = document.getElementById('uiPreferencesDropdown');
         if (uiPrefsDropdown) {
              uiPrefsDropdown.addEventListener('change', (e) => {
                 const targetId = e.target.id;
-if(targetId === 'dropdownTextPosToggle') appSettings.caseTextPosition = e.target.checked ? 'right' : 'left';
-                if(targetId === 'dropdownThemeToggle') appSettings.theme = e.target.checked ? 'dark' : 'light';
-                if(targetId === 'dropdownCounterPosToggle') appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
-                if(targetId === 'dropdownCaseCardLayoutToggle') appSettings.caseCardLayout = e.target.checked ? 'reversed' : 'default';
-                if(targetId === 'dropdownTabLayoutToggle') appSettings.tabLayout = e.target.checked ? 'h-scroll' : 'wrap';
-                if(targetId === 'dropdownSearchToggle') appSettings.showMerchantSearch = e.target.checked;
-                if(targetId === 'dropdownCopyTitleToggle') appSettings.showCopyTitleBtn = e.target.checked;
+                // General
+                if(targetId === 'dropdownThemeToggle') {
+                    appSettings.theme = e.target.checked ? 'dark' : 'light';
+                    applyTheme(appSettings.theme);
+                    updateThemeToggleIcon();
+                }
+                // Audit UI
+                if(targetId === 'dropdownShowRoMatchPopupToggle') appSettings.showRoMatchPopup = e.target.checked;
+                if(targetId === 'dropdownSearchToggle') {
+                    appSettings.showMerchantSearch = e.target.checked;
+                    updateMerchantSearchVisibility();
+                }
+                if(targetId === 'dropdownCounterPosToggle') {
+                    appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
+                    updateCounterPosition();
+                }
+                // File UI
+                if(targetId === 'dropdownAutoSaveOnPasteToggle') appSettings.autoSaveOnPaste = e.target.checked;
+                if(targetId === 'dropdownCopyTitleToggle') {
+                    appSettings.showCopyTitleBtn = e.target.checked;
+                    updateCopyTitleBtnVisibility();
+                }
+                if(targetId === 'dropdownTextPosToggle') {
+                    appSettings.caseTextPosition = e.target.checked ? 'right' : 'left';
+                    updateCaseTextPosition();
+                }
+                if(targetId === 'dropdownCaseCardLayoutToggle') {
+                    appSettings.caseCardLayout = e.target.checked ? 'reversed' : 'default';
+                    updateCaseCardLayout();
+                }
+                if(targetId === 'dropdownTabLayoutToggle') {
+                    appSettings.tabLayout = e.target.checked ? 'hscroll' : 'wrap';
+                    updateTabLayout();
+                }
                 saveSettings();
              });
         }
