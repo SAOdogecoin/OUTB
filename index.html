@@ -2558,32 +2558,32 @@ function downloadAll(asHtml = false){
     // --- CASE MODE ---
 
     function generateFilerHTML(payload) {
-        let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
-        payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
-        
-        const theme = document.documentElement.getAttribute('data-theme') || 'light';
-        const fullScript = document.querySelector('script').innerHTML;
-        
-        const fileContent = `
-            <!DOCTYPE html>
-            <html lang="en" data-theme="${theme}">
-            <head>
-                ${document.head.innerHTML}
-            </head>
-            <body>
-                ${document.getElementById('notificationPopup').outerHTML}
-                ${document.querySelector('.top-bar').outerHTML}
-                ${document.getElementById('caseModeWrapper').outerHTML}
-                ${document.getElementById('caseTextModal').outerHTML}
-                ${document.getElementById('caseModeActionModal').outerHTML}
+    let payloadString = `const standalonePayload = ${JSON.stringify(payload)};`;
+    payloadString = payloadString.replace(/<\/script>/gi, '<\\/script>');
+    
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const fullScript = document.querySelector('script').innerHTML;
+    
+    const fileContent = `
+        <!DOCTYPE html>
+        <html lang="en" data-theme="${theme}">
+        <head>
+            ${document.head.innerHTML}
+        </head>
+        <body>
+            ${document.getElementById('toastContainer').outerHTML}
+            ${document.querySelector('.top-bar').outerHTML}
+            ${document.getElementById('caseModeWrapper').outerHTML}
+            ${document.getElementById('caseTextModal').outerHTML}
+            ${document.getElementById('caseModeActionModal').outerHTML}
 
-                <script>
-                    ${fullScript.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString)}
-                <\/script>
-            </body>
-            </html>`;
-        return fileContent;
-    }
+            <script>
+                ${fullScript.replace('// STANDALONE_DATA_PLACEHOLDER', payloadString)}
+            <\/script>
+        </body>
+        </html>`;
+    return fileContent;
+}
 
     function getCompletionState() {
         try {
@@ -4130,6 +4130,7 @@ function downloadAll(asHtml = false){
 </script>
 </body>
 </html>
+
 
 
 
