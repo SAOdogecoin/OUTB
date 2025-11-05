@@ -114,6 +114,19 @@
     .toolbar-icon-group .macos-icon-button, .toolbar-icon-group .dropdown > .macos-icon-button {
         background-color: transparent;
     }
+    .toolbar-icon-group > *:not(:last-child) {
+        position: relative;
+    }
+    .toolbar-icon-group > *:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: -2px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 20px;
+        width: 1px;
+        background-color: var(--border-subtle);
+    }
 
     #caseModeToggleGroup {
         cursor: pointer;
@@ -176,7 +189,7 @@
     .left-column-wrapper { display: flex; flex-direction: column; gap: 16px; }
 
     .tool-container {
-        background-color: var(--bg-window);
+        background-color: #efefef;
         border-radius: 24px;
         box-shadow: none;
         padding: 20px 20px 25px 20px;
@@ -187,6 +200,12 @@
         resize: none;
         min-height: 200px;
         transition: min-height 0.3s ease;
+    }
+    html[data-theme="dark"] .tool-container {
+        background-color: #2a2a2c;
+    }
+    html[data-theme="dark"] .main-wrapper.layout-side-by-side .left-column-wrapper {
+        background-color: #2a2a2c;
     }
     .parser-tool.is-hidden { min-height: 50px; padding-bottom: 20px;}
     .parser-tool .parser-content {
@@ -270,7 +289,7 @@
         gap: 0;
         display: flex;
         flex-direction: column;
-        background-color: var(--bg-window);
+        background-color: #efefef;
         border-radius: 24px;
         padding: 20px;
         position: relative;
@@ -289,7 +308,7 @@
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .parser-tool {
         padding-bottom: 20px !important; margin-bottom: 20px;
-        border-bottom: 1px solid var(--border-subtle); flex-grow: 0;
+        flex-grow: 0;
     }
     .main-wrapper.layout-side-by-side .left-column-wrapper .merchant-actions-tool {
         padding-bottom: 0 !important;
@@ -405,21 +424,45 @@
     .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; gap: 0.5rem; }
     .modal-footer .right-actions { display: flex; gap: 0.5rem; }
     
-    .notification-popup {
-        display: none; position: fixed; top: 20px; left: 50%;
-        transform: translateX(-50%) scale(0.9);
-        color: white; padding: 10px 20px; border-radius: 20px;
-        font-size: 1.1em; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 2000; opacity: 0;
-        transition: opacity 0.3s ease, top 0.3s ease, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    #toastContainer {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 10px;
+        pointer-events: none;
     }
-    .notification-popup.success { background-color: color-mix(in srgb, var(--accent-green) 85%, #000000 15%); }
-    .notification-popup.error { background-color: color-mix(in srgb, var(--accent-red) 85%, #000000 15%); }
-    .notification-popup.info { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
 
-    .notification-popup.show {
-        display: block; opacity: 1; top: 30px; transform: translateX(-50%) scale(1);
+    .toast {
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        min-width: 250px;
+        max-width: 400px;
+        opacity: 0;
+        transform: translateX(400px);
+        transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        pointer-events: auto;
     }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast.hiding {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+
+    .toast.success { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
+    .toast.error { background-color: color-mix(in srgb, var(--accent-red) 85%, #000000 15%); }
+    .toast.info { background-color: color-mix(in srgb, var(--accent-blue) 85%, #000000 15%); }
     
     /* Modern, minimal scrollbar */
     html {
@@ -780,7 +823,7 @@
 </style>
 </head>
 <body>
-    <div id="notificationPopup" class="notification-popup">Notification</div>
+    <div id="toastContainer"></div>
     <div id="clearAllConfirmModal" class="modal-overlay">
         <div class="modal-content">
             <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-right: 8px;"></i>Clear All Notes?</h2>
@@ -856,9 +899,7 @@
                         <button id="btnClearAllHistory" class="macos danger" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-trash"></i> Clear History</button>
                     </div>
                 </div>
-            </div>
-            <div class="toolbar-icon-group">
-                 <div class="dropdown non-standalone">
+                <div class="dropdown">
                     <button id="uiPreferencesBtn" class="macos-icon-button" title="UI Preferences"><i class="fa-solid fa-swatchbook"></i></button>
                     <div id="uiPreferencesDropdown" class="dropdown-content" style="min-width: 320px; max-width: 360px;">
                         <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">General Preferences</div>
@@ -872,10 +913,6 @@
                         <div class="settings-group inline">
                             <label>Show RO Match popup on new merchant</label>
                             <label class="macos-switch"><input type="checkbox" id="dropdownShowRoMatchPopupToggle"><span class="slider"></span></label>
-                        </div>
-                        <div class="settings-group inline">
-                            <label>Show Merchant Search Bar</label>
-                            <label class="macos-switch"><input type="checkbox" id="dropdownSearchToggle"><span class="slider"></span></label>
                         </div>
                         <div class="settings-group inline">
                             <label>Show Parser View</label>
@@ -898,11 +935,11 @@
                         </div>
                         <div class="settings-group inline">
                             <label>Case Card Text Position</label>
-                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownTextPosToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                            <span class="toggle-icons">Left<label class="macos-switch"><input type="checkbox" id="dropdownTextPosToggle"><span class="slider"></span></label>Right</span>
                         </div>
                         <div class="settings-group inline">
                             <label>Reverse Case Card Controls</label>
-                            <span class="toggle-icons"><i class="fa-solid fa-align-left"></i><label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label><i class="fa-solid fa-align-right"></i></span>
+                            <span class="toggle-icons">Left<label class="macos-switch"><input type="checkbox" id="dropdownCaseCardLayoutToggle"><span class="slider"></span></label>Right</span>
                         </div>
                         <div class="settings-group inline">
                             <label>Case Filer Tab Layout</label>
@@ -910,9 +947,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="dropdown non-standalone">
-                <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
+                <div class="dropdown">
+                    <button id="btnOpenSettings" class="macos-icon-button" title="Settings"><i class="fa-solid fa-sliders"></i></button>
                 <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
                     <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
                     <div class="settings-group">
@@ -933,7 +969,13 @@
                         <label>Auto-clear history (24h)</label>
                         <label class="macos-switch"><input type="checkbox" id="settingsAutoClearHistoryToggleInput"><span class="slider"></span></label>
                     </div>
-                    <button id="btnSaveSettings" class="macos primary" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-save"></i> Save Settings</button>
+                    <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
+                    <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Download Settings</div>
+                    <div class="settings-group inline">
+                        <label>Default Download Format</label>
+                        <span class="toggle-icons">TXT<label class="macos-switch"><input type="checkbox" id="settingsDefaultFileTypeToggle"><span class="slider"></span></label>HTML</span>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -963,16 +1005,7 @@
                     <div id="merchantCounterTarget"></div>
                 </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    <div class="dropdown split-button-dropdown" data-align="left">
-                        <button id="btnDownloadSelected" class="macos primary split-button-main" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
-                        <button id="btnDownloadSelectedDropdownToggle" class="macos primary split-button-toggle" disabled><i class="fa-solid fa-chevron-down"></i></button>
-                        <div id="downloadSelectedDropdown" class="dropdown-content download-options">
-                            <div class="button-row">
-                                <button class="macos secondary" data-action="download-txt"><i class="fa-solid fa-file-lines"></i>as Text</button>
-                                <button class="macos secondary" data-action="download-html"><i class="fa-solid fa-file-code"></i>as Filer</button>
-                            </div>
-                        </div>
-                    </div>
+                    <button id="btnDownloadSelected" class="macos primary" disabled><i class="fa-solid fa-download"></i>Download Selected</button>
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                     <div class="macos-textfield-container" style="min-width: 250px;">
@@ -994,12 +1027,7 @@
                         <button id="btnClearRoInput" class="macos-icon-button" title="Clear RO Data"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                     <span id="roMatchCounter">0/0</span>
-                    <div class="dropdown">
-                        <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
-                        <div id="roIdsDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
-                            <div id="roIdsDropdownContent"></div>
-                        </div>
-                    </div>
+                    <button id="btnViewRoIdsMain" class="macos primary" disabled><i class="fa-solid fa-list-check"></i>View ROs</button>
                 </div>
             </div>
             <div id="noteAreaContainer" class="macos-textfield-container" style="flex-grow: 1; display:flex;">
@@ -1010,7 +1038,7 @@
                     <div style="display: flex; gap: 8px; flex-wrap:wrap; align-items: center;">
                         <button id="btnAddSeparator" class="macos secondary"><i class="fa-solid fa-equals"></i>Separator</button>
                         <button id="btnClearAllNotes" class="macos danger"><i class="fa-solid fa-eraser"></i>Clear All</button>
-                        <div class="toolbar-icon-group" style="border:none; padding: 0; box-shadow: none; background: transparent;">
+                        <div class="toolbar-icon-group">
                             <button id="btnUndoNote" class="macos-icon-button" title="Undo"><i class="fa-solid fa-undo"></i></button>
                             <button id="btnRedoNote" class="macos-icon-button" title="Redo"><i class="fa-solid fa-redo"></i></button>
                        </div>
@@ -1119,6 +1147,16 @@
         </div>
     </div>
 
+    <div id="roIdsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2><i class="fa-solid fa-list-check" style="margin-right:8px;"></i>Matched RO IDs</h2>
+            <div id="roIdsModalContent" style="max-height: 400px; overflow-y: auto;"></div>
+            <div class="modal-actions">
+                <button id="btnCloseRoIdsModal" class="macos primary">Close</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     // STANDALONE_DATA_PLACEHOLDER
     const amzlTemplate = `We've reviewed our removal orders and discovered some shipments whose delivery status is unclear. Could you please check on your end? We're unable to verify the tracking status. If they were lost in transit, could you kindly issue a reimbursement`;
@@ -1163,6 +1201,7 @@
         caseCardLayout: 'default', // 'default' or 'reversed'
         autoSaveOnPaste: true,
         upsUspsMode: false,
+        defaultFileType: 'html', // 'txt' or 'html'
     };
     let regexPatterns = {
         amzlSource: null,
@@ -1211,14 +1250,33 @@
     }
 
     function showNotification(message, type = 'info', duration = 3000) {
-        const popup = document.getElementById('notificationPopup');
-        if (!popup) return;
-        popup.textContent = message;
-        popup.className = 'notification-popup';
-        popup.classList.add(type);
-        popup.classList.add('show');
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        // Add to container
+        container.appendChild(toast);
+
+        // Trigger show animation
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        // Hide and remove after duration
         setTimeout(() => {
-            popup.classList.remove('show');
+            toast.classList.remove('show');
+            toast.classList.add('hiding');
+
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300); // Match transition duration
         }, duration);
     }
 
@@ -1275,7 +1333,6 @@
         // Sync UI preferences dropdown toggles
         document.getElementById('dropdownThemeToggle').checked = (appSettings.theme === 'dark');
         document.getElementById('dropdownShowRoMatchPopupToggle').checked = appSettings.showRoMatchPopup;
-        document.getElementById('dropdownSearchToggle').checked = appSettings.showMerchantSearch;
         document.getElementById('dropdownParserToggle').checked = appSettings.showParser;
         document.getElementById('dropdownCounterPosToggle').checked = (appSettings.counterPosition === 'merchants');
         document.getElementById('dropdownAutoSaveOnPasteToggle').checked = appSettings.autoSaveOnPaste;
@@ -1283,6 +1340,9 @@
         document.getElementById('dropdownTextPosToggle').checked = (appSettings.caseTextPosition === 'right');
         document.getElementById('dropdownCaseCardLayoutToggle').checked = (appSettings.caseCardLayout === 'reversed');
         document.getElementById('dropdownTabLayoutToggle').checked = (appSettings.tabLayout === 'hscroll');
+
+        // Sync settings dropdown toggles
+        document.getElementById('settingsDefaultFileTypeToggle').checked = (appSettings.defaultFileType === 'html');
         
         document.getElementById('marketplaceSelectUrlGen').value = appSettings.marketplaceUrlGen;
 
@@ -1765,28 +1825,6 @@
         a.remove();
     }
 
-    function handleMerchantNameEdit(event, originalSectionKey, originalDisplayName, isNameOriginallyFromFirstLine) {
-        const editableSpan = event.target;
-        const newName = editableSpan.textContent.trim();
-        editableSpan.contentEditable = false; // Immediately disable editing
-        if (!newName || newName === originalDisplayName) {
-            editableSpan.textContent = originalDisplayName;
-            return;
-        }
-        const noteArea = document.getElementById('noteArea');
-        const currentNotes = noteArea.value;
-        let newSectionText;
-        if (isNameOriginallyFromFirstLine) {
-            const lines = originalSectionKey.split('\n');
-            newSectionText = newName + (lines.length > 1 ? '\n' + lines.slice(1).join('\n') : '');
-        } else {
-            newSectionText = newName + '\n\n' + originalSectionKey;
-        }
-
-        noteArea.value = currentNotes.replace(originalSectionKey, newSectionText);
-        countTemplatesNoteTaker();
-        recordNoteChange();
-    }
 
     function countTemplatesNoteTaker() {
         const noteArea = document.getElementById('noteArea');
@@ -1813,7 +1851,7 @@
             let merchantName = `Entry ${++merchantIndex}`;
             const firstLine = sectionText.split('\n')[0]?.trim();
             let isNameFromFirstLine = false;
-            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100 && !firstLine.includes(':') && !firstLine.startsWith('Removal order ID')) {
+            if (firstLine && !firstLine.startsWith(amzlTemplate.substring(0, 10)) && !firstLine.startsWith(upsUspsTemplate.substring(0, 10)) && firstLine.length < 100 && !firstLine.startsWith('Removal order ID')) {
                 merchantName = firstLine;
                 isNameFromFirstLine = true;
             } else if (sectionText.includes('Removal order ID:')) {
@@ -1849,40 +1887,11 @@
             const controlsDiv = document.createElement('div');
             controlsDiv.className = 'merchant-controls';
 
-            const editBtn = document.createElement('button');
-            editBtn.className = 'macos-icon-button edit-merchant-btn';
-            editBtn.title = 'Edit name';
-            editBtn.innerHTML = '<i class="fa-solid fa-pencil"></i>';
-            
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent row selection
-                nameSpan.contentEditable = true;
-                nameSpan.focus();
-                const range = document.createRange();
-                range.selectNodeContents(nameSpan);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            });
-
-            nameSpan.addEventListener('blur', (e) => handleMerchantNameEdit(e, key, data.displayName, data.isNameFromFirstLine));
-            nameSpan.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.target.blur();
-                } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    e.target.textContent = data.displayName;
-                    e.target.blur();
-                }
-            });
-
             const countSpan = document.createElement('span');
             countSpan.className = 'case-count';
             countSpan.textContent = `${data.count} ${data.count === 1 ? 'case' : 'cases'}`;
-            
+
             controlsDiv.appendChild(countSpan);
-            controlsDiv.appendChild(editBtn);
 
             merchantDiv.appendChild(statusDot);
             merchantDiv.appendChild(checkbox);
@@ -1890,11 +1899,11 @@
             merchantDiv.appendChild(controlsDiv);
 
              merchantDiv.addEventListener('click', (e) => {
-                if (e.target.closest('.edit-merchant-btn') || e.target.closest('.macos-checkbox')) {
-                    if(e.target.closest('.macos-checkbox')) updateSelectedCountNoteTaker();
+                if (e.target.closest('.macos-checkbox')) {
+                    updateSelectedCountNoteTaker();
                     return;
                 }
-                
+
                 const isChecked = checkbox.checked;
 
                 if(e.ctrlKey || e.metaKey){
@@ -2455,6 +2464,7 @@
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
         document.getElementById('settingsUpsUspsToggle').checked = appSettings.upsUspsMode;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
+        document.getElementById('settingsDefaultFileTypeToggle').checked = (appSettings.defaultFileType === 'html');
     }
     
 
@@ -3264,9 +3274,9 @@
         }
     }
     
-    function populateRoIdsDropdown(specificMerchant) {
+    function populateRoIdsModal(specificMerchant) {
         parseNotesForCaseMode();
-        const dropdownContent = document.getElementById('roIdsDropdownContent');
+        const modalContent = document.getElementById('roIdsModalContent');
         const dataSource = specificMerchant ? [specificMerchant] : caseModeData;
 
         const regex = /Removal order ID:\s*(\S+)/g;
@@ -3276,7 +3286,7 @@
             const idListHTML = allUniqueIds.sort().map((id, index) => {
                 const isMatched = matchedRoIds.has(id);
                 const matchType = isMatched ? matchedRoIds.get(id) : '';
-                const uniqueId = `ro-check-dropdown-${index}`;
+                const uniqueId = `ro-check-modal-${index}`;
 
                 let statusHTML = '';
                 if(isMatched) {
@@ -3286,24 +3296,24 @@
                 return `
                 <div class="ro-id-item">
                     <label class="macos-checkbox-container" for="${uniqueId}" style="flex-grow:1;">
-                        <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox-dropdown" data-id="${id}" ${isMatched ? 'checked' : ''}>
+                        <input type="checkbox" id="${uniqueId}" class="macos-checkbox ro-match-checkbox-modal" data-id="${id}" ${isMatched ? 'checked' : ''}>
                         <span class="ro-id-text">${id}</span>
                     </label>
                     ${statusHTML}
                 </div>`;
             }).join('');
 
-            dropdownContent.innerHTML = `
+            modalContent.innerHTML = `
                 <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Match RO IDs for ${specificMerchant.displayName}</div>
                 <div class="ro-id-list">${idListHTML}</div>`;
         } else {
-             dropdownContent.innerHTML = "<p>No 'Removal order ID' found in any templates.</p>";
+             modalContent.innerHTML = "<p>No 'Removal order ID' found in any templates.</p>";
         }
 
-        const checklist = dropdownContent.querySelector('.ro-id-list');
+        const checklist = modalContent.querySelector('.ro-id-list');
         if(checklist) {
             checklist.onchange = (e) => {
-                if (e.target.classList.contains('ro-match-checkbox-dropdown')) {
+                if (e.target.classList.contains('ro-match-checkbox-modal')) {
                     const id = e.target.dataset.id;
                     if (e.target.checked) {
                         matchedRoIds.set(id, 'manual');
@@ -3758,13 +3768,14 @@
                 if (selectedDiv) {
                     const merchant = caseModeData.find(m => m.originalText === selectedDiv.dataset.key);
                     if (merchant) {
-                        populateRoIdsDropdown(merchant);
-                        const dropdown = document.getElementById('roIdsDropdown');
-                        if (dropdown) {
-                            dropdown.classList.toggle('show');
-                        }
+                        populateRoIdsModal(merchant);
+                        document.getElementById('roIdsModal').style.display = 'flex';
                     }
                 }
+            });
+
+            document.getElementById('btnCloseRoIdsModal')?.addEventListener('click', () => {
+                document.getElementById('roIdsModal').style.display = 'none';
             });
             document.getElementById('btnClearRoInput')?.addEventListener('click', () => {
                 const roInput = document.getElementById('roMatchInput');
@@ -3778,21 +3789,37 @@
 
             // Settings dropdown
             document.getElementById('btnOpenSettings')?.addEventListener('click', openSettingsDropdown);
-            document.getElementById('btnSaveSettings')?.addEventListener('click', () => {
-                appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
-                appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
-                appSettings.upsUspsMode = document.getElementById('settingsUpsUspsToggle').checked;
-                appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
 
-                // Update UPS/USPS output container visibility
+            // Auto-save settings on input change
+            document.getElementById('settingsAmzlCarriers')?.addEventListener('blur', () => {
+                appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
+                saveSettings();
+                initializeRegexPatterns();
+            });
+
+            document.getElementById('settingsOtherCarriers')?.addEventListener('blur', () => {
+                appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
+                saveSettings();
+                initializeRegexPatterns();
+            });
+
+            document.getElementById('settingsUpsUspsToggle')?.addEventListener('change', () => {
+                appSettings.upsUspsMode = document.getElementById('settingsUpsUspsToggle').checked;
                 const upsUspsContainer = document.getElementById('upsUspsOutputContainer');
                 if (upsUspsContainer) {
                     upsUspsContainer.style.display = appSettings.upsUspsMode ? 'block' : 'none';
                 }
-
                 saveSettings();
-                initializeRegexPatterns();
-                showNotification("Settings saved successfully!", "success");
+            });
+
+            document.getElementById('settingsAutoClearHistoryToggleInput')?.addEventListener('change', () => {
+                appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+                saveSettings();
+            });
+
+            document.getElementById('settingsDefaultFileTypeToggle')?.addEventListener('change', () => {
+                appSettings.defaultFileType = document.getElementById('settingsDefaultFileTypeToggle').checked ? 'html' : 'txt';
+                saveSettings();
             });
 
             // Theme toggle button
@@ -3826,26 +3853,11 @@
                 });
             }
 
-            // Download selected button - direct click downloads HTML
+            // Download selected button - uses default file type from settings
             document.getElementById('btnDownloadSelected')?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                downloadSelectedMerchants(true); // Download as HTML (Filer)
-            });
-
-            // Download selected dropdown toggle
-            document.getElementById('btnDownloadSelectedDropdownToggle')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const dropdown = document.getElementById('downloadSelectedDropdown');
-                if (dropdown) {
-                    dropdown.classList.toggle('show');
-                }
-            });
-
-            // Download selected dropdown menu items
-            document.getElementById('downloadSelectedDropdown')?.addEventListener('click', e => {
-                const action = e.target.closest('button')?.dataset.action;
-                if(action === 'download-txt') downloadSelectedMerchants(false);
-                if(action === 'download-html') downloadSelectedMerchants(true);
+                const asHtml = (appSettings.defaultFileType === 'html');
+                downloadSelectedMerchants(asHtml);
             });
 
             document.getElementById('btnSplitSelected')?.addEventListener('click', openSplitModal);
@@ -3985,17 +3997,13 @@
                 }
                 // Audit UI
                 if(targetId === 'dropdownShowRoMatchPopupToggle') appSettings.showRoMatchPopup = e.target.checked;
-                if(targetId === 'dropdownSearchToggle') {
-                    appSettings.showMerchantSearch = e.target.checked;
-                    updateMerchantSearchVisibility();
-                }
                 if(targetId === 'dropdownParserToggle') {
                     appSettings.showParser = e.target.checked;
                     updateParserVisibility();
                 }
                 if(targetId === 'dropdownCounterPosToggle') {
                     appSettings.counterPosition = e.target.checked ? 'merchants' : 'notes';
-                    updateCounterPosition();
+                    updateCounterPillLocation();
                 }
                 // File UI
                 if(targetId === 'dropdownAutoSaveOnPasteToggle') appSettings.autoSaveOnPaste = e.target.checked;
