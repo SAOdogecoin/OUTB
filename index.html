@@ -104,8 +104,8 @@
     .toolbar-icon-group, .url-generator-group {
         display: flex;
         align-items: center;
-        border: none;
-        border-radius: 50px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
         padding: 4px;
         background-color: var(--bg-window);
         box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -465,12 +465,7 @@
     .merchant-item.selected { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); color: white; }
     .merchant-item .merchant-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; min-width: 50px;}
     .merchant-item .status-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        margin-right: 8px; flex-shrink: 0;
-        background-color: var(--accent-red);
-    }
-    .merchant-item .status-dot.matched {
-        background-color: var(--accent-green);
+        display: none;
     }
     
     .merchant-item .merchant-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
@@ -487,16 +482,21 @@
         background-color: var(--bg-hover); padding: 3px 8px;
         border-radius: 10px; transition: all 0.2s ease;
     }
+    .merchant-item .case-count.matched {
+        background-color: var(--accent-green);
+        color: white;
+    }
     .merchant-item.selected .case-count { background-color: rgba(255,255,255,0.2); color: white; }
+    .merchant-item.selected .case-count.matched { background-color: rgba(255,255,255,0.3); color: white; }
     
     .macos-checkbox-container { display: flex; align-items: center; cursor: pointer; gap: 8px; width: auto; }
     .macos-checkbox {
-        appearance: none; margin: 0; width: 15px; height: 15px; border-radius: 4px;
+        appearance: none; margin: 0; width: 20px; height: 20px; border-radius: 5px;
         display: flex; align-items: center; justify-content: center;
         background-color: var(--bg-input); border: 0.5px solid var(--border-color); flex-shrink: 0;
     }
     .macos-checkbox:checked { background-color: var(--accent-blue); border-color: var(--accent-blue-dark); }
-    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; }
+    .macos-checkbox:checked::after { content: '✔'; color: white; font-size: 14px; font-weight: bold; }
     .merchant-item.selected .macos-checkbox { background-color: #fff; border-color: transparent; }
     .merchant-item.selected .macos-checkbox:checked::after { color: var(--accent-blue); }
 
@@ -801,7 +801,7 @@
     </div>
 
     <div class="top-bar">
-        <div class="dropdown non-standalone" data-align="right">
+        <div class="dropdown non-standalone">
             <button id="btnOpenSettings" class="macos-icon-button" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
             <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
                 <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
@@ -831,7 +831,6 @@
             <div class="url-generator-group">
                 <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    <span class="desktop-only" style="margin-left: 6px;">URL</span>
                 </button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -931,7 +930,7 @@
         <div class="left-column-wrapper">
             <div id="parserTool" class="tool-container parser-tool">
                  <div class="tool-card-title-bar">
-                    <h3 class="tool-card-title"><i class="fa-solid fa-filter"></i>Parser</h3>
+                    <h3 class="tool-card-title">Parser</h3>
                     <button id="parserToggle" class="macos-icon-button" title="Toggle Parser View"><i class="fa-solid fa-eye-slash"></i></button>
                 </div>
                 <div class="parser-content">
@@ -947,7 +946,7 @@
 
             <div class="tool-container merchant-actions-tool">
                 <div class="tool-card-title-bar">
-                    <h3 class="tool-card-title"><i class="fa-solid fa-users"></i>Merchants</h3>
+                    <h3 class="tool-card-title">Merchants</h3>
                     <div id="merchantCounterTarget"></div>
                 </div>
                 <div style="flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
@@ -974,7 +973,7 @@
 
         <div class="tool-container note-taker-tool">
              <div class="tool-card-title-bar">
-                <h3 class="tool-card-title"><i class="fa-regular fa-pen-to-square"></i>Notes</h3>
+                <h3 class="tool-card-title">Notes</h3>
                 <div class="ro-match-controls non-standalone">
                      <div class="macos-textfield-container">
                         <input type="text" id="roMatchInput" class="macos-textfield" placeholder="Paste RO data for matching...">
@@ -3375,15 +3374,18 @@
             if (!merchant) return;
 
             const statusDot = div.querySelector('.status-dot');
+            const caseCount = div.querySelector('.case-count');
             const merchantRoIds = new Set(merchant.cases.flatMap(c => [...c.text.matchAll(regex)].map(match => match[1])));
-            
+
             if (merchantRoIds.size === 0) {
                 statusDot.classList.remove('matched');
+                if (caseCount) caseCount.classList.remove('matched');
                 return;
             }
 
             const allMatched = [...merchantRoIds].every(id => matchedRoIds.has(id));
             statusDot.classList.toggle('matched', allMatched);
+            if (caseCount) caseCount.classList.toggle('matched', allMatched);
         });
     }
 
