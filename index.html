@@ -22,8 +22,8 @@
         --text-placeholder: #aaaaaf;
         --border-color: #C6C6C6;
         --border-subtle: #E0E0E0;
-        --accent-blue: #007AFF;
-        --accent-blue-dark: #006ADC;
+        --accent-blue: #1d1d1f;
+        --accent-blue-dark: #000000;
         --accent-red: #ff3b30;
         --accent-red-hover: #ff453a;
         --accent-green: #34c759;
@@ -48,8 +48,8 @@
         --text-placeholder: #8e8e93;
         --border-color: #545458;
         --border-subtle: #424245;
-        --accent-blue: #0A84FF; 
-        --accent-blue-dark: #007AFF;
+        --accent-blue: #f2f2f7;
+        --accent-blue-dark: #FFFFFF;
         --accent-red: #ff453a;
         --accent-red-hover: #ff3b30;
         --accent-green: #30d158;
@@ -753,6 +753,12 @@
     .toggle-icons i { color: var(--text-secondary); font-size: 1.1em; }
 
 
+    @media (max-width: 768px) {
+        .desktop-only {
+            display: none !important;
+        }
+    }
+
     @media (max-width: 600px) {
         .card-content {
             flex-direction: column;
@@ -795,7 +801,7 @@
     </div>
 
     <div class="top-bar">
-        <div class="dropdown non-standalone">
+        <div class="dropdown non-standalone" data-align="right">
             <button id="btnOpenSettings" class="macos-icon-button" title="Settings" style="margin-right: 12px;"><i class="fa-solid fa-sliders"></i></button>
             <div id="settingsDropdown" class="dropdown-content" style="min-width: 300px;">
                 <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Carrier Settings</div>
@@ -806,6 +812,10 @@
                 <div class="settings-group">
                     <label for="settingsOtherCarriers" style="font-size: 0.9em;">Other Carriers:</label>
                     <div class="macos-textfield-container"><input type="text" id="settingsOtherCarriers" class="macos-textfield" placeholder="e.g., UPS,USPS"></div>
+                </div>
+                <div class="settings-group inline">
+                    <label>Enable UPS/USPS Mode</label>
+                    <label class="macos-switch"><input type="checkbox" id="settingsUpsUspsToggle"><span class="slider"></span></label>
                 </div>
                 <hr style="border:none; border-top: 1px solid var(--border-subtle); margin: 8px 0;">
                 <div style="font-weight: 600; font-size: 0.85em; color: var(--text-secondary); margin-bottom: 8px; padding-left: 4px;">Data & History</div>
@@ -821,7 +831,7 @@
             <div class="url-generator-group">
                 <button id="openUrlBtn" class="macos-icon-button" title="Open Report URL in New Tab">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    <span class="desktop-only" style="margin-left: 6px;">Open Report URL</span>
+                    <span class="desktop-only" style="margin-left: 6px;">URL</span>
                 </button>
                 <select id="marketplaceSelectUrlGen">
                     <option value="com">US</option>
@@ -853,7 +863,16 @@
             </div>
             <div class="toolbar-icon-group non-standalone">
                 <button id="btnThemeToggle" class="macos-icon-button" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
-                <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+                <div class="dropdown">
+                    <button id="btnOpenHistory" class="macos-icon-button" title="Deletion History"><i class="fa-solid fa-trash-alt"></i></button>
+                    <div id="historyDropdown" class="dropdown-content" style="min-width: 400px; max-width: 500px; max-height: 400px; overflow-y: auto;">
+                        <div style="font-weight: 600; font-size: 0.9em; margin-bottom: 8px; padding-left: 4px;">Deletion History</div>
+                        <div id="historyList">
+                            <p style="color: var(--text-secondary); font-size: 0.9em;">No history found.</p>
+                        </div>
+                        <button id="btnClearAllHistory" class="macos danger" style="width: 100%; margin-top: 8px;"><i class="fa-solid fa-trash"></i> Clear History</button>
+                    </div>
+                </div>
             </div>
             <div class="toolbar-icon-group">
                  <div class="dropdown non-standalone">
@@ -919,13 +938,7 @@
                     <div class="macos-textfield-container">
                         <textarea id="shipmentInput" class="macos-textfield" placeholder="Paste Amazon removal shipment data here..."></textarea>
                     </div>
-                    <div class="parser-controls" style="margin-top:16px; display:flex; flex-direction:column; gap: 12px; align-items: flex-start;">
-                        <label for="upsUspsToggle" class="parser-control-row">
-                            <label class="macos-switch"><input type="checkbox" id="upsUspsToggle"><span class="slider"></span></label>
-                            <span>UPS/USPS</span>
-                        </label>
-                    </div>
-                     <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
+                    <div id="upsUspsOutputContainer" style="display: none; margin-top: 16px;">
                         <div class="macos-textfield-container"><textarea id="upsUspsOutputArea" class="macos-textfield" placeholder="Extracted Other Carrier Tracking Numbers..."></textarea></div>
                         <button id="btnProcessUpsUsps" class="macos primary" style="margin-top: 8px;"><i class="fa-solid fa-gears"></i>Process & Add</button>
                     </div>
@@ -948,19 +961,10 @@
                         </div>
                     </div>
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label for="newMerchantInput" style="font-weight: 500; white-space: nowrap;"><i class="fa-solid fa-plus"></i> New Merchant:</label>
-                        <div class="macos-textfield-container" style="min-width: 250px;">
-                            <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
-                        </div>
-                    </div>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
-                </div>
-                 <div id="merchantSearchContainer" style="margin-top:16px; display: none; position:relative; flex-shrink:0;">
-                    <div class="macos-textfield-container">
-                         <input type="text" id="merchantSearchInput" class="macos-textfield" style="padding-left:30px" placeholder="Search merchants...">
+                    <div class="macos-textfield-container" style="min-width: 250px;">
+                        <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
                     </div>
-                     <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-placeholder);"></i>
                 </div>
                 
                 <div id="merchantList"></div>
@@ -1054,19 +1058,6 @@
         </div>
     </div>
     
-    <div id="historyModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2><i class="fa-solid fa-trash-alt" style="margin-right:8px;"></i>Deletion History</h2>
-            <div id="historyList">
-                <p>No history found.</p>
-            </div>
-            <div class="modal-actions">
-                <button id="btnClearAllHistory" class="macos danger"><i class="fa-solid fa-trash"></i> Clear History</button>
-                <button id="btnCloseHistoryModal" class="macos primary">Close</button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Modals for Case Mode -->
     <div id="caseTextModal" class="modal-overlay">
         <div class="modal-content">
@@ -1152,6 +1143,7 @@
         showRoMatchPopup: false,
         caseCardLayout: 'default', // 'default' or 'reversed'
         autoSaveOnPaste: true,
+        upsUspsMode: false,
     };
     let regexPatterns = {
         amzlSource: null,
@@ -1487,7 +1479,6 @@
     function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
-        const upsUspsToggle = document.getElementById('upsUspsToggle');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const inputValue = input.value;
         if (inputValue.trim()) {
@@ -1496,7 +1487,7 @@
             return;
         }
         const currentNoteValue = noteArea.value;
-        const isUpsUspsMode = upsUspsToggle ? upsUspsToggle.checked : false;
+        const isUpsUspsMode = appSettings.upsUspsMode;
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
         const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
         const coreTNReplaceRegex = regexPatterns.coreTnExtract;
@@ -2425,17 +2416,10 @@
         // Sync dropdown inputs with current appSettings
         document.getElementById('settingsAmzlCarriers').value = appSettings.amzlTypeCarriers.join(',');
         document.getElementById('settingsOtherCarriers').value = appSettings.otherCarriers.join(',');
+        document.getElementById('settingsUpsUspsToggle').checked = appSettings.upsUspsMode;
         document.getElementById('settingsAutoClearHistoryToggleInput').checked = appSettings.autoClearHistory;
     }
     
-    function openHistoryModal() {
-        renderHistoryModal();
-        document.getElementById('historyModal').style.display = 'flex';
-    }
-    
-    function closeHistoryModal() {
-        document.getElementById('historyModal').style.display = 'none';
-    }
 
     function openClearHistoryConfirmModal() {
         document.getElementById('confirmClearHistoryModal').style.display = 'flex';
@@ -3698,7 +3682,15 @@
             document.getElementById('btnSaveSettings')?.addEventListener('click', () => {
                 appSettings.amzlTypeCarriers = document.getElementById('settingsAmzlCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
                 appSettings.otherCarriers = document.getElementById('settingsOtherCarriers').value.trim().split(',').map(s => s.trim()).filter(Boolean);
+                appSettings.upsUspsMode = document.getElementById('settingsUpsUspsToggle').checked;
                 appSettings.autoClearHistory = document.getElementById('settingsAutoClearHistoryToggleInput').checked;
+
+                // Update UPS/USPS output container visibility
+                const upsUspsContainer = document.getElementById('upsUspsOutputContainer');
+                if (upsUspsContainer) {
+                    upsUspsContainer.style.display = appSettings.upsUspsMode ? 'block' : 'none';
+                }
+
                 saveSettings();
                 initializeRegexPatterns();
                 showNotification("Settings saved successfully!", "success");
@@ -3712,8 +3704,8 @@
                 updateThemeToggleIcon();
             });
 
-            // History button
-            document.getElementById('btnOpenHistory')?.addEventListener('click', openHistoryModal);
+            // History button - render history when opening dropdown
+            document.getElementById('btnOpenHistory')?.addEventListener('click', renderHistoryModal);
 
             document.getElementById('btnClearSelected')?.addEventListener('click', clearSelectedMerchants);
             document.getElementById('caseModeToggleGroup')?.addEventListener('click', toggleCaseMode);
@@ -3749,8 +3741,6 @@
             document.getElementById('confirmClearAllBtn')?.addEventListener('click', confirmAndClearAllNotes);
             document.getElementById('closeClearSuccessPopupBtn')?.addEventListener('click', () => document.getElementById('clearAllSuccessPopup').style.display = 'none');
             
-            document.getElementById('btnCloseHistoryModal')?.addEventListener('click', closeHistoryModal);
-            document.getElementById('historyModal')?.addEventListener('click', e => { if (e.target.id === 'historyModal') closeHistoryModal(); });
             document.getElementById('historyList')?.addEventListener('click', e => { if (e.target.closest('.restore-btn')) { restoreHistoryItem(e.target.closest('.restore-btn').dataset.historyId); }});
             document.getElementById('btnClearAllHistory')?.addEventListener('click', openClearHistoryConfirmModal);
             document.getElementById('btnCancelClearHistory')?.addEventListener('click', closeClearHistoryConfirmModal);
@@ -3770,15 +3760,11 @@
 
             document.getElementById('merchantSearchInput')?.addEventListener('input', filterMerchants);
 
-            const upsUspsToggle = document.getElementById('upsUspsToggle');
+            // Initialize UPS/USPS mode from settings
             const upsUspsOutputContainer = document.getElementById('upsUspsOutputContainer');
-            if (upsUspsToggle && upsUspsOutputContainer && shipmentInput) {
-                function toggleUpsUspsMode(isUpsMode) {
-                    upsUspsOutputContainer.style.display = isUpsMode ? 'block' : 'none';
-                    shipmentInput.placeholder = isUpsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
-                }
-                upsUspsToggle.addEventListener('change', function() { toggleUpsUspsMode(this.checked); });
-                toggleUpsUspsMode(upsUspsToggle.checked);
+            if (upsUspsOutputContainer && shipmentInput) {
+                upsUspsOutputContainer.style.display = appSettings.upsUspsMode ? 'block' : 'none';
+                shipmentInput.placeholder = appSettings.upsUspsMode ? "Paste shipment data for Other Carriers..." : "Paste Amazon removal shipment data here...";
             }
              window.addEventListener('resize', handleAutoLayout);
             window.addEventListener('beforeunload', saveAllScrollPositions);
