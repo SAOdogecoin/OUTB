@@ -75,6 +75,10 @@ html[data-theme="dark"] .merchant-item {
 html[data-theme="dark"] .merchant-item {
     background-color: var(--bg-input);
 }
+
+    html[data-theme="dark"] .macos-checkbox {
+    background-color: var(--bg-window); /* Use the main card background color for contrast */
+}
     
     html { box-sizing: border-box; background-color: var(--bg-primary); }
     *, *:before, *:after { box-sizing: inherit; }
@@ -1025,7 +1029,7 @@ html[data-theme="dark"] .merchant-item {
                     <button id="btnSplitSelected" class="macos secondary" disabled><i class="fa-solid fa-table-columns"></i>Split</button>
                     <button id="btnClearSelected" class="macos danger"><i class="fa-regular fa-trash-can"></i>Clear Selected</button>
                     <div class="macos-textfield-container" style="min-width: 250px;">
-                        <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste name and press Enter...">
+                        <input type="text" id="newMerchantInput" class="macos-textfield" placeholder="Paste merchant ID and name here...">
                     </div>
                 </div>
                 
@@ -4073,5 +4077,6 @@ html[data-theme="dark"] .merchant-item {
 </script>
 </body>
 </html>
+
 
 
