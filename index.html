@@ -2688,8 +2688,11 @@ html[data-theme="dark"] .merchant-item {
 
     // MODIFICATION START: exportCaseTrackerFile is updated to inject the unique fileId
     function exportCaseTrackerFile(all = false) {
+        // Parse notes first to ensure caseModeData is up to date
+        parseNotesForCaseMode();
+
         let merchantsToExport;
-    
+
         if (all) {
             merchantsToExport = caseModeData;
         } else {
