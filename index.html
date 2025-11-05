@@ -2038,24 +2038,10 @@ html[data-theme="dark"] .merchant-item {
         updateMerchantStatusDots();
     }
 
-    function exportCaseTrackerFile(all = false) {
-    let merchantsToExport;
-
-    if (all) {
-        merchantsToExport = caseModeData;
-    } else {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) {
-            showNotification("No merchants selected to export.", "info");
-            return;
-        }
-        const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
-        merchantsToExport = caseModeData.filter(m => selectedKeys.has(m.originalText));
-
-        if (merchantsToExport.length === 0) {
-            showNotification("Could not find data for selected merchants. This can happen if notes were edited after selection.", "error");
-            return;
-        }
+    function exportCaseTrackerFile(merchantsToExport) {
+    if (!merchantsToExport || merchantsToExport.length === 0) {
+        showNotification("No data available to export.", "error");
+        return;
     }
     
     const totalCases = merchantsToExport.reduce((sum, m) => sum + m.cases.length, 0);
@@ -2081,28 +2067,26 @@ html[data-theme="dark"] .merchant-item {
     showNotification("Filer View HTML file has been downloaded.", "success");
 }
     
-    function downloadSelectedMerchants(asHtml = false) {
-    // Ensure caseModeData is fresh before any download logic.
-    parseNotesForCaseMode();
+function downloadSelectedMerchants(asHtml = false) {
+    parseNotesForCaseMode(); // Always get fresh data model
+
+    const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
+    if (selectedDivs.length === 0) {
+        showNotification("No merchants selected to download.", "info");
+        return;
+    }
+
+    const selectedKeys = new Set(Array.from(selectedDivs, div => div.dataset.key));
+    const selectedMerchantsData = caseModeData.filter(m => selectedKeys.has(m.originalText));
+
+    if (selectedMerchantsData.length === 0) {
+         showNotification("Could not find data for selected merchants.", "error");
+         return;
+    }
 
     if (asHtml) {
-        exportCaseTrackerFile(false);
+        exportCaseTrackerFile(selectedMerchantsData); 
     } else {
-        const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-        if (selectedDivs.length === 0) {
-            showNotification("No merchants selected to download.", "info");
-            return;
-        }
-
-        const selectedMerchantsData = Array.from(selectedDivs).map(div => {
-            return caseModeData.find(m => m.originalText === div.dataset.key);
-        }).filter(Boolean);
-
-        if (selectedMerchantsData.length === 0) {
-             showNotification("Could not find data for selected merchants.", "error");
-             return;
-        }
-
         const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
         const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
 
@@ -2112,19 +2096,21 @@ html[data-theme="dark"] .merchant-item {
         showNotification("TXT file has been downloaded.", "success");
     }
 }
-    
-    function downloadAll(asHtml = false){
-        if (asHtml) {
-            exportCaseTrackerFile(true);
-        } else {
-            const allMerchantsData = caseModeData;
-            const totalCases = allMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
-            const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
-            const combinedText = allMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
-            const filename = `${filenameBase}.txt`;
-            downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
-        }
+
+function downloadAll(asHtml = false){
+    parseNotesForCaseMode();
+    const allMerchantsData = caseModeData;
+
+    if (asHtml) {
+        exportCaseTrackerFile(allMerchantsData);
+    } else {
+        const totalCases = allMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
+        const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
+        const combinedText = allMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
+        const filename = `${filenameBase}.txt`;
+        downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
     }
+}
 
     function processSingleROBlock(roBlockText, removalOrdersArray) {
         const roIdLineMatch = roBlockText.match(/^\s*Removal order ID:[^\n]+/);
@@ -4144,6 +4130,7 @@ html[data-theme="dark"] .merchant-item {
 </script>
 </body>
 </html>
+
 
 
 
