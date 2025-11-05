@@ -2040,10 +2040,13 @@ html[data-theme="dark"] .merchant-item {
     
     function downloadSelectedMerchants(asHtml = false) {
         if (asHtml) {
-            exportCaseTrackerFile(false); 
-        } else { 
+            exportCaseTrackerFile(false);
+        } else {
             const selectedDivs = document.querySelectorAll('#merchantList .merchant-item.selected');
-            if (selectedDivs.length === 0) return;
+            if (selectedDivs.length === 0) {
+                showNotification("No merchants selected to download.", "info");
+                return;
+            }
 
             const selectedMerchantsData = Array.from(selectedDivs).map(div => {
                 return caseModeData.find(m => m.originalText === div.dataset.key);
@@ -2053,13 +2056,14 @@ html[data-theme="dark"] .merchant-item {
                  showNotification("Could not find data for selected merchants.", "error");
                  return;
             }
-            
+
             const totalCases = selectedMerchantsData.reduce((sum, m) => sum + m.cases.length, 0);
             const filenameBase = `${getFilenamePrefix()}(${totalCases})-${getFormattedDate()}-`;
 
             const combinedText = selectedMerchantsData.map(getFormattedBlockWithVerification).join(merchantSeparator);
             const filename = `${filenameBase}.txt`;
             downloadFile(combinedText + '\n', filename, 'text/plain;charset=utf-8');
+            showNotification("TXT file has been downloaded.", "success");
         }
     }
 
