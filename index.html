@@ -3719,8 +3719,31 @@
             const shipmentInput = document.getElementById('shipmentInput');
             if (shipmentInput) {
                  let parseTimer;
-                 shipmentInput.addEventListener('input', () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); });
+                 let lastValue = shipmentInput.value;
+                 const triggerParse = () => { clearTimeout(parseTimer); parseTimer = setTimeout(parseShipmentData, 300); };
+
+                 shipmentInput.addEventListener('input', triggerParse);
+                 shipmentInput.addEventListener('change', triggerParse);
+                 shipmentInput.addEventListener('paste', () => { setTimeout(parseShipmentData, 350); });
+                 shipmentInput.addEventListener('focus', () => {
+                     // Check if value changed while input was not focused (e.g., via extension)
+                     if (shipmentInput.value !== lastValue && shipmentInput.value.trim()) {
+                         lastValue = shipmentInput.value;
+                         triggerParse();
+                     }
+                 });
+                 shipmentInput.addEventListener('blur', () => {
+                     lastValue = shipmentInput.value;
+                 });
                  shipmentInput.addEventListener('scroll', saveShipmentInputScroll);
+
+                 // Check if extension pre-filled the input on page load
+                 setTimeout(() => {
+                     if (shipmentInput.value.trim() && shipmentInput.value !== lastValue) {
+                         lastValue = shipmentInput.value;
+                         triggerParse();
+                     }
+                 }, 500);
             }
             const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
             if(upsUspsOutputArea) {
