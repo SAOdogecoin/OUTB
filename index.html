@@ -1593,23 +1593,34 @@ html[data-theme="dark"] .merchant-item {
         updateSelectedCountNoteTaker();
     }
 
-    function parseShipmentData() {
+function parseShipmentData() {
         const input = document.getElementById('shipmentInput');
         const noteArea = document.getElementById('noteArea');
         const upsUspsOutputArea = document.getElementById('upsUspsOutputArea');
         const inputValue = input.value;
+        
         if (inputValue.trim()) {
             input.value = '';
         } else {
             return;
         }
+
         const currentNoteValue = noteArea.value;
         const isUpsUspsMode = appSettings.upsUspsMode;
+        
+        // --- 1. DEFINE FILTERS ---
+        // Regex to extract specific header info
+        const statusRegex = /Status:\s*([a-zA-Z]+)/; // Captures "Completed" or "Pending"
+        const shipmentDateRegex = /Shipment Date:\s*([a-zA-Z]+\s+\d{1,2},\s+\d{4}.*?)(?:\n|$)/;
+
         const trackingNumberSourceRegex = isUpsUspsMode ? regexPatterns.otherSource : regexPatterns.amzlSource;
         const existingTrackingNumberRegexGlobal = regexPatterns.allExisting;
         const coreTNReplaceRegex = regexPatterns.coreTnExtract;
+        
         const existingTrackingNumbers = new Set();
         let matchCheck;
+        
+        // Gather existing tracking numbers to prevent duplicates
         while ((matchCheck = existingTrackingNumberRegexGlobal.exec(currentNoteValue)) !== null) {
             const coreTN = matchCheck[1].replace(coreTNReplaceRegex, '').replace(/\s|-/g, '');
             if (coreTN) existingTrackingNumbers.add(coreTN);
@@ -1620,54 +1631,118 @@ html[data-theme="dark"] .merchant-item {
                 if (trimmedTn) existingTrackingNumbers.add(trimmedTn.replace(/\s|-/g, ''));
             });
         }
+
         const seenTrackingNumbersInCurrentInput = new Set();
+        
+        // Split by "Removal order ID" to handle order-level filters
         const overallBlocks = inputValue.split(/(?=Removal order ID:)/g);
+        
         const parsedDataBlocks = [];
         const extractedUpsUspsNumbers = [];
+        
+        // Stats counters
         let validShipmentsFound = 0;
         let skippedDuplicateCount = 0;
-        let currentBlockRemovalOrderId = '';
+        let skippedStatusCount = 0;
+        let skippedShipmentAgeCount = 0; // < 16 days
+
+        const today = new Date(); // Current time for comparison
+
         overallBlocks.forEach(block => {
             if (!block.trim()) return;
+
+            // --- 2. ORDER LEVEL CHECKS ---
+            
+            // A. Check Status (Must be Completed or Pending)
+            const statusMatch = block.match(statusRegex);
+            if (statusMatch) {
+                const status = statusMatch[1].trim();
+                if (status !== "Completed" && status !== "Pending") {
+                    skippedStatusCount++;
+                    return; // Skip this whole order block
+                }
+            }
+
+            // (75-day "Date Submitted" check removed per request)
+
+            let currentBlockRemovalOrderId = '';
             const blockRoMatch = block.match(/Removal order ID:\s*([^\n]+)/);
             if (blockRoMatch) {
                 currentBlockRemovalOrderId = blockRoMatch[1].trim();
             }
+
+            // --- 3. SHIPMENT LEVEL CHECKS ---
+
             const shipmentSections = block.split(/(?=Shipment ID:)/g).filter(section => section.trim() !== '');
+            
             shipmentSections.forEach(section => {
                 if (section.trim().startsWith("Removal order ID:")) return;
+
+                // B. Check Shipment Date (Must be 16+ Days old)
+                const shipDateMatch = section.match(shipmentDateRegex);
+                if (shipDateMatch) {
+                    // Format: "November 19, 2025 at 7:58:46 AM GMT+8" -> Remove "at"
+                    const shipString = shipDateMatch[1].replace(' at ', ' ').trim();
+                    const shipDate = new Date(shipString);
+                    
+                    if (!isNaN(shipDate)) {
+                        const timeSinceShipment = today - shipDate; 
+                        const daysSinceShipment = Math.floor(timeSinceShipment / (1000 * 60 * 60 * 24));
+
+                        // Filter Logic:
+                        // If days < 16 (0-15 days), SKIP.
+                        // If days >= 16, KEEP.
+                        if (daysSinceShipment < 16) {
+                            skippedShipmentAgeCount++;
+                            return; // Skip this specific shipment
+                        }
+                    }
+                }
+
+                // C. Tracking Number Extraction (Existing Logic)
                 const trackingMatches = Array.from(section.matchAll(trackingNumberSourceRegex));
                 if (!trackingMatches || trackingMatches.length === 0) return;
+
                 const sectionCoreTNs = new Set();
                 const sectionFullTNs = [];
+
                 trackingMatches.forEach(match => {
                     const rawTNPart = match[1].trim();
                     const carrier = match[2];
                     const coreTN = rawTNPart.replace(/\s|-/g, '');
+                    
                     if (!coreTN) return;
                     sectionCoreTNs.add(coreTN);
                     const fullFormattedTN = `${rawTNPart}(${carrier})`;
                     sectionFullTNs.push(fullFormattedTN);
                 });
+
                 let hasDuplicate = false;
                 const coreTNsToCheck = Array.from(sectionCoreTNs);
+                
                 for (const coreTn of coreTNsToCheck) {
                     if (existingTrackingNumbers.has(coreTn) || seenTrackingNumbersInCurrentInput.has(coreTn)) {
                         hasDuplicate = true;
                         break;
                     }
                 }
+
                 if (hasDuplicate) {
                     skippedDuplicateCount++;
                     coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
                     return;
                 }
+
                 coreTNsToCheck.forEach(tn => seenTrackingNumbersInCurrentInput.add(tn));
+
+                // D. Build Output
                 const shipmentIdMatch = section.match(/^Shipment ID:\s*([^\n]+)/m);
                 const shipmentId = shipmentIdMatch ? shipmentIdMatch[1].trim() : 'N/A';
+                
                 const productLines = section.split('\n').map(line => line.trim());
                 const parsedProducts = [];
                 let currentProduct = null;
+
                 for (let i = 0; i < productLines.length; i++) {
                     const line = productLines[i];
                     if (line.startsWith('Merchant SKU:')) {
@@ -1691,11 +1766,23 @@ html[data-theme="dark"] .merchant-item {
                 if (currentProduct && currentProduct.merchantSku && currentProduct.qty !== undefined && !parsedProducts.includes(currentProduct)) {
                     parsedProducts.push(currentProduct);
                 }
+
                 if (parsedProducts.length === 0) return;
+
                 const roIdToUse = currentBlockRemovalOrderId || "N/A";
-                const outputParts = [`Removal order ID:${roIdToUse}`, `Shipment ID:${shipmentId}`, `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`];
-                const productOutputs = parsedProducts.map(p => [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n'));
+                
+                const outputParts = [
+                    `Removal order ID:${roIdToUse}`,
+                    `Shipment ID:${shipmentId}`,
+                    `Tracking Number(s):${Array.from(new Set(sectionFullTNs)).join(', ')}`
+                ];
+
+                const productOutputs = parsedProducts.map(p => 
+                    [`Merchant SKU:${p.merchantSku || 'N/A'}`, `FNSKU:${p.fnsku || 'N/A'}`, `Qty:${p.qty}`].join('\n')
+                );
+
                 const completeDataBlock = outputParts.join('\n') + '\n' + productOutputs.join('\n\n');
+
                 if (isUpsUspsMode) {
                     coreTNsToCheck.forEach(coreTN => {
                         if (!tempUpsUspsData[coreTN]) tempUpsUspsData[coreTN] = completeDataBlock;
@@ -1707,6 +1794,9 @@ html[data-theme="dark"] .merchant-item {
                 validShipmentsFound++;
             });
         });
+
+        // --- 4. OUTPUT RESULTS & NOTIFICATIONS ---
+
         let casesAdded = 0;
         let finalOutputString = '';
         let templateUsed = isUpsUspsMode ? upsUspsTemplate : amzlTemplate;
@@ -1717,12 +1807,13 @@ html[data-theme="dark"] .merchant-item {
                 upsUspsOutputArea.value += (upsUspsOutputArea.value ? '\n' : '') + uniqueNumbersToAdd.join('\n');
                 saveUpsUspsOutputToLocalStorage();
                 saveUpsUspsContextToLocalStorage();
+                
                 let processedMessage = `Extracted ${uniqueNumbersToAdd.length} Other Carrier number(s). `;
-                if (skippedDuplicateCount > 0) processedMessage += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) processedMessage += `(Skipped ${skippedDuplicateCount} dups). `;
                 showNotification(processedMessage, "info");
             } else {
                 let message = "No new Other Carrier shipments found. ";
-                if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
+                if (skippedDuplicateCount > 0) message += `(Skipped ${skippedDuplicateCount} dups). `;
                 showNotification(message, "info");
             }
         } else {
@@ -1743,12 +1834,28 @@ html[data-theme="dark"] .merchant-item {
 
             countTemplatesNoteTaker();
             recordNoteChange();
-            if (casesAdded > 0) showNotification(`+${casesAdded} cases added`, "info");
-            if (skippedDuplicateCount > 0) showNotification(`Skipped ${skippedDuplicateCount} duplicate(s).`, "info");
+            
+            // Build detailed notification
+            let msg = `+${casesAdded} cases added. `;
+            const skips = [];
+            if (skippedDuplicateCount) skips.push(`${skippedDuplicateCount} dups`);
+            if (skippedStatusCount) skips.push(`${skippedStatusCount} bad status`);
+            if (skippedShipmentAgeCount) skips.push(`${skippedShipmentAgeCount} <16 days`);
+            
+            if (skips.length > 0) msg += `Skipped: ${skips.join(', ')}.`;
+            
+            showNotification(msg, "info", 5000);
+            
         } else if (!isUpsUspsMode) {
-             let message = "No new AMZL-type shipments found. ";
-             if (skippedDuplicateCount > 0) message += `Skipped ${skippedDuplicateCount} duplicate(s). `;
-             showNotification(message, "info");
+             let message = "No new shipments. ";
+             const skips = [];
+             if (skippedDuplicateCount) skips.push(`${skippedDuplicateCount} dups`);
+             if (skippedStatusCount) skips.push(`${skippedStatusCount} bad status`);
+             if (skippedShipmentAgeCount) skips.push(`${skippedShipmentAgeCount} <16 days`);
+
+             if (skips.length > 0) message += `Skipped: ${skips.join(', ')}.`;
+             
+             showNotification(message, "info", 4000);
         }
         
         saveShipmentInputScroll();
@@ -4130,6 +4237,7 @@ function downloadAll(asHtml = false){
 </script>
 </body>
 </html>
+
 
 
 
